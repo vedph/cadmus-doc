@@ -4,6 +4,8 @@ This list contains the general-purpose models used by many Cadmus-based projects
 
 ## Bricks
 
+- <https://cadmus-bricks.fusi-soft.com>
+
 ### Reference Bricks
 
 - [asserted chronotope](https://github.com/vedph/cadmus-bricks/blob/master/docs/asserted-chronotope.md)
