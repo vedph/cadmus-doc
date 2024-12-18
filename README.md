@@ -1,6 +1,8 @@
 # Cadmus Documentation
 
-- [Cadmus](https://myrmex.github.io/overview/cadmus/)
+- 🌐 [Cadmus Site](https://myrmex.github.io/overview/cadmus/)
+- 🌐 [Site from this repository](https://vedph.github.io/cadmus-doc/)
+- 💡 [Shortcut to shared Cadmus models](https://vedph.github.io/cadmus-doc/models/models.html)
 
 This repository is work in progress. It will be progressively collecting conceptual documentation about Cadmus.
 
