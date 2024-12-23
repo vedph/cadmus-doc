@@ -1,3 +1,0 @@
-# Cadmus Graph Shell
-
-TODO

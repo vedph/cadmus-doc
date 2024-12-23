@@ -82,6 +82,7 @@ graph LR;
   cadmus-part-philology-pg --> cadmus-state
   cadmus-part-philology-pg --> cadmus-ui
   cadmus-part-philology-pg --> cadmus-ui-pg
+  cadmus-part-philology-pg --> cadmus-part-philology-ui
   cadmus-part-philology-ui --> ngx-tools
   cadmus-part-philology-ui --> ngx-mat-tools
   cadmus-part-philology-ui --> cadmus-core
@@ -117,4 +118,5 @@ graph LR;
   cadmus-ui-pg --> cadmus-core
   cadmus-ui-pg --> cadmus-api
   cadmus-ui-pg --> cadmus-state
+  cadmus-ui-pg --> cadmus-ui
 ```
