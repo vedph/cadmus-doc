@@ -6,3 +6,6 @@ url: https://vedph.github.io/cadmus-doc
 
 aux_links:
   Template Repository: https://github.com/just-the-docs/just-the-docs-template
+
+mermaid:
+  version: "11.4.1"
