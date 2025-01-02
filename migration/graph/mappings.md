@@ -5,29 +5,24 @@ layout: default
 
 # Graph Mappings
 
-- [Sources](#sources)
-- [Identifiers](#identifiers)
-  - [Source ID (SID)](#source-id-sid)
-  - [Entry ID (EID)](#entry-id-eid)
-  - [Entity ID (UID)](#entity-id-uid)
-    - [UID Builder](#uid-builder)
-- [Mapping Rule](#mapping-rule)
-  - [JMES Path](#jmes-path)
-    - [Basic Expressions](#basic-expressions)
-    - [Lists](#lists)
-    - [Projections](#projections)
-    - [Multiselect](#multiselect)
-    - [Functions](#functions)
-- [Templates](#templates)
-  - [Expressions (@)](#expressions-)
-  - [Node Keys (?)](#node-keys-)
-  - [Metadata ($)](#metadata-)
-  - [Macros (!)](#macros-)
-  - [Filters](#filters)
-- [Sample](#sample)
-  - [Sample Data](#sample-data)
-  - [Sample Mappings](#sample-mappings)
-  - [Sample Results](#sample-results)
+- [Graph Mappings](#graph-mappings)
+  - [Sources](#sources)
+  - [Identifiers](#identifiers)
+    - [Source ID (SID)](#source-id-sid)
+    - [Entry ID (EID)](#entry-id-eid)
+    - [Entity ID (UID)](#entity-id-uid)
+      - [UID Builder](#uid-builder)
+  - [Mapping Rule](#mapping-rule)
+  - [Templates](#templates)
+    - [Expressions](#expressions)
+    - [Node Keys](#node-keys)
+    - [Metadata](#metadata)
+    - [Macros](#macros)
+    - [Filters](#filters)
+  - [Sample](#sample)
+    - [Sample Data](#sample-data)
+    - [Sample Mappings](#sample-mappings)
+    - [Sample Results](#sample-results)
 
 The mapping between Cadmus source data (items and parts) and nodes is defined by a number of node mappings.
 
@@ -61,7 +56,7 @@ A SID is built with these components:
 
 (a) for **items**:
 
-1. the _GUID_ of the source (item).
+1. the 36-characters _GUID_ of the source (item).
 2. if the node comes from a group or a facet, the suffix `|group` or `|facet`. On passage, note that the group ID can be composite (using slash, e.g. `alpha/beta`); in this case, a mapping producing nodes for groups emits several nodes, one for each component. The top component is the first in the group ID, followed by its children (in the above sample, `beta` is child of `alpha`). Each of these nodes has an additional suffix for the component ordinal, preceded by `|`.
 
 Examples:
@@ -92,9 +87,11 @@ Conversely, a manuscript's decorations part is a collection of decorations, each
 
 Thus, here we call EIDs the identifiers provided by users for entries in a Cadmus collection-part. When present, such EIDs are used to build node identifiers URIs (UIDs).
 
+>This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a usually human-friendly identifier for some entity contained in a data model. For instance, should the decorations of a manuscript include images, we could use their EIDs to name each image after them.
+
 ### Entity ID (UID)
 
-The entity ID is a _shortened URI_ where a conventional prefix replaces the namespace, calculated as defined by the entity mapping.
+The entity ID is a _shortened URI_ where (like in Turtle) a conventional prefix replaces the namespace, calculated as defined by the entity mapping.
 
 To get relatively human-friendly UIDs, the UID is essentially derived from a template defined in the mapping rule generating a node.
 
@@ -106,9 +103,9 @@ So, this mechanism ensures that the UID is unique, even though it is specified b
 
 #### UID Builder
 
->Note: this is a technical note, feel free to skip it.
+⚙️ TECHNICAL NOTE
 
-Such UID is built by a component implementing interface `IUidBuilder`. A RAM-based implementation of this UID (`RamUidBuilder`) is provided for testing.
+The UID is built by a component implementing interface `IUidBuilder`. A RAM-based implementation of this UID (`RamUidBuilder`) is provided for testing.
 
 In real world, the implementation relies on a RDBMS database. The table used for it is named `uid_lookup`, and has these fields:
 
@@ -131,75 +128,27 @@ A mapping rule is modeled as an object having a number of properties, defining:
 
 In turn, each mapping rule can include any number of _children rules_. The model as it used in a JSON-based serialization is as follows:
 
-- `sourceType`\*: the type of the source object, i.e. item (1) or part (2). This is meaningful for the root mapping only.
-- `sid`\*: the source ID (SID) of this mapping. This is meaningful for the root mapping only.
-- `facetFilter`: an optional item's facet filter.
-- `groupFilter`: an optional item's group filter.
-- `flagsFilter`: an optional item's flags filter.
-- `partTypeFilter`: an optional part's type ID filter.
-- `partRoleFilter`: an optional part's role ID filter.
-- `description`: an optional human-readable short description for the mapping rule.
-- `source`\*: the source expression representing the data selected by this mapping. In the current implementation this is a [JMES path](https://jmespath.org/).
+- `sourceType`\*: the type of the source object. This is meaningful for _root_ mappings only. The source type is a number: `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). Thus, mappings defined in a mappings document effectively use only `1` and `2`.
+- `sid`\*: the source ID (SID) of this mapping. This is usually specified at the root mapping level, but you can also override the root sid in your children mappings (almost always this means adding suffix(es) to the root SID). Thus, SIDs are inherited unless overridden in descendants. If a SID includes the `index` metadatum, and the mapper is processing an array, it will be recalculated for each array's item.
+- `facetFilter`: an optional item's facet filter. When specified, the mapping will target only those items whose facet ID is _equal_ to this value.
+- `groupFilter`: an optional item's group filter. This is a regular expression; when specified, the mapping will target only those items whose group ID _matches_ this expression.
+- `flagsFilter`: an optional item's flags filter. This is a numeric value, where each bit represents a flag. When specified, the mapping will target only those items whose flags include at least _all_ the bits set in this value, i.e. all the flags specified in the filter must be present.
+- `partTypeFilter`: an optional part's type ID filter. When specified, the mapping will target only those items whose part type ID is _equal_ to this value.
+- `partRoleFilter`: an optional part's role ID filter. When specified, the mapping will target only those items whose part role ID is _equal_ to this value.
+- `description`: an optional, human-readable short description for the mapping rule. This is useful for documentation purposes.
+- `source`\*: the source expression representing the data selected by this mapping. In the current implementation this is a [JMES path](jmes-path). For instance, `events[?type=='person.birth']` matches only the entries in the `events` array property of a part's model whose type is equal to `person.birth`. When your source expression selects an object, you can refer to it as a whole with `.`, or to any of its properties by their name. When it selects an array, the mapper will implicitly loop through all its items, and be run for each of them. So, you can still define your mappings in terms of a single object, which here is the array's item. Additionally, the `index` metadatum will be used to represent the index number of the item in the array (0-N).
+- `scalarPattern`:  the optional regular expression pattern which should match against a scalar value defined by the mapping's source expression for the mapping to be applied. When this is defined and does not match, the mapping will not be applied. This can be used to overcome the limitations of the source expression in languages like JMESPath, where e.g. `.[?lost==true]` is always evaluated as a match, even when the value of the scalar property `lost` is `false`. So, in this example setting `scalarPattern` to `true` and source to `lost` will apply the mapping only if this property's value is `true`.
 - `output`:
-  - `nodes`: an object (dictionary) where each property is the key of a node emitted by the mapping rule, whose string value is the node's identifier [template](#templates). Optionally, this template can be followed by space plus the node's label, and/or its tag between square brackets. For instance, `x:events/{$.} label [tag]` defines the node's UID, its user-friendly label, and an optional tag.
-  - `triples`: an array of strings, each representing a triple [template](#templates).
+  - `nodes`: an object (dictionary) where each property is the key of a node emitted by the mapping rule, whose string value is the node's identifier [template](#templates). Optionally, this template can be followed by space plus the node's label, and/or its tag between square brackets, the tag being preceded by `|`. For instance, `x:events/{$.} [label|tag]` defines the node's UID, its human-friendly label, and an optional tag.
+  - `triples`: an array of strings, each representing a triple [template](#templates). Each triple is in any of these forms:
+    - `S P O`: subject, predicate, object (all URIs);
+    - `S P "O"`: subject, predicate, literal object in double quotes;
+    - `S P "O"@lang`: subject, predicate, literal object in double quotes followed by an [ISO639](https://en.wikipedia.org/wiki/ISO_639) language identifier (e.g. `"sample"@en`);
+    - `S P "O"^^type`: subject, predicate, literal object in double quotes followed by a type specifier (e.g. `"123"^^xs:int`).
   - `metadata`: optional metadata to be consumed in [templates](#templates). Metadata come from several sources: the source object, the mapping process itself, and these definitions in the mapping.
-- `children`: children mappings.
+- `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
 
 >Note: the source type is a number where 0=user, 1=item, 2=part, 3=thesaurus, 4=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not an enumerated value, so that you can eventually add new values by just defining new constants.
-
-### JMES Path
-
-- [tutorial](https://jmespath.org/tutorial.html)
-- [examples](https://jmespath.org/examples.html)
-
-This is just a short cheatsheet derived from the excellent JMES tutorial, which also provides interactive examples.
-
-#### Basic Expressions
-
-- identifier: `a` (null if not found)
-- subexpression: `a.b` (cascaded null if not found)
-
-#### Lists
-
-- index expression (list): `[1]` (0-based; negative=from end)
-- slicing: `start:stop:step` (all optional; stop is exclusive, step defaults to 1): `[0:4]` = first three elements, equivalent to `[:4]`.
-
-#### Projections
-
-Projections are evaluated as two steps:
-
-- left hand side (LHS): creates a JSON array of initial values.
-- right hand side (RHS): the expression to project for each element in the JSON array created by the LHS.
-
-If the result of the expression projected onto an individual array element is null, then that value is omitted from the collected set of results.
-
-There are 5 kinds of projections:
-
-- list projections, via a wildcard expression: `people[*].first` = property `first` of each item in `people`.
-- object projections, as above for objects: `ops.*.numArgs`.
-- flatten Projections: `[]` flattens a list (not recursively, just one level) as generated e.g. from concatenating two list projections, which would result in a list of lists: `reservations[*].instances[].state`.
-- slice Projections
-- filter Projections: filters the LHS side before evaluating the RHS side: `LHS [?EXPR OP EXPR]`: `machines[?state='running'].name`.
-
-You can stop a projection with a _Pipe Expression_: `people[*].first | [0]` = get 1st element if the list.
-
-#### Multiselect
-
-Multiselect allows you to create elements that don’t exist in a JSON document. A multiselect list creates a list, and a multiselect hash creates a JSON object.
-
-- `people[].[name, state.name]` = for each item in the list, create a list including the specified properties. Unlike a projection, the result of the expression is always included, even if the result is a null.
-- `people[].{name: name, state: state.name}` = as above but the result will be an object for each item.
-
-#### Functions
-
-A number of [functions](https://jmespath.org/specification.html#builtin-functions) is available for expressions. Functions can be combined with filter expressions, e.g.
-
-```txt
-myarray[?contains(@, 'foo') == `true`]
-```
-
-= finds all elements in `myarray` that contains the string `foo`.
 
 ## Templates
 
@@ -214,17 +163,21 @@ A template has any number of placeholders, delimited by `{}`, where the opening 
 
 These placeholders can be freely nested. The mapping rules will take care of resolving them starting from the deepest ones.
 
->The placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
+>⚙️ The placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
 
-### Expressions (@)
+### Expressions
+
+- syntax: `{@...}`
 
 Expressions select data from the source. The syntax of an expression depends on the mapper's implementation.
 
-Currently the only implementation is JSON-based, so expressions are [JMES paths](https://jmespath.org/). This is a very powerful selection and transformation language, which should cover most of the mapping requirements.
+Currently the only implementation is JSON-based, so expressions are [JMES paths](jmes-path). This is a very powerful selection and transformation language, which should cover most of the mapping requirements.
 
 For instance, say you are mapping an event object having an `eid` property equal to some string: you can select the value of this string with the placeholder `{@eid}`.
 
-### Node Keys (?)
+### Node Keys
+
+- syntax: `{?...}`
 
 During the mapping process, nodes emitted in the context of each mapping (including all its descendant mappings) are stored in a dictionary with the keys specified in the mapping itself for each node.
 
@@ -251,7 +204,7 @@ As a sample, consider this mapping fragment:
 }
 ```
 
-Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}`.
+Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}` (where `{$.}` is a [macro](#macros) representing the value of the current leaf node in the source tree). So, in this case the generated node will have an UID equal to `x:events/` plus the node's URI.
 
 As a node is a complex object, in a template placeholder you can pick different properties from it. These are specified by adding a **suffix** preceded by `:` to the node's key. Available suffixes are:
 
@@ -260,7 +213,9 @@ As a node is a complex object, in a template placeholder you can pick different 
 - `:sid` = the node's SID.
 - `:src_type` = the node's source type.
 
-### Metadata ($)
+### Metadata
+
+- syntax: `{$...}`
 
 The mapping process can set some metadata, which get stored under arbitrary keys, and are available to any template in the context of its root mapping.
 
@@ -269,6 +224,7 @@ Metadata can be emitted by the mapping process itself, or be defined in a mappin
 Currently the mapping process emits these metadata:
 
 - `item-id`: the item ID (GUID).
+- `item-eid` (*): the EID of the item, as conventionally defined by the first matching metadatum with name = `eid` from the item's `MetadataPart`, if present. As this is the typical lookup mechanism, your consumer code can provide this additional metadatum by opting in via a metadata supplier.
 - `part-id`: the part ID (GUID).
 - `group-id`: the item's group ID.
 - `facet-id`: the item's facet ID.
@@ -276,12 +232,28 @@ Currently the mapping process emits these metadata:
 - `.`: the value of the current leaf node in the source JSON data. For instance, if the mapping is selecting a string property from `events/event[0].eid`, this is the value of `eid`.
 - `index`: the index of the element being processed from a source array. When the source expression used by the mapping points to an array, every item of the array gets processed separately from that mapping onwards. At each iteration, the `index` metadatum is set to the current index.
 
-Additionally, your backend code might use a metadata supplier with extra metadata sources to provide more metadata. A typical source is `ItemEidMetadataSource`, which adds these metadata:
+⚙️ Additionally, your backend code might use a metadata supplier with extra metadata sources to provide more metadata. A typical source is `ItemEidMetadataSource`, which adds these metadata:
 
 - `item-eid`: the value of metadatum `eid` in the `MetadataPart` (if any) of the current item.
 - `metadata-pid`: the part ID (GUID) of the metadata part (if any) of the current item.
 
-### Macros (!)
+> (*) As an example, see the Cadmus CLI tool code which by default opts into this metadatum with a code like this:
+
+```cs
+GraphUpdater updater = new(graphRepository)
+  {
+      // we want item-eid as an additional metadatum, derived from
+      // eid in the role-less MetadataPart of the item, when present
+      MetadataSupplier = new MetadataSupplier()
+          .SetCadmusRepository(repository)
+          // from Cadmus.Graph.Extras
+          .AddItemEid()
+  };
+```
+
+### Macros
+
+- syntax: `{!...}`
 
 Macros are a modular way for customizing the mapping process when more complex logic is required. A macro is just an object implementing an interface (`INodeMappingMacro`), requiring:
 
@@ -294,9 +266,11 @@ The macro syntax in the placeholder is very simple: it consists of the macro ID,
 !{some_macro(arg1 & arg2)}
 ```
 
-Some macros are built-in, and conventionally their ID start with an underscore. Currently there is only one:
+Some macros are **built-in**, and conventionally their ID start with an underscore. Currently there is only one:
 
-- `_hdate(separator)` (tag `node-mapping-macro.historical-date`): this macro gets the JSON code representing a Cadmus historical date, and returns either its sort value or its human-friendly, machine parsable text value. The return type is defined by the second argument, which can be either `value` (the default) or `text`.
+- `_hdate(json,property)`: this macro handles a Cadmus historical date and returns either its sort value, or its human-friendly, machine-parsable text value. Its arguments are:
+  1. the JSON code representing a Cadmus historical date;
+  2. the property of the date to return: `value` (default) or `text`.
 
 ### Filters
 
@@ -313,11 +287,14 @@ Should you want to disable this filtering, start the template with `!`, which be
 
 As a sample, consider this historical events part. This contains any number of events, eventually with their place and/or time, and directly-related entities.
 
-In this sample, we have two events representing the birth of Petrarch in 1304 at Arezzo, from ser Petracco and Eletta Cangiani, and his death at Arquà in 1374.
+In this sample we have two events:
+
+- the birth of Petrarch in 1304 at Arezzo from ser Petracco and Eletta Cangiani;
+- the death of Petrarch at Arquà in 1374.
 
 ### Sample Data
 
-Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties:
+Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties. The first event has type `person.birth`, the second has type `person.death` (these types come from a [thesaurus](../../models/thesauri.md)).
 
 ```json
 {
@@ -370,21 +347,23 @@ As you can see, each event in the `events` array is identified by an arbitrarily
 
 Each event usually is connected to a place (`Arezzo`) and a date (`1304`). Also, it has a human-friendly description, and a list of related entities, each having a relation type (from another thesaurus), and the ID of the related entity.
 
-So the first event represents an event of type birth, which took place at Arezzo in 1304, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as this events part is inside a person item, which represents that person.
+So, here:
 
-The second event represents an event of type death, which took place at Arquà in 1374. Again, the person took out of existence by this event is implicit.
+- the _first event_ represents an event of type birth, which took place at Arezzo in 1304, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as this events part is inside a person item, which represents that person.
+
+- the _second event_ represents an event of type death, which took place at Arquà in 1374. Again, the person took out of existence by this event is implicit.
 
 ### Sample Mappings
 
 We can arrange some basic mappings to project each event from this part into a node, with linked nodes for classification, attributes, and relations.
 
-These mappings are encoded in a simple JSON document, which can be imported into the index database. In Cadmus, mappings are found in the index database; but it's easier to design them in a simple JSON document, to be later imported into it.
+These mappings are encoded in a simple JSON document, which can be imported into the index database. In Cadmus, mappings are found in the index database (in table `node_mapping`); but it's easier to design them in a simple JSON document, to be later imported into it.
 
 The JSON document is an array of mapping objects. Each mapping object has some properties, and optionally any number of children mappings, nested under their `children` property.
 
 Here is a quick recap of mappings for the first event, reading the file from top to bottom:
 
-(1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). Its output is just a metadatum, which will be consumed by its children mappings. This has key `eid-sid` and is built from a template, collecting the part ID and the event's EID. So, all the children of this mapping start with their source located at the birth event.
+👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). Its output is just a metadatum, which will be consumed by its children mappings. This has key `eid-sid` and is built from a template, collecting the part ID and the event's EID. So, all the children of this mapping start with their source located at the birth event.
 
 ```json
 {
@@ -402,7 +381,7 @@ Here is a quick recap of mappings for the first event, reading the file from top
 }
 ```
 
-(2) the first child of this mapping matches the event's [EID](#entry-id-eid) property, and uses it to emit a node for that event. As a sample, its template has a prefix (`x:events/`, where `x:` stands for some URI namespace), and the EID from the event. These build the node's UID. This node is keyed under `event`: this key will be used by other mappings to refer to the UID of this node. As you know, the [UID](#entity-id-uid) cannot be known in advance, as it might receive a numeric suffix to disambiguate it. So, having a key for each emitted node allows us to refer to it in other mappings. Of course, the key is meaningful only in the scope of the process of this mapping. It will have no existence outside of the mapping process. Think of it as a sort of variable name, to be used in mapping templates.
+👉 (2) the first child of this mapping matches the event's [EID](#entry-id-eid) property, and uses it to emit a node for that event. As a sample, its template has a prefix (`x:events/`, where `x:` stands for some URI namespace), and the EID from the event. These build the node's UID. This node is keyed under `event`: this key will be used by other mappings to refer to the UID of this node. As you know, the [UID](#entity-id-uid) cannot be known in advance, as it might receive a numeric suffix to disambiguate it. So, having a key for each emitted node allows us to refer to it in other mappings. Of course, the key is meaningful only in the scope of the process of this mapping. It will have no existence outside of the mapping process. Think of it as a sort of variable name, to be used in mapping templates.
 
 ```json
 {
@@ -421,12 +400,12 @@ Here is a quick recap of mappings for the first event, reading the file from top
 }
 ```
 
-(3) the same mapping, once emitted the event node, uses it to build a couple of triples. One tells that this event is a birth event; and another that it brought into life the entity corresponding to the item containing this part. This item corresponds to the person who was born. Note that triples use node and metadata placeholders:
+👉 (3) the same mapping, once emitted the event node, uses it to build a couple of triples. One tells that this event is a birth event; and another that it brought into life the entity corresponding to the item containing this part. This item corresponds to the person who was born. Note that triples use node and metadata placeholders:
 
 - `{?event}` represents the event's node UID, as generated by this mapping. Here we are using the node's key to refer to it, as the UID cannot be known in advance.
 - `{$item-uri}` represents the UID of the item containing this part, i.e. the UID of the person who was born. This is a metadatum injected by the context, before the mapping process starts. Every object mapped - be it an item, a part, or a thesaurus - injects into the context some metadata, besides providing JSON code representing it.
 
-(4) the second child mapping matches the event's `note` property. It then emits a node representing a free textual annotation, and a corresponding triple using it. The triple links the event (referred to via its key) to the note's literal text (`{$.}` wraps a simple dot, which is the path to the current node; here, `note` being a string property, the current node is just the string's value, i.e. the note's text). Also notice that the UID here is just `x:notes/n`, which is generic as this node carries no intrinsic data we could use for a more meaningful user-friendly ID. The infrastructure will ensure that each additional note emitted gets a numeric suffix, thus producing sequences like `x:notes/n`, `x:notes/n#1`, `x:notes/n#23`, etc. (the actual numbers vary, the only requirement being that each is unique, so often they won't be progressive).
+👉 (4) the second child mapping matches the event's `note` property. It then emits a node representing a free textual annotation, and a corresponding triple using it. The triple links the event (referred to via its key) to the note's literal text (`{$.}` wraps a simple dot, which is the path to the current node; here, `note` being a string property, the current node is just the string's value, i.e. the note's text). Also notice that the UID here is just `x:notes/n`, which is generic as this node carries no intrinsic data we could use for a more meaningful user-friendly ID. The infrastructure will ensure that each additional note emitted gets a numeric suffix, thus producing sequences like `x:notes/n`, `x:notes/n#1`, `x:notes/n#23`, etc. (the actual numbers vary, the only requirement being that each is unique, so often they won't be progressive).
 
 ```json
 {
@@ -442,7 +421,7 @@ Here is a quick recap of mappings for the first event, reading the file from top
 }
 ```
 
-(5) the third child walks down the event's `chronotope` property, including the place and/or date. As such, it has no output, but it just provides an ad hoc SID and a number of children mappings. As you can see, here the hierarchy of mappings reflects the hierarchy of the object. That's a very intuitive way of designing such processes.
+👉 (5) the third child walks down the event's `chronotope` property, including the place and/or date. As such, it has no output, but it just provides an ad hoc SID and a number of children mappings. As you can see, here the hierarchy of mappings reflects the hierarchy of the object. That's a very intuitive way of designing such processes.
 
 ```json
 {
@@ -452,7 +431,7 @@ Here is a quick recap of mappings for the first event, reading the file from top
 }
 ```
 
-(6) down to the `chronotope`'s mapping children, we have a couple of them, for `place` and `date`. The `place` mapping emits a place node, and a couple of triples telling that this is a place, and that the event took place there. The `date` mapping looks more interesting, as it requires a macro. We want to emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. So, the logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a macro, i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
+👉 (6) down to the `chronotope`'s mapping children, we have a couple of them, for `place` and `date`. The `place` mapping emits a place node, and a couple of triples telling that this is a place, and that the event took place there. The `date` mapping looks more interesting, as it requires a macro. We want to emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. So, the logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a macro, i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
 
 ```json
 "children": [
@@ -489,7 +468,7 @@ Here is a quick recap of mappings for the first event, reading the file from top
 ]
 ```
 
-(7) at this point, we're done with the `chronotope` property. The next mapping is child of the `event` object, and matches all the related entities whose `relation` property has value `mother`, i.e. the mother of this person. It outputs a node for her, using the received `id` with some prefix, just to show how we can still manipulate the received ID if needed, so users can enter a shortened version if useful. The corresponding triple links the event and the mother.
+👉 (7) at this point, we're done with the `chronotope` property. The next mapping is child of the `event` object, and matches all the related entities whose `relation` property has value `mother`, i.e. the mother of this person. It outputs a node for her, using the received `id` with some prefix, just to show how we can still manipulate the received ID if needed, so users can enter a shortened version if useful. The corresponding triple links the event and the mother.
 
 ```json
 {
@@ -716,7 +695,7 @@ x:timespans/ts#1       | x:timespans/ts#1       | bdd152f1-2ae2-4189-8a4a-e3d68c
 
 Then, these are their triples:
 
-(a) for birth:
+(a) for **birth**:
 
 - the event is classified as a birth event;
 - the event brought into life the entity corresponding to the item (=Petrarch);
@@ -727,7 +706,7 @@ Then, these are their triples:
 - the birth had Eletta Cangiani as the mother;
 - the birth had ser Petracco as the father.
 
-(b) for death:
+(b) for **death**:
 
 - the event is classified as a death event;
 - the event took out of existence the entity corresponding to the item (=Petrarch);
