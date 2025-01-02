@@ -1,6 +1,7 @@
 ---
 title: "Graph - Graph Studio Examples" 
 layout: default
+parent: "Graph - Graph Studio"
 ---
 
 # Graph Studio Examples

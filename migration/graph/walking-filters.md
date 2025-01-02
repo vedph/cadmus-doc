@@ -1,6 +1,8 @@
 ---
 title: "Graph - Walking Graph Filters" 
 layout: default
+parent: "Graph - Walking Graph"
+nav_order: 1
 ---
 
 # Walker Filters
