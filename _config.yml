@@ -9,3 +9,21 @@ aux_links:
 
 mermaid:
   version: "11.4.1"
+
+nav:
+  - title: "Home"
+    url: /
+  - title: "Models"
+    url: /models/index
+    children:
+      - title: "Shared Models"
+        url: /models/shared
+      - title: "Thesauri"
+        url: /models/thesauri
+  - title: "Frontend"
+    url: /frontend/index
+  - title: "Data Migration"
+    url: /migration/index
+    children:
+      - title: "Graphs"
+        url: /migration/graph/index
