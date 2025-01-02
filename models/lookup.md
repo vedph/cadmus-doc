@@ -261,7 +261,7 @@ C. **graph** links: any item, part's entity, or thesaurus entry can be mapped in
 
 The picture below provides a visual summary:
 
-![Cadmus links](../../../img/cadmus/links.png)
+![Cadmus links](img/links.png)
 
 Type (A) above (**static lookup**) is the easiest scenario: any part can use any number of preset taxonomies (thesauri). For instance, here item A has a part linked (red arrow) to an entry in one of the available thesauri.
 
