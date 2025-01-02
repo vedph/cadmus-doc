@@ -6,10 +6,10 @@ layout: home
 # Cadmus Documentation
 
 - [models](models/index)
-  - [shared models](models/shared.md)
-  - [taxonomies: thesauri](models/thesauri.md)
+  - [shared models](models/shared)
+  - [taxonomies: thesauri](models/thesauri)
 
-- [frontend](frontend/index.md)
+- [frontend](frontend/index)
 
-- [data migration](migration/index.md)
-  - [exporting graphs](migration/graph/index.md)
+- [data migration](migration/index)
+  - [exporting graphs](migration/graph/index)

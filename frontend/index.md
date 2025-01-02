@@ -5,11 +5,11 @@ layout: default
 
 # Cadmus Frontend
 
-- [bricks](bricks.md)
-- [Cadmus shell](shell.md)
-- [geography shell](grography-shell.md)
-- [epigraphy shell](epigraphy-shell.md)
-- [codicology shell](codicology-shell.md)
+- [bricks](bricks)
+- [Cadmus shell](shell)
+- [geography shell](grography-shell)
+- [epigraphy shell](epigraphy-shell)
+- [codicology shell](codicology-shell)
 
 ## Overview
 
@@ -40,7 +40,7 @@ graph LR;
 - 🌐 repositories:
   - [@myrmidon/ngx-tools repository](https://github.com/vedph/ngx-tools): both `ngx-tools` and `ngx-mat-tools`. Basic extensions for Angular.
   - [@myrmidon/auth-jwt repository](https://github.com/Myrmex/auth-jwt): both `auth-jwt-login` and `auth-jwt-admin`.
-  - [bricks repository](https://github.com/vedph/cadmus-bricks-shell-v3): the [bricks](bricks.md) libraries repository. These are small, general-purpose UI widgets used to build Cadmus part and fragment editors.
+  - [bricks repository](https://github.com/vedph/cadmus-bricks-shell-v3): the [bricks](bricks) libraries repository. These are small, general-purpose UI widgets used to build Cadmus part and fragment editors.
   - [@myrmidon/ngx-annotorious repository](https://github.com/vedph/ngx-annotorious): Annotorious V3-based image annotation components. Before bricks V3, these were part of the same bricks repository.
 
 ## Shells

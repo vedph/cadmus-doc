@@ -5,10 +5,10 @@ layout: default
 
 # Graph
 
-- [adapters](adapters.md)
-- [mappings](mappings.md)
-- [updating](updating.md)
-- [database](database.md)
+- [adapters](adapters)
+- [mappings](mappings)
+- [updating](updating)
+- [database](database)
 
 Graph components allow mapping Cadmus data into RDF-like graphs.
 
@@ -50,8 +50,8 @@ So, at the hearth of the graph is the projection via mapping. The mapping flow i
 
 (1) a **source object** is provided to the mapper. This can be any type, but the current implementation relies on objects serialized into JSON. Usually, these come from MongoDB directly, so JSON is already at hand. Source object are items or parts (thesauri can be imported as nodes, but this does not happen via mapping as it's a single procedure, whatever the thesaurus). At any rate, ultimately from the point of view of the mapper any source object is just JSON code representing it.
 
->Note: between the source object and the mappings there is an intermediate layer represented by [adapter components](adapters.md), whose task is adapting that object to the mappings and providing additional information from it.
+>Note: between the source object and the mappings there is an intermediate layer represented by [adapter components](adapters), whose task is adapting that object to the mappings and providing additional information from it.
 
-(2) the mapper finds all the **[mappings](mappings.md)** matching the source object, and applies each of them, collecting the results (nodes and triples) into a graph set.
+(2) the mapper finds all the **[mappings](mappings)** matching the source object, and applies each of them, collecting the results (nodes and triples) into a graph set.
 
-(3) the graph set is **[merged](updating.md)** into the graph store.
+(3) the graph set is **[merged](updating)** into the graph store.
