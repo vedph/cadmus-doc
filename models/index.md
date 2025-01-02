@@ -5,5 +5,6 @@ layout: default
 
 # Models
 
-- [taxonomies (thesauri)](thesauri)
 - [shared models](models)
+- [taxonomies (thesauri)](thesauri)
+- [dynamic lookup](lookup)
