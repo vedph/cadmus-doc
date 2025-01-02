@@ -5,7 +5,7 @@ layout: home
 
 # Cadmus Documentation
 
-- [models](models/index.md)
+- [models](models/index)
   - [shared models](models/shared.md)
   - [taxonomies: thesauri](models/thesauri.md)
 
