@@ -10,20 +10,6 @@ aux_links:
 mermaid:
   version: "11.4.1"
 
-toc:
-  - title: "Home"
-    url: /
-  - title: "Models"
-    url: /models/index
-    children:
-      - title: "Shared Models"
-        url: /models/shared
-      - title: "Thesauri"
-        url: /models/thesauri
-  - title: "Frontend"
-    url: /frontend/index
-  - title: "Data Migration"
-    url: /migration/index
-    children:
-      - title: "Graphs"
-        url: /migration/graph/index
+enable_copy_code_button: true
+
+nav_sort: case_insensitive

@@ -1,6 +1,8 @@
 ---
 title: "Models - Thesauri" 
 layout: default
+parent: Models
+nav_order: 2
 ---
 
 # Thesauri

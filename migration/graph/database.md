@@ -1,18 +1,21 @@
 ---
 title: "Graph - Database" 
 layout: default
+parent: Graph
+nav_order: 4
 ---
 
 # Graph Database
 
-- [Namespace Lookup Table](#namespace-lookup-table)
-- [UID Lookup Table](#uid-lookup-table)
-- [URI Lookup Table](#uri-lookup-table)
-- [Node Table](#node-table)
-- [Node Class Table](#node-class-table)
-- [Property Table](#property-table)
-- [Node Mapping Tables](#node-mapping-tables)
-- [Triple Table](#triple-table)
+- [Graph Database](#graph-database)
+  - [Namespace Lookup Table](#namespace-lookup-table)
+  - [UID Lookup Table](#uid-lookup-table)
+  - [URI Lookup Table](#uri-lookup-table)
+  - [Node Table](#node-table)
+  - [Node Class Table](#node-class-table)
+  - [Property Table](#property-table)
+  - [Node Mapping Tables](#node-mapping-tables)
+  - [Triple Table](#triple-table)
 
 The database model is designed to be integrated in the existing Cadmus index, while being minimalist and performance-wise. Its main purpose is providing editable RDF-like data, mostly automatically generated.
 

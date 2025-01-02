@@ -1,6 +1,8 @@
 ---
 title: "Graph - Adapters" 
 layout: default
+parent: Graph
+nav_order: 1
 ---
 
 # Graph Adapters

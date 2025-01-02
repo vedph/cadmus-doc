@@ -1,6 +1,8 @@
 ---
 title: "Graph - Updating Mappings" 
 layout: default
+parent: Graph
+nav_order: 3
 ---
 
 # Graph Updating

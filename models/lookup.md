@@ -1,6 +1,8 @@
 ---
 title: "Models - Dynamic Lookup" 
 layout: default
+parent: Models
+nav_order: 3
 ---
 
 # Dynamic Lookup

@@ -1,6 +1,8 @@
 ---
 title: "Graph - Graph Studio" 
 layout: default
+parent: Graph
+nav_order: 6
 ---
 
 # Graph Studio

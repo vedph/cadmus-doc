@@ -1,6 +1,8 @@
 ---
 title: "Models - List" 
 layout: default
+parent: Models
+nav_order: 1
 ---
 
 # Shared Models

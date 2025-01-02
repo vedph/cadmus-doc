@@ -1,6 +1,8 @@
 ---
 title: "Graph - Mappings" 
 layout: default
+parent: Graph
+nav_order: 2
 ---
 
 # Graph Mappings

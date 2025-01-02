@@ -1,6 +1,8 @@
 ---
 title: "Graph - Walking Graph" 
 layout: default
+parent: Graph
+nav_order: 5
 ---
 
 # Graph Walking
