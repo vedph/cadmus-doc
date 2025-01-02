@@ -10,7 +10,7 @@ aux_links:
 mermaid:
   version: "11.4.1"
 
-nav:
+toc:
   - title: "Home"
     url: /
   - title: "Models"
