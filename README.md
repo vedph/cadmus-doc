@@ -1,4 +1,6 @@
-# just-the-docs-template
+# Cadmus Documentation
+
+🌐 <https://vedph.github.io/cadmus-doc>
 
 This is a *bare-minimum* template to create a [Jekyll] site that:
 

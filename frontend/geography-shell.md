@@ -1,6 +1,8 @@
 ---
 title: "Geography Shell" 
 layout: default 
+parent: "Cadmus Frontend"
+nav_order: 2
 ---
 
 # Geography Shell

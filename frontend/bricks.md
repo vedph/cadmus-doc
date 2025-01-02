@@ -1,6 +1,8 @@
 ---
 title: "Bricks" 
-layout: default 
+layout: default
+parent: "Cadmus Frontend"
+nav_order: 1
 ---
 
 # Bricks
