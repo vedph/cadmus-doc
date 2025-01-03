@@ -19,6 +19,7 @@ graph LR;
   cadmus-flags-pg --> cadmus-flags-ui
   cadmus-flags-ui --> ngx-tools
   cadmus-flags-ui --> ngx-mat-tools
+  cadmus-flags-ui --> cadmus-state
   cadmus-graph-pg --> ngx-tools
   cadmus-graph-pg --> ngx-mat-tools
   cadmus-graph-pg --> cadmus-api
@@ -36,10 +37,10 @@ graph LR;
   cadmus-graph-ui --> cadmus-refs-lookup
   cadmus-graph-ui-ex --> ngx-tools
   cadmus-graph-ui-ex --> ngx-mat-tools
+  cadmus-graph-ui-ex --> cadmus-refs-lookup
   cadmus-graph-ui-ex --> cadmus-core
   cadmus-graph-ui-ex --> cadmus-api
   cadmus-graph-ui-ex --> cadmus-graph-ui
-  cadmus-graph-ui-ex --> cadmus-refs-lookup
   cadmus-item-editor --> ngx-tools
   cadmus-item-editor --> ngx-mat-tools
   cadmus-item-editor --> paged-data-browsers
@@ -50,11 +51,11 @@ graph LR;
   cadmus-item-list --> ngx-tools
   cadmus-item-list --> ngx-mat-tools
   cadmus-item-list --> paged-data-browsers
+  cadmus-item-list --> cadmus-refs-lookup
   cadmus-item-list --> cadmus-core
   cadmus-item-list --> cadmus-api
   cadmus-item-list --> cadmus-state
   cadmus-item-list --> cadmus-ui
-  cadmus-item-list --> cadmus-refs-lookup
   cadmus-item-search --> ngx-tools
   cadmus-item-search --> ngx-mat-tools
   cadmus-item-search --> paged-data-browsers
@@ -73,14 +74,14 @@ graph LR;
   cadmus-part-general-pg --> cadmus-part-general-ui
   cadmus-part-general-ui --> ngx-tools
   cadmus-part-general-ui --> ngx-mat-tools
-  cadmus-part-general-ui --> cadmus-core
-  cadmus-part-general-ui --> cadmus-ui
   cadmus-part-general-ui --> cadmus-refs-asserted-ids
   cadmus-part-general-ui --> cadmus-refs-doc-references
   cadmus-part-general-ui --> cadmus-refs-historical-date
   cadmus-part-general-ui --> cadmus-refs-asserted-chronotope
   cadmus-part-general-ui --> cadmus-refs-assertion
   cadmus-part-general-ui --> cadmus-refs-proper-name
+  cadmus-part-general-ui --> cadmus-core
+  cadmus-part-general-ui --> cadmus-ui
   cadmus-part-philology-pg --> ngx-tools
   cadmus-part-philology-pg --> ngx-mat-tools
   cadmus-part-philology-pg --> cadmus-core
@@ -98,8 +99,8 @@ graph LR;
   cadmus-preview-pg --> cadmus-preview-ui
   cadmus-preview-ui --> ngx-tools
   cadmus-preview-ui --> ngx-mat-tools
-  cadmus-preview-ui --> cadmus-api
   cadmus-preview-ui --> cadmus-text-block-view
+  cadmus-preview-ui --> cadmus-api
   cadmus-profile-core
   cadmus-state --> ngx-tools
   cadmus-state --> cadmus-core
@@ -118,10 +119,11 @@ graph LR;
   cadmus-thesaurus-ui --> paged-data-browsers
   cadmus-thesaurus-ui --> cadmus-ui
   cadmus-ui --> ngx-tools
-  cadmus-ui --> cadmus-core
   cadmus-ui --> cadmus-refs-lookup
+  cadmus-ui --> cadmus-core
   cadmus-ui-pg --> cadmus-core
   cadmus-ui-pg --> cadmus-api
   cadmus-ui-pg --> cadmus-state
   cadmus-ui-pg --> cadmus-ui
+  cadmus-ui-pg --> cadmus-item-editor
 ```
