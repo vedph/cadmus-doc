@@ -7,6 +7,7 @@ layout: default
 
 - [bricks](bricks)
 - [Cadmus shell](shell)
+- [bibliography shell](biblio-shell)
 - [geography shell](geography-shell)
 - [epigraphy shell](epigraphy-shell)
 - [codicology shell](codicology-shell)
