@@ -14,9 +14,13 @@ graph LR;
   cadmus-fr-epigraphy-ligatures --> cadmus-mat-physical-size
   cadmus-fr-epigraphy-ligatures --> cadmus-refs-decorated-counts
   cadmus-fr-epigraphy-ligatures --> cadmus-ui-flag-set
+  cadmus-fr-epigraphy-ligatures --> cadmus-ui
+  cadmus-fr-epigraphy-ligatures --> cadmus-ui-pg
   cadmus-part-epigraphy-formula-patterns --> cadmus-mat-physical-size
   cadmus-part-epigraphy-formula-patterns --> cadmus-refs-decorated-counts
   cadmus-part-epigraphy-formula-patterns --> cadmus-ui-flag-set
+  cadmus-part-epigraphy-formula-patterns --> cadmus-ui
+  cadmus-part-epigraphy-formula-patterns --> cadmus-ui-pg
   cadmus-part-epigraphy-signs --> cadmus-mat-physical-size
   cadmus-part-epigraphy-signs --> cadmus-ui-flag-set
   cadmus-part-epigraphy-signs --> cadmus-core
