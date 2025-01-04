@@ -2,7 +2,7 @@
 title: "Epigraphy Shell" 
 layout: default
 parent: "Cadmus Frontend"
-nav_order: 3
+nav_order: 5
 ---
 
 # Epigraphy Shell

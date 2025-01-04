@@ -1,6 +1,8 @@
 ---
 title: "Cadmus Shell" 
 layout: default 
+parent: "Cadmus Frontend"
+nav_order: 2
 ---
 
 # Shell
