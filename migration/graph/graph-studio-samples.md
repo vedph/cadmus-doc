@@ -17,7 +17,7 @@ parent: "Graph - Graph Studio"
       - [Text Sent Event](#text-sent-event)
     - [Event Example](#event-example)
 
-Let us consider a couple of example mappings for [Graph Studio](graph-studio.md). Say we have a Cadmus item representing a literary work, including:
+Let us consider a couple of example mappings for [Graph Studio](graph-studio). Say we have a Cadmus item representing a literary work, including:
 
 - a metadata part which among others includes an `eid` metadatum, providing the user-friendly EID for the work.
 - a historical events part, listing some events related to that work.

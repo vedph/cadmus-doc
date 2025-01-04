@@ -10,7 +10,7 @@ nav_order: 6
 - 🛠️ [GitHub code repository](https://github.com/vedph/cadmus-graph-studio-app)
 - 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/)
 
-Cadmus Graph Studio is an essential tool designed to ease the creation of [graph mappings](mappings.md). This minimalist tool is almost server-less, except for the fact that an API backend is provided to test [JMES Path expressions](https://jmespath.org) and mappings.
+Cadmus Graph Studio is an essential tool designed to ease the creation of [graph mappings](mappings). This minimalist tool is almost server-less, except for the fact that an API backend is provided to test [JMES Path expressions](https://jmespath.org) and mappings.
 
 No database is required; you just create your mappings, and get the corresponding JSON document defining them. You will then be able to use the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) to import mappings in the database from this document. You can also import such a JSON document, edit it in the tool, and export it again.
 

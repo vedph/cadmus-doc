@@ -16,7 +16,7 @@ nav_order: 3
     - [Linking Entities: Asserted ID Brick](#linking-entities-asserted-id-brick)
   - [Linking Recap](#linking-recap)
 
-_Dynamic lookup_ refers to a feature of the system providing lookup data sets dynamically built from searching the underlying index. This feature stands side to side to the _static lookup_ data sets provided by [thesauri](thesauri.md).
+_Dynamic lookup_ refers to a feature of the system providing lookup data sets dynamically built from searching the underlying index. This feature stands side to side to the _static lookup_ data sets provided by [thesauri](thesauri).
 
 ## Concept and Issues
 
@@ -206,7 +206,7 @@ For instance, say you have a manuscripts decorations part, listing a number of d
 
 As we have seen above, this EID can be extended to the whole item by means of the generic metadata part, where you just add a metadatum named `eid` with some arbitrarily defined value. This is just a convention, as in the end EIDs are found only in parts, whatever their type. So, for instance a user might enter a metadatum pair like e.g. `eid=vat_lat_123`, and use it as the human friendly identifier for a manuscript item corresponding to Vat. Lat. 123.
 
->Items and parts always have a globally unique identifier (GUID), like e.g. `30ed7d3d-a70f-4254-a611-8cc1872f10d5`. Of course, while this is granted to be unique, it's not user friendly at all. So, when filling data, most times users prefer shorter and more readable identifiers, like `angel1`. Once this identifier, which is scoped to its part, gets connected with a part and/or an item, the GUID of that item/part ensure that this identifier will be globally unique, too. This combination mechanism is similar to the strategies adopted by mapping rules in projecting data from parts into a [semantic graph](graph.md).
+>Items and parts always have a globally unique identifier (GUID), like e.g. `30ed7d3d-a70f-4254-a611-8cc1872f10d5`. Of course, while this is granted to be unique, it's not user friendly at all. So, when filling data, most times users prefer shorter and more readable identifiers, like `angel1`. Once this identifier, which is scoped to its part, gets connected with a part and/or an item, the GUID of that item/part ensure that this identifier will be globally unique, too. This combination mechanism is similar to the strategies adopted by mapping rules in projecting data from parts into a [semantic graph](graph).
 
 Of course, once we have scattered such EIDs in our parts, we might want some mechanism in the UI to quickly lookup them, and to eventually build non-scoped IDs from their values. This can be accomplished with the [asserted ID(s) bricks](https://github.com/vedph/cadmus-bricks-shell/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README.md). These provide a way to include external or internal references to resource identifiers, whatever their type and origin.
 
@@ -247,7 +247,7 @@ The user can then use buttons to append each of these components to the ID being
 
 To recap, the main strategies for linking data in Cadmus are:
 
-A. **static** lookup against preset (yet editable) taxonomies ([thesauri](thesauri.md)).
+A. **static** lookup against preset (yet editable) taxonomies ([thesauri](thesauri)).
 
 B. **dynamic** lookup:
 
@@ -255,7 +255,7 @@ B. **dynamic** lookup:
 2. _from entity to entity in the context of the same part_. This is inside the part's model, where some entities are given their ID for this purpose. These IDs, conventionally named EIDs (entity IDs), are unique only within the boundaries of the part including them. So, for instance in a manuscript's decorations part where each decoration is an entity users need only to ensure that each decoration EID is unique inside that part (which in this example is equal to saying that every decoration EID is unique only inside the manuscript including them, as the decorations part is inside a manuscript item).
 3. _from part to entity in another part_, via `LookupPinComponent`. This uses the EIDs provided by parts (via data pins), making them global by means of a part- or item-related prefix.
 
-C. **graph** links: any item, part's entity, or thesaurus entry can be mapped into a graph's node via [mapping rules](graph-mappings.md), and users are free to add new links among nodes (as well as to add new nodes).
+C. **graph** links: any item, part's entity, or thesaurus entry can be mapped into a graph's node via [mapping rules](graph-mappings), and users are free to add new links among nodes (as well as to add new nodes).
 
 >A part can represent one or more entities. For instance, a manuscript's decorations part represents many entities (one for each decoration), while a date part just represents a single entity (the date assigned to the item including that part).
 

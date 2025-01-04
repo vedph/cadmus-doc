@@ -296,7 +296,7 @@ In this sample we have two events:
 
 ### Sample Data
 
-Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties. The first event has type `person.birth`, the second has type `person.death` (these types come from a [thesaurus](../../models/thesauri.md)).
+Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties. The first event has type `person.birth`, the second has type `person.death` (these types come from a [thesaurus](../../models/thesauri)).
 
 ```json
 {
