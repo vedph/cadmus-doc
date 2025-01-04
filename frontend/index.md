@@ -23,9 +23,9 @@ Most of the packages make use of a set of UI widgets named _bricks_, as they rep
 - [epigraphy shell](epigraphy-shell)
 - [codicology shell](codicology-shell)
 
->All the packages are distributed via NPM under the base namespace `@myrmidon`.
+>All the packages are distributed via NPM under the base namespace `@myrmidon` and adopt semantic versioning.
 
-## Overview
+## Core Repositories
 
 This diagram shows the dependencies among some core `@myrmidon` frontend repositories used for Cadmus. Some of them are more general-purpose, and thus do not include `cadmus` in their name.
 
