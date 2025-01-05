@@ -19,7 +19,7 @@ In a sense, just like you might be able to create a full-fledged TEI document wi
 
 The graph is a complement to the Cadmus architecture, which must be opted in. Many projects can do without it; but the most complex ones will probably require it, especially when dealing with **relationships**.
 
-Using a metaphor, the basic architecture includes objects of any type (parts), contained in a box (item) with an attached label (item's metadata); boxes are stored on shelves (the database infrastructure). In this architecture, it is essential that each object model is independent, as it is right this independency which allows its reuse in any other container.
+Using a [metaphor](../../index.md#overview), the basic architecture includes objects of any type (parts), contained in a box (item) with an attached label (item's metadata); boxes are stored on shelves (the database infrastructure). In this architecture, it is essential that each object model is independent, as it is right this independency which allows its reuse in any other container.
 
 So, in a sense our objects are _monadic_. Yet, we often need to represent relationships among them. While properties considered intrinsic or relevant to such objects are part of their model, relations with other objects are usually confined to the realm of incidental events.
 
