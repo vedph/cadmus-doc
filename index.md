@@ -95,3 +95,6 @@ In the end, this tool will allow you to build your own data with your own models
   - [codicology shell](codicology-shell)
 
 ### Deployment
+
+- [deployment](deploy/index)
+  - [setup](deploy/setup)
