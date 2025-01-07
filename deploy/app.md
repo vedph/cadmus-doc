@@ -2,7 +2,7 @@
 title: "Cadmus Deployment - App Setup"
 layout: default
 parent: "Cadmus Deployment"
-nav_order: 1
+nav_order: 2
 ---
 
 # App Setup
