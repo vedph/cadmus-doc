@@ -1,10 +1,10 @@
 ---
-title: "Cadmus Deployment"
+title: "Deployment"
 layout: default
 nav_order: 5
 ---
 
-# Cadmus Deployment
+# Deployment
 
 This section contains general information about deploying a Cadmus app. Cadmus is distributed in Docker images, so in the end all what you need is a host with Docker installed, and a Docker compose script to orchestrate all the required services.
 

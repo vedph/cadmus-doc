@@ -1,7 +1,7 @@
 ---
-title: "Cadmus Deployment - HTTPS Configuration"
+title: "Deployment - HTTPS Configuration"
 layout: default
-parent: "Cadmus Deployment"
+parent: "Deployment"
 nav_order: 3
 ---
 

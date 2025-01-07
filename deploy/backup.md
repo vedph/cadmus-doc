@@ -1,7 +1,7 @@
 ---
-title: "Cadmus Deployment - Backup"
+title: "Deployment - Backup"
 layout: default
-parent: "Cadmus Deployment"
+parent: "Deployment"
 nav_order: 4
 ---
 

@@ -1,7 +1,7 @@
 ---
-title: "Cadmus Deployment - Docker Setup"
+title: "Deployment - Docker Setup"
 layout: default
-parent: "Cadmus Deployment"
+parent: "Deployment"
 nav_order: 1
 ---
 

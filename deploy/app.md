@@ -1,7 +1,7 @@
 ---
-title: "Cadmus Deployment - App Setup"
+title: "Deployment - App Setup"
 layout: default
-parent: "Cadmus Deployment"
+parent: "Deployment"
 nav_order: 2
 ---
 
@@ -24,7 +24,7 @@ nav_order: 2
       - [Securing Databases](#securing-databases)
       - [External Databases](#external-databases)
     - [Other Services](#other-services)
-  - [4. Frontend App Settings](#4-frontend-app-settings)
+  - [4. Configure Frontend App](#4-configure-frontend-app)
 
 Essentially, to host Cadmus app on a server you should just customize the default _Docker compose script_, which is designed for hosting the system on a local machine. This usually resolves to changing some URIs, and replacing mock security data.
 
@@ -238,8 +238,6 @@ In this context, the path to the `Default` connection property will be `CONNECTI
 ```
 
 the first item of the array will be targeted by `ALLOWEDORIGINS__0`; the second item by `ALLOWEDORIGINS__1`; and so forth.
-
-In this section I list the most relevant settings from the perspective of a server setup. The settings marked with 🚩 _must_ be changed to adapt to the hosting environment.
 
 ### Overriding Settings
 
@@ -573,7 +571,7 @@ Other options are specific for each service. Other mailing services can be used 
 
 >💡 The messaging section is separated from the mailer section because building a text message is a process potentially shared among different messaging systems (email, SMS, etc.). Messages are built according to a set of HTML templates in the API layer (in folder `wwwroot/messages` of its source code).
 
-## 4. Frontend App Settings
+## 4. Configure Frontend App
 
 When hosting on a server, the web application needs to know the address of the API service, which is no longer found at `localhost`. To avoid having to recompile the Angular app when changing this address, the app has an uncompiled `env.json` file including the base URIs accessed by it. So, you can just change the URIs inside this file and you are ready to go.
 
