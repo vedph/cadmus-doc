@@ -93,6 +93,7 @@ In the end, this tool will allow you to build your own data with your own models
   - [geography shell](geography-shell)
   - [epigraphy shell](epigraphy-shell)
   - [codicology shell](codicology-shell)
+  - [developing frontend](frontend/dev/index)
 
 ### Deployment
 
