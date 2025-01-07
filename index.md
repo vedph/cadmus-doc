@@ -42,7 +42,7 @@ This way, new annotations can be added to the same text without affecting the ex
 
 In the end, this brings together non textual data, textual data, and meta textual data, in an open-ended, modular architecture; and optionally allows you to define complex relationships across objects by projecting any subset of their data into a RDF-like graph, ready to be exported into a LOD cloud.
 
-Finally, as a content editor Cadmus is located at the center of a potentially wider data flow, which may include data import (even when requiring complex remodeling) and data export. For instance, a number of [export modules](migration/index.md) allows you generating standard formats automatically: e.g. a full TEI XML document with standoff annotation, or a set of RDF entities, or whatever other format or technology. As the content created by the editor is just a standard NoSql database, all what you have to do is querying it for whatever purpose.
+Finally, as a content editor Cadmus is located at the center of a potentially wider data flow, which may include data import (even when requiring complex remodeling) and data export. For instance, a number of [export modules](migration/index) allows you generating standard formats automatically: e.g. a full TEI XML document with standoff annotation, or a set of RDF entities, or whatever other format or technology. As the content created by the editor is just a standard NoSql database, all what you have to do is querying it for whatever purpose.
 
 ## Software Layers
 
