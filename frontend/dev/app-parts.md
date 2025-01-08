@@ -590,7 +590,7 @@ export class __NAME__sPartComponent
 </form>
 ```
 
-- 📁 CSS styles:
+- 📁 list part editor CSS styles:
 
 ```css
 table {
