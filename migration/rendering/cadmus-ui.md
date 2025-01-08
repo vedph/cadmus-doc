@@ -1,7 +1,7 @@
 ---
 title: "Cadmus UI" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 8
 ---
 

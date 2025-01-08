@@ -1,7 +1,7 @@
 ---
 title: "Configuration Samples" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 7
 ---
 

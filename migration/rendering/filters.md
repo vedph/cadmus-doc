@@ -1,7 +1,7 @@
 ---
 title: "Rendition Filters" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 4
 ---
 

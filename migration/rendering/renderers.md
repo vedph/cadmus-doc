@@ -1,7 +1,7 @@
 ---
 title: "Renderers" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 3
 ---
 

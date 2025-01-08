@@ -1,7 +1,7 @@
 ---
 title: "Rendering Markup" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 6
 ---
 

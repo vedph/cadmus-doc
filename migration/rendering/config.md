@@ -1,7 +1,7 @@
 ---
 title: "Rendering Configuration" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 2
 ---
 

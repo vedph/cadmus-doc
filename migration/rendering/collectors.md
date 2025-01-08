@@ -1,7 +1,7 @@
 ---
 title: "Item ID Collectors" 
 layout: default
-parent: Migration
+parent: Rendition
 nav_order: 5
 ---
 
