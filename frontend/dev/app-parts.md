@@ -117,7 +117,7 @@ Two different templates are provided here.
 
 ▶️ (1) write code and HTML template:
 
-- 📁 code:
+- 📁 part editor code:
 
 ```ts
 // NAME-part.component.ts
@@ -244,7 +244,7 @@ export class __NAME__PartComponent
 }
 ```
 
-- 📁 HTML template:
+- 📁 part editor HTML template:
 
 ```html
 <!-- NAME-part.component.html -->
@@ -275,7 +275,7 @@ export class __NAME__PartComponent
 
 ▶️ (1) write code and HTML template:
 
-- 📁 code:
+- 📁 list part editor code:
 
 ```ts
 // NAME-part.component.ts
@@ -485,7 +485,7 @@ export class __NAME__sPartComponent
 }
 ```
 
-- 📁 HTML template:
+- 📁 list part editor HTML template:
 
 ```html
 <!-- NAME-part.component.html -->
@@ -621,6 +621,8 @@ fieldset {
 
 Typically you should edit each **single entry** in a component (generated with `ng g component <NAME>-editor` where NAME is the model's name, e.g. `cod-binding-editor` for the `cod-bindings-part` component - remember to export it both from the library's module and from its barrel `public-api.ts` file), similar to the following template (rename `model` as you prefer):
 
+- 📁 entry editor code:
+
 ```ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
@@ -711,7 +713,7 @@ export class __NAME__Component implements OnInit {
 }
 ```
 
-HTML template:
+- 📁 HTML template:
 
 ```html
 <form [formGroup]="form" (submit)="save()">
@@ -744,7 +746,7 @@ HTML template:
 
 ▶️ (1) under your library's `src/lib` folder, add a **part editor feature component** named after the part (e.g. `ng g component note-part-feature` for `NotePartFeatureComponent` after `NotePart`).
 
-- 📁 code:
+- 📁 editor wrapper code:
 
 ```ts
 import { Component, OnInit } from '@angular/core';
@@ -796,7 +798,7 @@ export class __NAME__PartFeatureComponent
 }
 ```
 
-- 📁 HTML template:
+- 📁 editor wrapper HTML template:
 
 ```html
 <cadmus-current-item-bar/>
