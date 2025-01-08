@@ -34,9 +34,9 @@ In this approach, we are not required to split the text document into a predefin
 <l><w xml:id="w1">passer</w>, <w xml:id="w2">deliciae</w> <w xml:id="w3">meae</w> <w xml:id="w4">puellae</w></l>
 ```
 
-This is of course redundant, as not all the `w` elements (and their IDs) will be effectively used as target of linked annotations; but you need to systematically wrap all the words, as you can't know in advance which words will be annotated.
+This is of course _redundant_, as not all the `w` elements (and their IDs) will be effectively used as target of linked annotations; but you need to systematically wrap all the words, as you can't know in advance which words will be annotated.
 
-Also, and more important, this limits the annotation to the chosen granularity level (here the graphical word). Should you want to annotate a single syllable, or a single letter, you would be in trouble.
+Also, and more important, this limits the annotation to a _single granularity level_ (here the graphical word). Should you want to annotate a single syllable, or a single letter, you would be in trouble.
 
 ## Cadmus Approach to TEI Generation
 
@@ -48,7 +48,7 @@ Of course, the main practical issue here is provided by the fact that Cadmus is 
 
 The key to this flattening process is _merging_ all the layers selections into one. This is done by a specialized component, which produces a model based on "text blocks". A text block is an arbitrary span of text, linked to any number of annotation layers.
 
-For instance, say you have this line of text, where different portions of it are annotated at different levels (each represented by a letter):
+For instance, say you have this line of text from an inscription, where different portions of it are annotated at different levels (each represented by a letter):
 
 ```txt
 que bixit annos XX
@@ -60,6 +60,8 @@ que bixit annos XX
 
 Here, `O` represents an orthographic annotation (`que` for `quae`; `bixit` for `vixit`), which happens at the maximum level of granularity (the character); `P` represents a paleographic annotation (e.g. a graphical connection between `E` and `B`); and `C` a generic comment annotation (`bixit annos` to note the usage of accusative rather than the more usual ablative). As you can see, each annotation has its own extent: the two orthographic annotations rest on single letters (`e`, `b`); the paleographic annotation links two letters (final `e` and initial `b`), including the space between them; and the comment annotation spans for a couple of words. Most of these spans overlap, but this is not an issue as each rests on its own layer.
 
+In Cadmus terms, here you have 1 item (the inscription, Figure 1) including 5 parts: the base text (T), and 3 text layers (L) for comment, paleography, and orthography. Of course, the same item might have any other number and type of parts, even totally independent from the text: for instance, the material description of the support (this is represented by the X-labeled object among those extracted from the item's box).
+
 Now, when flattening these layers into a single sequence, the text gets split into blocks defined as the maximum extent of characters linked to exactly the same layers. So, the resulting blocks will be:
 
 - `qu` linked to none.
@@ -70,6 +72,10 @@ Now, when flattening these layers into a single sequence, the text gets split in
 - space and `XX` linked to none.
 
 Thus, the text segmentation is `qu|e| |b|ixit annos| XX`, defining 6 blocks, variously linked to different layers. These blocks, grouped into rows, are the model output by text part flattener components (`ITextPartFlattener`). The block model is shared among all the flatteners, but different flatteners are required to fit different types of parts representing text. As you may recall, in Cadmus there is no single text part; currently there are two, one for token-based texts, and another for tile-based texts; but, as for any other part, types are open. So, for each text part type you can have a corresponding flattener.
+
+![Flattening layers](img/flattening.png)
+
+- Figure 1 - _Flattening layers_
 
 By convention, the links to each fragment in its layer part (the block's layer IDs) is encoded with the part layer type ID, followed by `|` and its role ID, followed by the fragment's index in the layer part's fragments array. This is enough to uniquely identify each layer part's fragment in the context of an item. As data is processed item by item, this fits the renderers architecture. For instance, consider this layer ID:
 

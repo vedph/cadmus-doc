@@ -54,48 +54,6 @@ Technically, the system is a _full-stack framework_ using a number of layers: fr
 4. web API layer ([ASP.NET 9](https://www.asp.net)).
 5. web frontend layer ([Angular 19](https://angular.io)).
 
-A Cadmus editor, composed by aggregating existing parts or adding new ones, is _distributed_ via 🐋 [Docker](https://www.docker.com/) images, so that all what you need to run it, either locally or on a server, is a machine with Docker installed. Of course, given the layered architecture, you are free to replace the layers you want, e.g. to use a different frontend, or a different storage technology. Yet, in most cases you can just put together object models created for several projects, and have your own up and running in a few hours.
+A Cadmus editor, composed by aggregating existing parts or adding new ones, is [distributed](deploy/index) via 🐋 [Docker](https://www.docker.com/) images, so that all what you need to run it, either locally or on a server, is a machine with Docker installed. Of course, given the layered architecture, you are free to replace the layers you want, e.g. to use a different frontend, or a different storage technology. Yet, in most cases you can just put together object models created for several projects, and have your own up and running in a few hours.
 
 In the end, this tool will allow you to build your own data with your own models, getting a full, standard database for them (or any other resource derived from it, like a TEI document). Once you have the database, you can also grab it and do whatever you want with it, forgetting Cadmus altogether.
-
-## Contents
-
-### Data Models
-
-- [models](models/index)
-  - [shared models](models/shared)
-  - [taxonomies: thesauri](models/thesauri)
-
-### Data Migration
-
-- [data migration](migration/index)
-  - [graphs](migration/graph/index)
-    - [adapters](migration/graph/adapters)
-    - [mappings](migration/graph/mappings)
-      - [JMES path](migration/graph/jmes-path)
-    - [updating](migration/graph/updating)
-    - [database](migration/graph/database)
-    - [walking](migration/graph/walking)
-      - [walking filters](migration/graph/walking-filters)
-      - [walking API](migration/graph/walking-api)
-      - [walking sample](migration/graph/walking-sample)
-    - [graph studio](migration/graph/graph-studio)
-      - [graph studio sample](migration/graph/graph-studio-samples)
-
-### Backend
-
-### Frontend
-
-- [frontend](frontend/index)
-  - [bricks](bricks)
-  - [Cadmus shell](shell)
-  - [bibliography shell](biblio-shell)
-  - [geography shell](geography-shell)
-  - [epigraphy shell](epigraphy-shell)
-  - [codicology shell](codicology-shell)
-  - [developing frontend](frontend/dev/index)
-
-### Deployment
-
-- [deployment](deploy/index)
-  - [setup](deploy/setup)
