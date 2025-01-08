@@ -85,7 +85,7 @@ A Cadmus part corresponding to a _single entity_ is a single "entry". In this ca
 
 For instance, a person-information part inside a person item just adds data to the unique entity represented by the item (=the person). So, the target entity is just the one derived from the item. There is no need for an EID here, because the item will already get its own identifier.
 
-Conversely, a manuscript's decorations part is a collection of decorations, each corresponding to an entry, eventually having its EID (exposed via an `eid` property). All the entries with EIDs get mapped into entities.
+Conversely, a manuscript's decorations part is a collection of decorations, each corresponding to an entry, optionally having its EID (exposed via an `eid` property). All the entries with EIDs get mapped into entities.
 
 Thus, here we call EIDs the identifiers provided by users for entries in a Cadmus collection-part. When present, such EIDs are used to build node identifiers URIs (UIDs).
 
@@ -150,7 +150,7 @@ In turn, each mapping rule can include any number of _children rules_. The model
   - `metadata`: optional metadata to be consumed in [templates](#templates). Metadata come from several sources: the source object, the mapping process itself, and these definitions in the mapping.
 - `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
 
->Note: the source type is a number where 0=user, 1=item, 2=part, 3=thesaurus, 4=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not an enumerated value, so that you can eventually add new values by just defining new constants.
+>Note: the source type is a number where 0=user, 1=item, 2=part, 3=thesaurus, 4=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not an enumerated value, so that you can optionally add new values by just defining new constants.
 
 ## Templates
 
@@ -159,7 +159,7 @@ Templates are extensively used in mappings to build node identifiers and triple 
 A template has any number of placeholders, delimited by `{}`, where the opening brace is followed by a single character representing the placeholder type:
 
 1. `{@...}` = _expression_: this represents the expression used to select some source data for the mapping.
-2. `{?...}` = _node key_: the key for a previously emitted node, eventually suffixed.
+2. `{?...}` = _node key_: the key for a previously emitted node, optionally suffixed.
 3. `{$...}` = _metadata_: any metadata set during the mapping process.
 4. `{!...}` = _macro_: the output of a custom function, receiving the current data context from the source, and returning a string or null.
 
@@ -287,7 +287,7 @@ Should you want to disable this filtering, start the template with `!`, which be
 
 ## Sample
 
-As a sample, consider this historical events part. This contains any number of events, eventually with their place and/or time, and directly-related entities.
+As a sample, consider this historical events part. This contains any number of events, optionally with their place and/or time, and directly-related entities.
 
 In this sample we have two events:
 

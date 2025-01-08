@@ -74,7 +74,7 @@ This ensures that the same entity (as identified by its SID) always corresponds 
 - `node`: a node coming from a Cadmus record or added from any external sources (e.g. by a user, or imported from somewhere else).
 
   - `id` (int) PK FK. The ID got via `uri_lookup` from a string UID. The latter is calculated from mappings, or just entered from scratch by users. It should be in a URI-like form, shortened with a prefix, like e.g. `x:persons/barbato_da_sulmona`.
-  - `is_class` (boolean): a value indicating whether this node is a class. This is a shortcut property for a node being the subject of a triple with S=class URI, predicate=`a` and object=`rdfs:Class` (or eventually `owl:Class` -- note that `owl:Class` is defined as a subclass of `rdfs:Class`). Given the importance of class nodes in editing, this is a performance-wise shortcut.
+  - `is_class` (boolean): a value indicating whether this node is a class. This is a shortcut property for a node being the subject of a triple with S=class URI, predicate=`a` and object=`rdfs:Class` (or `owl:Class` -- note that `owl:Class` is defined as a subclass of `rdfs:Class`). Given the importance of class nodes in editing, this is a performance-wise shortcut.
   - `tag`: a general purpose tag for the classification for nodes. For instance, this can be used to mark all the nodes potentially used as properties, so that a frontend can filter them accordingly.
   - `label` (string): the optional label used to designate this entity in a human-friendly way. This is defined by mapping, or manually entered by user.
   - `source_type` (int): set from the mapping which generated this node; 0 if manually created.

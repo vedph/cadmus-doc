@@ -40,13 +40,13 @@ So, users can encode a lot of relations without leaving the user-friendly enviro
 
 Yet, when required users can directly edit the graph, to supply additional nodes or edges. Their edits get combined with the result of projections, and are never overwritten by them, even though the projection can keep in synch its nodes and triples whenever items and parts are added, updated or deleted.
 
-The following picture summarizes the different layers of abstraction used in Cadmus: from bottom to top, we start from the monadic objects; group them into boxes thus building models by dynamic composition; index a subset of their properties using data pins; and eventually project another subset via mapping into an editable graph.
+The following picture summarizes the different layers of abstraction used in Cadmus: from bottom to top, we start from the monadic objects; group them into boxes thus building models by dynamic composition; index a subset of their properties using data pins; and optionally project another subset via mapping into an editable graph.
 
 ![graph architecture](img/graph-architecture.png)
 
 The mappings are stored in the RDBMS index database, but for easier definition you can list them in a JSON file, and then let Cadmus tool import them.
 
-At any rate, given that they are a completely independent resource, this means that you can not only change or augment the projection behavior at any time; but you could even design a totally different mapping, using different ontologies from the same set of data. In a sense, the graph here is just another output of our objects (except that users can eventually edit it directly for supplying new details).
+At any rate, given that they are a completely independent resource, this means that you can not only change or augment the projection behavior at any time; but you could even design a totally different mapping, using different ontologies from the same set of data. In a sense, the graph here is just another output of our objects (except that users can edit it directly for supplying new details).
 
 So, at the hearth of the graph is the projection via mapping. The mapping flow includes these main steps:
 

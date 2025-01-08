@@ -426,7 +426,7 @@ The database-related settings essentially refer to connection strings. In `appse
 }
 ```
 
->💥 Please remember that the containerized API layer requiring the database service connects to it within a Docker network. This means that the server name is just the name of the container, and that the port is the default port for its database service. Even when you eventually remap the database service port, e.g. to avoid a clash with the same service (PostgreSQL at 5432) on the host, nonetheless the containerized API will continue to connect to the default port 5432.
+>💥 Please remember that the containerized API layer requiring the database service connects to it within a Docker network. This means that the server name is just the name of the container, and that the port is the default port for its database service. Even when you remap the database service port, e.g. to avoid a clash with the same service (PostgreSQL at 5432) on the host, nonetheless the containerized API will continue to connect to the default port 5432.
 
 - `ConnectionStrings` This object contains the connection string template to the MongoDB database (`Default`), and the authentication and index databases (`Auth`, `Index`). You must ensure that the strings use the database service as named in the Docker stack (or, if you prefer, any other external database service, in this case removing it from the bottom of the Docker stack). Typically, they are as follows:
 

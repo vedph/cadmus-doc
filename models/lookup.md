@@ -129,7 +129,7 @@ Once you have these parameters, use them to build a query and pass it to `ItemSe
 - the specified data pin's name.
 - the data pin's value including the input filter.
 
-This way, if a user types `pa` in a lookup control, and there is a data pin for that part type and pin name whose value starts with `pa` (like `Palermo`), it will be included in the results (up to a specified limit). The user will thus see a list of values including `pa`, and eventually pick the desired one from it.
+This way, if a user types `pa` in a lookup control, and there is a data pin for that part type and pin name whose value starts with `pa` (like `Palermo`), it will be included in the results (up to a specified limit). The user will thus see a list of values including `pa`, and optionally pick the desired one from it.
 
 For an implementation of this lookup mechanism in the frontend you can see the `LookupPinComponent`, having these input properties:
 
@@ -202,20 +202,20 @@ In this context, you will be able to edit the formulas as you find them, adding 
 
 As already suggested, you can extend this mechanism to work for all the entities scattered across other item's parts. In fact, many parts, especially when including several entities, provide a property, usually named `eid` (entity ID), filled by users to assign a human-friendly ID to some entity.
 
-For instance, say you have a manuscripts decorations part, listing a number of decorations. Each of them can eventually be assigned an ID, freely defined by the user, e.g. `angel1`. This EID is human-friendly, and is unique only in the context of its part. Getting a non-scoped, yet user-friendly ID would then require some conventional strategy, like e.g. prefixing the EID with the item and/or part EID.
+For instance, say you have a manuscripts decorations part, listing a number of decorations. Each of them can optionally be assigned an ID, freely defined by the user, e.g. `angel1`. This EID is human-friendly, and is unique only in the context of its part. Getting a non-scoped, yet user-friendly ID would then require some conventional strategy, like e.g. prefixing the EID with the item and/or part EID.
 
 As we have seen above, this EID can be extended to the whole item by means of the generic metadata part, where you just add a metadatum named `eid` with some arbitrarily defined value. This is just a convention, as in the end EIDs are found only in parts, whatever their type. So, for instance a user might enter a metadatum pair like e.g. `eid=vat_lat_123`, and use it as the human friendly identifier for a manuscript item corresponding to Vat. Lat. 123.
 
 >Items and parts always have a globally unique identifier (GUID), like e.g. `30ed7d3d-a70f-4254-a611-8cc1872f10d5`. Of course, while this is granted to be unique, it's not user friendly at all. So, when filling data, most times users prefer shorter and more readable identifiers, like `angel1`. Once this identifier, which is scoped to its part, gets connected with a part and/or an item, the GUID of that item/part ensure that this identifier will be globally unique, too. This combination mechanism is similar to the strategies adopted by mapping rules in projecting data from parts into a [semantic graph](graph).
 
-Of course, once we have scattered such EIDs in our parts, we might want some mechanism in the UI to quickly lookup them, and to eventually build non-scoped IDs from their values. This can be accomplished with the [asserted ID(s) bricks](https://github.com/vedph/cadmus-bricks-shell/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README.md). These provide a way to include external or internal references to resource identifiers, whatever their type and origin.
+Of course, once we have scattered such EIDs in our parts, we might want some mechanism in the UI to quickly lookup them, and to optionally build non-scoped IDs from their values. This can be accomplished with the [asserted ID(s) bricks](https://github.com/vedph/cadmus-bricks-shell/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README.md). These provide a way to include external or internal references to resource identifiers, whatever their type and origin.
 
 The asserted ID brick allows editing a simple model representing such IDs, having:
 
 - a value, the ID itself.
 - a scope, representing the context the ID originates from (e.g. an ontology, a repository, a website, etc.).
-- an optional tag, eventually used to group or classify the ID.
-- an optional assertion, eventually used to define the uncertainty level of the assignment of this ID to the context it applies to.
+- an optional tag, optionally used to group or classify the ID.
+- an optional assertion, optionally used to define the uncertainty level of the assignment of this ID to the context it applies to.
 
 The asserted IDs brick is just a collection of such IDs.
 

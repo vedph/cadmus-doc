@@ -60,7 +60,7 @@ Figure 1 - Walking from origin node
 
 With relation to the origin node, the first 3 triples are outbound, while the last 2 triples are inbound:
 
-- the outbound triples all share the same predicate (`rdfs:label`), so we just have a single shape out of the origin node, with its count=3. Eventually, we might also want to draw these shapes proportionally to their counts.
+- the outbound triples all share the same predicate (`rdfs:label`), so we just have a single shape out of the origin node, with its count=3. Optionally, we might also want to draw these shapes proportionally to their counts.
 - the inbound triples have each one its own predicate; so we have two shapes connected to the origin node, with their count=1.
 
 >Note: getting a page of groups of triples connected to an origin node is done via repository `GetTripleGroups`, which receives the paging, filtering, and sorting parameters, and returns the requested page with triple predicates and their totals.

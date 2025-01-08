@@ -36,7 +36,7 @@ XSLT-based JSON renderer. This can transform JSON, convert it into XML, transfor
 
 - ID: `it.vedph.json-renderer.xslt`
 - options:
-  - `FrDecoration`: a boolean value indicating whether fragment decoration is enabled. When true, the JSON corresponding to a layer part gets an additional `_key` property in each of its `fragments` array items. This key is built from the layer type ID eventually followed by `|` plus the role ID, followed by the fragment's index.
+  - `FrDecoration`: a boolean value indicating whether fragment decoration is enabled. When true, the JSON corresponding to a layer part gets an additional `_key` property in each of its `fragments` array items. This key is built from the layer type ID optionally followed by `|` plus the role ID, followed by the fragment's index.
   - `JsonExpressions`: the optional array of JSON transform expressions using JMES Path.
   - `QuoteStripping`: a boolean value indicating whether quotes wrapping a string result should be removed once JSON transforms have completed.
   - `Xslt`: the XSLT script.
@@ -207,7 +207,7 @@ you will rather get a structure like this:
 - ID: `it.vedph.json-renderer.tei-standoff.apparatus`
 - options:
   - `ZeroVariant`: the text to output for a zero variant. A zero variant is a deletion, represented as a text variant with an empty value. When building an output, you might want to add some conventional text for it, e.g. `del.` (_delevit_), which is the default value.
-  - `NotePrefix`: the note prefix. This is an optional string to be prefixed to the note text after a non-empty value in a `rdg` or `note` element value. Any apparatus entry can have a value, and an optional note; when it's a variant mostly it has a value, and eventually a note; when it's a note, mostly it has only the note without value. The default value is space.
+  - `NotePrefix`: the note prefix. This is an optional string to be prefixed to the note text after a non-empty value in a `rdg` or `note` element value. Any apparatus entry can have a value, and an optional note; when it's a variant mostly it has a value, and optionally a note; when it's a note, mostly it has only the note without value. The default value is space.
 
 As a sample, consider this configuration, used to export a Cadmus text + apparatus into standoff TEI XML:
 

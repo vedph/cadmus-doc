@@ -78,7 +78,7 @@ Armed with these coordinates, the filter fetches the base text from the database
 
 This is what is accomplished by turning on the `TextCutting` option, and setting its mode to 3 (which cuts the body, leaving head and tail at both sides). The limit here is 80 characters, with a tolerance of ±5 characters.
 
-Once the text has been eventually cut, it is inserted in the provided template at the `{text}` placeholder. The result is that our text gets output wrapped in a classed span element, like `<span class=\"apparatus-lemma\">the text here</span>`.
+Once the text has been optionally cut, it is inserted in the provided template at the `{text}` placeholder. The result is that our text gets output wrapped in a classed span element, like `<span class=\"apparatus-lemma\">the text here</span>`.
 
 The XSLT transformation has been adapted to this further processing by just copying the location element unchanged in its output, e.g.:
 
@@ -90,7 +90,7 @@ So, here is what happens:
 
 1. first, the JSON code for the selected fragment is extracted from apparatus text layer part in the database. Among other properties, the fragment has `location` with a value like `6.2`.
 2. the XSLT-based renderer transforms JSON into XML, and XML via XSLT into HTML.
-3. the filter kicks in, and matches `<location>6.2</location>` in the output. It then fetches the text corresponding to coordinates `6.2`, eventually cuts it if too long, and replaces it with an HTML span element of a specific class (`apparatus-lemma`). The final result is thus an apparatus including also the text fetched from a distinct part in the same item.
+3. the filter kicks in, and matches `<location>6.2</location>` in the output. It then fetches the text corresponding to coordinates `6.2`, optionally cuts it if too long, and replaces it with an HTML span element of a specific class (`apparatus-lemma`). The final result is thus an apparatus including also the text fetched from a distinct part in the same item.
 
 ```json
 {
@@ -277,7 +277,7 @@ Satis mīrātī sumus gravitātem tuam, quae plēna iūstitiae ac probae religi�
 ...
 ```
 
-The analyzer has no other requirement for its input format. Yet, for other processing types, it might be useful to eventually pre-segment the text into sentences. For instance, this happens when dealing with NLP tokenizers in conjunction with Chiron-based linguistic analysis. In this case, we can apply a simple sentence splitter filter, which refactors the text layout to ensure that each line corresponds to a single sentence.
+The analyzer has no other requirement for its input format. Yet, for other processing types, it might be useful to optionally pre-segment the text into sentences. For instance, this happens when dealing with NLP tokenizers in conjunction with Chiron-based linguistic analysis. In this case, we can apply a simple sentence splitter filter, which refactors the text layout to ensure that each line corresponds to a single sentence.
 
 ### Data Architecture
 
