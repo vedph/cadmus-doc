@@ -1,7 +1,7 @@
 ---
 title: "Cadmus Frontend"
 layout: default
-nav_order: 4
+nav_order: 5
 ---
 
 # Cadmus Frontend
@@ -66,4 +66,3 @@ The corresponding code repositories are:
 - [@myrmidon/auth-jwt repository](https://github.com/Myrmex/auth-jwt): both `auth-jwt-login` and `auth-jwt-admin`.
 - [bricks repository](https://github.com/vedph/cadmus-bricks-shell-v3): the [bricks](bricks) libraries repository. These are small, general-purpose UI widgets used to build Cadmus part and fragment editors.
 - [@myrmidon/ngx-annotorious repository](https://github.com/vedph/ngx-annotorious): Annotorious V3-based image annotation components. Before bricks V3, these were part of the same bricks repository.
-

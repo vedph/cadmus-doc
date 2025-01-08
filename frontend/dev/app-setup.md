@@ -258,7 +258,7 @@ This is optional and depends on your visuals.
 
 ## 6. Add Cadmus Infrastructure
 
-▶️ (1) add some extension points, optionally adding new entries for your new parts (see [dynamic lookup](https://github.com/vedph/cadmus_doc/blob/master/core/dynamic-lookup.md)):
+▶️ (1) add some extension points, optionally adding new entries for your new parts (see [dynamic lookup](https://github.com/vedph/cadmus_doc/blob/master/core/dynamic-lookup)):
 
 - 📁 `src/app/index-lookup-definitions.ts` with this content:
 
