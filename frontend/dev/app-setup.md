@@ -43,6 +43,34 @@ ng add @angular/localize
 
 >For Angular Material, use a custom theme or pick the theme you prefer, answer Yes when prompted to setup global typography styles, and accept the default "Include and enable animations" option. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
 
+💡 The `$localize` function should be defined when running the schematics `ng add @angular/localize`. If you did not run it, or you have legacy code from older CLI apps, it might happen that you are missing some of the changes done by it. In this case, you might get an undefined error at runtime (or build time) for `$localize`, or an error like this:
+
+```txt
+core.mjs:40035 Uncaught Error: It looks like your application or one of its dependencies is using i18n.
+Angular 9 introduced a global `$localize()` function that needs to be loaded.
+Please run `ng add @angular/localize` from the Angular CLI.
+(For non-CLI projects, add `import '@angular/localize/init';` to your `polyfills.ts` file.
+For server-side rendering applications add the import to your `main.server.ts` file.)
+```
+
+In this case, ensure that these settings are properly configured:
+
+1. you must have installed the NPM package `@angular/localize` (under `devDependencies`).
+2. you must add `@angular/localize/init` to your `polyfills` in `angular.json`, e.g. `"polyfills": ["zone.js", "@angular/localize/init"],` under `projects/NAME/architect/build/options` and `projects/NAME/architect/test/options`. In older code you might rather have a `polyfills.ts` file which is imported in `angular.json`; in this case, add the import there under the app imports.
+3. ensure `main.ts` has the reference _at the very top_:
+
+```ts
+/// <reference types="@angular/localize" />
+```
+
+4. in each `tsconfig` file (root `tsconfig.json`, `tsconfig.app.json`, `projects/LIB/tsconfig.lib.json`, `projects/LIB/tsconfig-prod.lib.json`) ensure that under `compilerOptions` you have:
+
+```json
+"types": [ "@angular/localize" ],
+```
+
+>While `tsconfig.lib.prod.json` typically extends from `tsconfig.lib.json`, it's meant for production builds and can override settings. Having the type declaration in both ensures consistent behavior across development and production builds.
+
 ▶️ (3) ensure to apply some [M3 theme](https://material.angular.io/guide/theming) in your app's `styles.scss`:
 
 ```scss
