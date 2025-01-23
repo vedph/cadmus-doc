@@ -88,6 +88,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 - parts:
   - [writing](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-writing.md)
+  - [signs](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-signs.md)
   - [support](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support.md)
   - [technique](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-technique.md)
   - [support fragments](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support-frr.md)
