@@ -59,6 +59,7 @@ graph LR;
   cadmus-part-epigraphy-pg --> cadmus-ui-pg
   cadmus-part-epigraphy-pg --> cadmus-part-epigraphy-support
   cadmus-part-epigraphy-pg --> cadmus-part-epigraphy-support-frr
+  cadmus-part-epigraphy-pg --> cadmus-part-epigraphy-technique
   cadmus-part-epigraphy-pg --> cadmus-part-epigraphy-writing
   cadmus-part-epigraphy-pg --> cadmus-part-epigraphy-signs
   cadmus-part-epigraphy-pg --> cadmus-fr-epigraphy-ligatures
