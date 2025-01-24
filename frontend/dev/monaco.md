@@ -191,26 +191,26 @@ export const appConfig: ApplicationConfig = {
 
 6. when getting your text back, just read it from your control's value (here `this.description.value`).
 
-👉 Note that we are using `updateEditorContent` both in `updateForm` and in editor init. This is because typically the editor's text is set when data is bound to an input endpoint of the component, which typically is a signal got via `model` or `input`, so that `updateForm` is called in an effect like:
+    👉 Note that we are using `updateEditorContent` both in `updateForm` and in editor init. This is because typically the editor's text is set when data is bound to an input endpoint of the component, which typically is a signal got via `model` or `input`, so that `updateForm` is called in an effect like:
 
-```ts
-effect(() => {
-  this.updateForm(this.sign());
-});
-```
+    ```ts
+    effect(() => {
+    this.updateForm(this.sign());
+    });
+    ```
 
-Thus, it might happen that when `updateForm` gets called in the effect, the Monaco editor is not yet initialized. Setting the content in both these places ensures that we set it later if Monaco wasn't ready yet.
+    Thus, it might happen that when `updateForm` gets called in the effect, the Monaco editor is not yet initialized. Setting the content in both these places ensures that we set it later if Monaco wasn't ready yet.
 
 7. in your template, add the editor and bind its `ready` event:
 
-```hml
-  <div id="editor">
-    <nge-monaco-editor
-      style="--editor-height: 100%"
-      (ready)="onEditorInit($event)"
-    />
-  </div>
-```
+    ```hml
+    <div id="editor">
+        <nge-monaco-editor
+        style="--editor-height: 100%"
+        (ready)="onEditorInit($event)"
+        />
+    </div>
+    ```
 
 8. remember to destroy disposables:
 
