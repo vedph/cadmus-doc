@@ -805,11 +805,13 @@ export class __NAME__PartFeatureComponent
 <cadmus-__NAME__-part
   [identity]="identity"
   [data]="$any(data)"
-  (dataChange)="save($event)"
+  (dataChange)="save($event!.value!)"
   (editorClose)="close()"
   (dirtyChange)="onDirtyChange($event)"
 />
 ```
+
+>Note that since version 12 the `dataChange` handler requires `$event!.value!` as an argument rather than just `$event` as before. This is because version 12 moved input/output endpoints to signals, which also implied a better alignment between the type of `data` and of its corresponding event.
 
 ▶️ (2) ensure that this component is exported from the `public-api.ts` barrel file.
 
