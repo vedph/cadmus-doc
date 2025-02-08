@@ -271,6 +271,8 @@ export class __NAME__PartComponent
 
 ▶️ (2) ensure the component has been added to the `public-api.ts` barrel file (and, if still using modules, to the library module's `declarations` and `exports`).
 
+>If your editor needs to be customized with specific settings, you can add them to the backend JSON profile and retrieve them in the editor's code. To this end, inject the `AppRepository` service and request the setting object for the editor of the part/fragment type ID and role via its `getSettingFor(typeId, roleId?)` method. This will return an object with any model, representing all the settings for that specific editor.
+
 ### 2.2. List Part Editor Template
 
 ▶️ (1) write code and HTML template:
