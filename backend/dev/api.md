@@ -436,13 +436,13 @@ This is the core customization for the whole project. Usually, the profile file 
 
 ```yml
 # Stage 1: base
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 443
 
 # Stage 2: build
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj", "Cadmus__PRJ__Api/"]
 # copy local packages to avoid using a NuGet custom feed, then restore
@@ -581,7 +581,7 @@ README.md
 To build a Docker image (replace `PRJ` with your project's name):
 
 ```ps1
-docker build . -t vedph2020/cadmus-__PRJ__-api:1.0.0 -t vedph2020/cadmus-__PRJ__-api:latest
+docker buildx build . --platform linux/amd64,linux/arm64,windows/amd64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push
 ```
 
 ## 6. Add Readme
@@ -593,7 +593,7 @@ docker build . -t vedph2020/cadmus-__PRJ__-api:1.0.0 -t vedph2020/cadmus-__PRJ__
 
 🐋 Quick Docker image build:
 
-    docker build . -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest
+  docker buildx build . --platform linux/amd64,linux/arm64,windows/amd64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push
 
 (replace with the current version).
 
