@@ -437,3 +437,11 @@ In the import UI you have 3 modes:
 - **synch**: equal to patch, with the addition that any existing entry not found in the imported thesaurus is removed.
 
 For all these options you can check `dry run` to test the import without writing to the database, so you can be sure that your source format is correct before attempting an import.
+
+👉 To import thesauri:
+
+1. open the UI, usually accessible from a thesauri menu.
+2. expand the importer at the bottom of the page.
+3. select the import mode (default is _replace_). It is also recommended to check the `dry run` before truly importing data, so you can prevent errors during import. Once you have run a test with `dry run`, just uncheck it and repeat the import.
+4. select the file you want to import.
+5. click the _upload_ button.
