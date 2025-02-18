@@ -7,6 +7,17 @@ nav_order: 2
 
 # Thesauri
 
+- [Thesauri](#thesauri)
+  - [Requirements](#requirements)
+  - [Overview](#overview)
+  - [Editing Thesauri](#editing-thesauri)
+  - [Role-Dependent Thesauri](#role-dependent-thesauri)
+  - [Model](#model)
+    - [Hierarchical Thesauri](#hierarchical-thesauri)
+    - [Aliases](#aliases)
+    - [Models Thesaurus](#models-thesaurus)
+  - [Importing Thesauri](#importing-thesauri)
+
 Thesauri represent taxonomies of any type you might be using in editing your content. For instance, in describing a writing you might have a set of ink colors to pick from.
 
 Thesauri can be shared across any number of data models (parts), wherever users need to pick a value from a predefined set, even if in most cases each part or fragment has its own thesauri.
@@ -405,3 +416,24 @@ Example:
     }
 ]
 ```
+
+## Importing Thesauri
+
+Unless you did not opt in for this option in your app configuration, thesauri can also be imported in batch from the Cadmus editor UI.
+
+You can provide thesauri in these formats:
+
+- **JSON**, with the root being either an array of thesauri, or a single thesaurus object.
+- **Excel** (XLSX or XLS), where cells are:
+  1. thesaurus ID;
+  2. entry ID;
+  3. value;
+  4. target ID (for aliases).
+
+In the import UI you have 3 modes:
+
+- **replace**: if the imported thesaurus already exists, it is fully replaced by the new one.
+- **patch**: the existing thesaurus is patched with the imported one: any existing entry has its value overwritten; any non existing entry is just added.
+- **synch**: equal to patch, with the addition that any existing entry not found in the imported thesaurus is removed.
+
+For all these options you can check `dry run` to test the import without writing to the database, so you can be sure that your source format is correct before attempting an import.
