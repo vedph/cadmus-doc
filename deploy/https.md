@@ -7,6 +7,24 @@ nav_order: 3
 
 # HTTPS Configuration
 
+- [HTTPS Configuration](#https-configuration)
+  - [(A) NGINX Proxy Companion](#a-nginx-proxy-companion)
+    - [Sample Cadmus Docker Compose](#sample-cadmus-docker-compose)
+    - [Defining A-Records](#defining-a-records)
+      - [Configuring DNS](#configuring-dns)
+  - [(B) Alternative Method](#b-alternative-method)
+    - [Getting a Certificate](#getting-a-certificate)
+    - [Passing Certificates to the API](#passing-certificates-to-the-api)
+    - [Passing Certificates to the Frontend](#passing-certificates-to-the-frontend)
+  - [(C) Using Your Certificate](#c-using-your-certificate)
+    - [C1 - Proxy](#c1---proxy)
+    - [C2 - Cadmus](#c2---cadmus)
+    - [C3. Start Proxy](#c3-start-proxy)
+
+Here you can find various procedures for configuring HTTPS in your VM. Procedures (A) and (B) use LetsEncrypt to get a certificate, while procedure (C) is a variant of (A) which can be used when you already have your own certificate file (typically `yourdomain.crt` and `yourdomain.key` files).
+
+>⚠️ When getting your own certificate, ensure that it's a SAN certificate, i.e. that it allows subdomains too. This is required because you will typically have a single certificate for both the web application and its backend API, and the backend API is usually accessible at a subdomain. For instance, you might have `mydomain.edu` for the web application, and `api.mydomain.edu` for the backend API.
+
 ## (A) NGINX Proxy Companion
 
 This procedure can be used whenever you want to configure a Docker-based NGINX reverse proxy. This will:
@@ -401,4 +419,227 @@ cadmus-app:
     - /opt/cadmus/nginx/nginx.conf:/etc/nginx/nginx.conf
     - /opt/cadmus/nginx/docker_it.cer:/etc/nginx/docker_it.cer
     - /opt/cadmus/nginx/docker_it.key:/etc/nginx/docker_it.key
+```
+
+## (C) Using Your Certificate
+
+### C1 - Proxy
+
+The proxy service is provided by NGINX Proxy Companion. The only relevant difference from the [above configuration](#a-nginx-proxy-companion) is that here _we already have a certificate_ to use, represented by these two files (where `YOURDOMAIN` is your domain name,  e.g. `febo.disputedborders.unitn.it`):
+
+- `YOURDOMAIN.crt`
+- `YOURDOMAIN.key`
+
+The setup procedure is thus a variation of the standard one:
+
+▶️ 1. create a Docker network: `docker network create nginx-proxy`
+
+▶️ 2. create a `dockers/proxy` folder.
+
+▶️ 3. place in this folder:
+
+- the 2 certificate files (`crt` and `key`).
+- a `docker-compose.yml` for the reverse proxy service, with this content:
+
+```yml
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    restart: unless-stopped
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    environment:
+      - ENABLE_IPV6=true
+      # add these to help with debugging
+      #- DEBUG=true
+      #- NGINX_PROXY_DEBUG=true
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true
+
+volumes:
+  #ssl-cert-volume:
+  vhost:
+  html:
+```
+
+This uses a volume to store the certificate files.
+
+▶️ 4. create a certificates directory and place the files there with their symbolic links for the API subdomain:
+
+```sh
+cd dockers/proxy
+mkdir certs
+cp *.crt certs/
+cp *.key certs/
+cd certs
+ln -s YOURDOMAIN.crt api.YOURDOMAIN.crt
+ln -s YOURDOMAIN.key api.YOURDOMAIN.key
+chmod 644 *.crt
+chmod 600 *.key
+```
+
+>The names of the certificate files must match the `VIRTUAL_HOST` values used in docker compose, which usually are equal to the domain name. Here we have a `VIRTUAL_HOST` equal to the domain name, and another one for the API equal to the subdomain name; that's why we create links here. This way, when `nginx-proxy` looks for certificates matching either `VIRTUAL_HOST` value (`YOURDOMAIN` or `api.YOURDOMAIN`), it will find the appropriate certificate files.
+
+At this stage, we can't start the proxy yet because we first need to start the Cadmus services it must deal with.
+
+### C2 - Cadmus
+
+▶️ 1. create a `dockers/cadmus-PRJ` folder (replace `PRJ` with your project name).
+
+▶️ 2. place in this folder a `docker-compose.yml` file with this content (I replaced sensitive data with `...OMITTED...`):
+
+```yml
+services:
+  # MongoDB
+  cadmus-PRJ-mongo:
+    image: mongo
+    restart: unless-stopped
+    container_name: cadmus-PRJ-mongo
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    command: mongod --logpath=/dev/null
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-vol:/data/db
+    networks:
+      - nginx-proxy
+
+ # PostgreSQL
+  cadmus-PRJ-pgsql:
+    image: postgres
+    restart: unless-stopped
+    container_name: cadmus-PRJ-pgsql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgsql-vol:/var/lib/postgresql/data
+    networks:
+      - nginx-proxy
+
+  # Cadmus PRJ API
+  cadmus-PRJ-api:
+    image: vedph2020/cadmus-PRJ-api:1.0.3
+    restart: unless-stopped
+    container_name: cadmus-PRJ-api
+    ports:
+      - 5105:8080
+    depends_on:
+      - cadmus-PRJ-mongo
+      - cadmus-PRJ-pgsql
+    environment:
+      - VIRTUAL_HOST=api.YOURDOMAIN
+      # 8080, not 5105!
+      - VIRTUAL_PORT=8080
+      - ASPNETCORE_URLS=http://+:8080
+      - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-PRJ-mongo:27017/{0}
+      - CONNECTIONSTRINGS__AUTH=Server=cadmus-PRJ-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__INDEX=Server=cadmus-PRJ-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - SERILOG__CONNECTIONSTRING=mongodb://cadmus-PRJ-mongo:27017/{0}-log
+      - STOCKUSERS__0__PASSWORD=...OMITTED...
+      - ALLOWEDORIGINS__0=https://YOURDOMAIN
+      # for testing HTTP
+      - ALLOWEDORIGINS__1=http://YOURDOMAIN
+      - JWT__SECUREKEY=...OMITTED...
+      - SEED__DELAY=20
+      - MESSAGING__APIROOTURL=https://api.YOURDOMAIN
+      - MESSAGING__APPROOTURL=http://YOURDOMAIN
+      #- MESSAGING__SUPPORTEMAIL=...
+    networks:
+      - nginx-proxy
+
+  # Cadmus PRJ App
+  cadmus-app:
+    image: vedph2020/cadmus-PRJ-app:4.0.0
+    restart: unless-stopped
+    container_name: cadmus-PRJ-app
+    ports:
+      - 4200:80
+    depends_on:
+      - cadmus-PRJ-api
+    environment:
+      - VIRTUAL_HOST=YOURDOMAIN
+      # 80, not 4200!
+      - VIRTUAL_PORT=80
+    volumes:
+      - /opt/cadmus-PRJ/env.js:/usr/share/nginx/html/env.js
+    networks:
+      - nginx-proxy
+
+volumes:
+  mongo-vol:
+  pgsql-vol:
+
+networks:
+  nginx-proxy:
+    external: true
+```
+
+>Note that within the Docker network, `nginx-proxy` should connect to the container's **internal** port (80), not the host-mapped port (4200). The host port mapping (4200:80) is only relevant for connections from _outside_ Docker.
+
+💡 This setup will expose port 80 (and 443 for SSL) to the outside world, and automatically route traffic to the correct service based on the domain name used to access your server. The `jwilder/nginx-proxy` image uses Docker labels to determine which service a request should be routed to, so we need to add a `VIRTUAL_HOST` environment variable to each of the exposed services with its domain name for that service.
+
+▶️ 3. create file `/opt/cadmus-PRJ/env.js` with this content:
+
+```js
+(function (window) {
+  window.__env = window.__env || {};
+  window.__env.apiUrl = "https://api.YOURDOMAIN/api/";
+  window.__env.version = "4.0.2-prod";
+  window.__env.thesImportEnabled = true;
+})(this);
+```
+
+💡 This will be used by the bound volume in the above Docker compose script to provide host-specific parameters to the web app. While most of the host-specific parameters are provided to the backend API via environment variables, this can't be done for a JS app, which has no way to access them. So, having them in an external file bound to the containerized app allows us to change the settings without touching the app's Docker image nor its container.
+
+▶️ 4. start the Cadmus services:
+
+```sh
+cd dockers/cadmus-PRJ
+sudo docker compose up
+```
+
+>I omit `-d` to see the log while services start thus being able to check if everything works as expected.
+
+### C3. Start Proxy
+
+Once Cadmus service are up and running, start the proxy service:
+
+```sh
+cd dockers/proxy
+sudo docker compose up -d
+```
+
+👉 To check if the app is running:
+
+```sh
+docker exec cadmus-PRJ-app netstat -tulpn
+```
+
+👉 To ensure that from the nginx-proxy container, we can reach the app container:
+
+```sh
+docker exec nginx-proxy curl http://YOURIP:4200
+```
+
+👉 To read the internal NGINX proxy configuration:
+
+```sh
+docker exec nginx-proxy cat /etc/nginx/conf.d/default.conf
 ```
