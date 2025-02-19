@@ -195,6 +195,7 @@ using Serilog.Events;
 using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using Cadmus.Api.Controllers;
+using Cadmus.Api.Controllers.Import;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -327,6 +328,7 @@ public static class Program
             // controllers from Cadmus.Api.Controllers
             builder.Services.AddControllers()
                 .AddApplicationPart(typeof(ItemController).Assembly)
+                .AddApplicationPart(typeof(ThesaurusImportController).Assembly)
                 .AddControllersAsServices();
 
             WebApplication app = builder.Build();
