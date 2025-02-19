@@ -595,13 +595,13 @@ networks:
 
 💡 This setup will expose port 80 (and 443 for SSL) to the outside world, and automatically route traffic to the correct service based on the domain name used to access your server. The `jwilder/nginx-proxy` image uses Docker labels to determine which service a request should be routed to, so we need to add a `VIRTUAL_HOST` environment variable to each of the exposed services with its domain name for that service.
 
-▶️ 3. create file `/opt/cadmus-PRJ/env.js` with this content:
+▶️ 3. create file `/opt/cadmus-PRJ/env.js` with this content (of course adjust the version number and use your domain name):
 
 ```js
 (function (window) {
   window.__env = window.__env || {};
   window.__env.apiUrl = "https://api.YOURDOMAIN/api/";
-  window.__env.version = "4.0.2-prod";
+  window.__env.version = "1.0.0";
   window.__env.thesImportEnabled = true;
 })(this);
 ```
@@ -643,3 +643,5 @@ docker exec nginx-proxy curl http://YOURIP:4200
 ```sh
 docker exec nginx-proxy cat /etc/nginx/conf.d/default.conf
 ```
+
+>💡 Reading this configuration is one of the first steps you should take when dealing with HTTPS issues, because it contains useful comments by the NGINX proxy service which generated it.
