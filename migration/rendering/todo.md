@@ -1,10 +1,3 @@
----
-title: "Rendering Markup" 
-layout: default
-parent: Rendition
-nav_order: 6
----
-
 # Rendering Markup
 
 - [Rendering Markup](#rendering-markup)
