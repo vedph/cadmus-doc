@@ -2,7 +2,7 @@
 title: "Text Tree Renderers" 
 layout: default
 parent: "Rendition Architecture"
-nav_order: 5
+nav_order: 6
 ---
 
 # Text Tree Renderers

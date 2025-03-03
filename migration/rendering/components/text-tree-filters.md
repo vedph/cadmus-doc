@@ -2,7 +2,7 @@
 title: "Text Tree Filters" 
 layout: default
 parent: "Rendition Architecture"
-nav_order: 6
+nav_order: 7
 ---
 
 # Text Tree Filters

@@ -1,8 +1,8 @@
 ---
-title: "Renderer Context Suppliers" 
+title: "Context Suppliers" 
 layout: default
 parent: "Rendition Architecture"
-nav_order: 2
+nav_order: 3
 ---
 
 # Renderer Context Suppliers

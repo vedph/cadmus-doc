@@ -2,7 +2,7 @@
 title: "Renderer Filters" 
 layout: default
 parent: "Rendition Architecture"
-nav_order: 4
+nav_order: 5
 ---
 
 # Renderer Filters

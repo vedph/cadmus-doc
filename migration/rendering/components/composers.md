@@ -2,7 +2,7 @@
 title: "Item Composers" 
 layout: default
 parent: "Rendition Architecture"
-nav_order: 7
+nav_order: 8
 ---
 
 # Item Composers
