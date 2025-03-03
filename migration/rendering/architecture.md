@@ -17,7 +17,7 @@ nav_order: 1
         - [Building Text Tree](#building-text-tree)
         - [Rendering Text Tree](#rendering-text-tree)
 
-The easiest form of data export in Cadmus is based on rendering data, for both exporting data into files and providing a frontend interface with "previews", i.e. views which summarize structured data for human readers. For instance, in the former case you can export standoff TEI documents from text items with layers; in the latter case, you can view a compact and human-friendly data summary inside the editor itself.
+The easiest form of data export in Cadmus is based on rendering data, for both exporting data into files and providing a frontend interface with "previews", i.e. views which summarize structured data for human readers. For instance, in the former case you can export stand-off TEI documents from text items with layers; in the latter case, you can view a compact and human-friendly data summary inside the editor itself.
 
 So, export may be done at different levels of granularity:
 

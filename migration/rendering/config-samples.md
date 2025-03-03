@@ -132,12 +132,12 @@ So, here is what happens:
 
 ## Exporting Text with Apparatus in TEI
 
-This sample configuration exports all the Cadmus text items into a TEI file for the text, and another TEI file for the critical apparatus, using standoff notation.
+This sample configuration exports all the Cadmus text items into a TEI file for the text, and another TEI file for the critical apparatus, using stand-off notation.
 
 - an **item ID collector** collects all the text items (=all the items whose facet is `text`) from the underlying database, in their order.
-- an **item composer** renders each text item in TEI standoff. This uses:
+- an **item composer** renders each text item in TEI stand-off. This uses:
   - a **text parte flattener** for token-based texts, to flatten metatextual layer(s) with the base text.
-  - a **text block renderer** for TEI standoff notation. In turn, this uses a simple **renderer filter** (`nl-appender`) to append a newline after each `div` element.
+  - a **text block renderer** for TEI stand-off notation. In turn, this uses a simple **renderer filter** (`nl-appender`) to append a newline after each `div` element.
   - a **JSON renderer** for rendering the apparatus layer. This  will build `app` elements from each apparatus layer fragment. To add more layers, just add more renderers, each targeting a specific layer type.
 
 ```json
@@ -205,7 +205,7 @@ For instance, this is the first portion of the TEI text, for its first item. Ren
 
 As you can see, `body` contains a set of children `div` elements, each representing a row of text blocks; its ID, starting with `r`, is built from the item's ordinal number plus the row's ordinal number. So, `r1_1` is item 1, row 1; while `r2_1` is item 2, row 1.
 
-In turn, each of these "row" `div` elements contains text mixed with `seg` elements. These `seg` elements are used to wrap any arbitrarily defined portion of text under an ID, so that it can be referenced from a TEI standoff file. So, with reference to the text blocks model, each block here is either a text node (when it has no links), or a `seg` element (when it has 1 or more links).
+In turn, each of these "row" `div` elements contains text mixed with `seg` elements. These `seg` elements are used to wrap any arbitrarily defined portion of text under an ID, so that it can be referenced from a TEI stand-off file. So, with reference to the text blocks model, each block here is either a text node (when it has no links), or a `seg` element (when it has 1 or more links).
 
 Each `seg` element has an ID defined by `b` (=block) followed by the item's ordinal number, the text blocks row's ordinal number, and the block ordinal number.
 

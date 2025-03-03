@@ -21,7 +21,7 @@ nav_order: 6
 
 - ID: `it.vedph.text-tree-renderer.tei-app-linear`
 
-### TEI Standoff (Linear)
+### TEI Stand-off (Linear)
 
 👉 Render the base text from a linear tree into a TEI segmented text using `seg`, each with its mapped ID, so that it can be targeted by annotations.
 

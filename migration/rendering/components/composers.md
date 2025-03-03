@@ -29,4 +29,4 @@ TEI text item composer, exporting TEI from a text item into one file.
 - format: `TEI`
 - output: file system
 
-TEI standoff text item composer, exporting TEI from a text item with layers into a set of files.
+TEI stand-off text item composer, exporting TEI from a text item with layers into a set of files.
