@@ -1,55 +1,42 @@
 ---
-title: "Rendition Filters" 
+title: "Renderer Filters" 
 layout: default
-parent: Rendition
+parent: "Rendition Architecture"
 nav_order: 4
 ---
 
-# Rendition Filters
+# Renderer Filters
 
-- [Rendition Filters](#rendition-filters)
-  - [Appender Filter](#appender-filter)
-  - [Fragment Link Filter](#fragment-link-filter)
-  - [ISO 639 Lookup Filter](#iso-639-lookup-filter)
-  - [Markdown Conversion Filter](#markdown-conversion-filter)
-  - [Text Replacements Filter](#text-replacements-filter)
-  - [Thesaurus Lookup Filter](#thesaurus-lookup-filter)
-  - [Token-based Text Extractor Filter](#token-based-text-extractor-filter)
-  - [Sentence Split Filter](#sentence-split-filter)
+- [Renderer Filters](#renderer-filters)
+  - [Appender](#appender)
+  - [ISO 639](#iso-639)
+  - [Markdown](#markdown)
+  - [Mongo Token Extractor](#mongo-token-extractor)
+  - [Replace](#replace)
+  - [Sentence Split](#sentence-split)
+  - [Source ID](#source-id)
+  - [Thesaurus](#thesaurus)
 
-Cadmus provides some builtin filters which can be used by JSON renderers or text block renderers; as for any other component type, you are free to add your own filters.
+## Appender
 
-The filters to be used are typically specified in a JSON-based [configuration](config), where each filter type has its own ID. You can concatenate as many filters as you want, even when they are of the same type. All the filters will be applied in the order they are defined. Here I list the builtin filters.
-
-## Appender Filter
-
-Append the specified text to the input.
+👉 Append the specified text to the input.
 
 - ID: `it.vedph.renderer-filter.appender`
 - options:
   - `Text`: the text to append.
 
-## Fragment Link Filter
+## ISO 639
 
-Map layer keys into target IDs, leveraging the metadata built by the text renderer run before this filter. This is used to link fragments renditions to their base text (see about [building TEI](markup) for more).
-
-- ID: `it.vedph.renderer-filter.fr-link`
-- options:
-  - `TagOpen`: the opening tag for fragment key.
-  - `TagClose`: the closing tag for fragment key.
-
-## ISO 639 Lookup Filter
-
-Language codes ISO639-3 or ISO639-2 filter. This is a simple lookup filter replacing these ISO codes with the corresponding English language names, e.g. `eng` with `English`. Often, when dealing with such codes they rather belong to a thesaurus (e.g. the list of languages used in a manuscript); in this case, you will rather use a thesaurus filter to resolve the codes, as this ensures that you get the desired name and locale. This filter instead is used as a quick way of resolving language codes when you just deal with ISO639 without recurring to a thesaurus, nor requiring localization.
+👉 Replace ISO639-3 or ISO639-2 codes with the corresponding English language names, e.g. `eng` with `English`. Often, when dealing with such codes they rather belong to a thesaurus (e.g. the list of languages used in a manuscript); in this case, you will rather use a thesaurus filter to resolve the codes, as this ensures that you get the desired name and locale. This filter instead is used as a quick way of resolving language codes when you just deal with ISO639 without recurring to a thesaurus, nor requiring localization.
 
 - ID: `it.vedph.renderer-filter.iso639`
 - options:
   - `Pattern`: the pattern used to identify ISO codes. It is assumed that the code is the first captured group in a match. Default is `^^` followed by 3 lowercase letters for ISO 639-3. For all the matches, the filter will extract the code, lookup it, and replace the matched expression with either the result or the code itself, when it was not found.
   - `TwoLetters`: true to use 2-letters codes instead of 3-letters codes.
 
-## Markdown Conversion Filter
+## Markdown
 
-Convert Markdown text into HTML or plain text.
+👉 Render any Markdown region or the whole text, as specified in configuration.
 
 - ID: `it.vedph.renderer-filter.markdown`
 - options:
@@ -57,32 +44,9 @@ Convert Markdown text into HTML or plain text.
   - `MarkdownClose`: the markdown region closing tag. When not set, it is assumed that the whole text is Markdown.
   - `Format`: the Markdown regions target format: if not specified, nothing is done; if `txt`, any Markdown region is converted into plain text; if `html`, any Markdown region is converted into HTML.
 
-## Text Replacements Filter
+## Mongo Token Extractor
 
-Perform any text replacements, either literals or based on regular expressions.
-
-- ID: `it.vedph.renderer-filter.replace`
-- options:
-  - `Replacements`: an array of objects with these properties:
-    - `Source`: the text or pattern to find.
-    - `Target`: the replacement.
-    - `Repetitions`: the max repetitions count, or 0 for no limit (=keep replacing until no more changes).
-    - `IsPattern`: `true` if `Source` is a regular expression pattern rather than a literal.
-
->Note: unless you need to effectively repeat the replacement, always set the `Repetitions` property to 1 to optimize the performance. Otherwise, the default value being 0 (=no limit), all the replacements which need to be executed just once will be repeated a second time just to discover that no repetition is required.
-
-## Thesaurus Lookup Filter
-
-Lookup any thesaurus entry by its ID, replacing it with its value when found, or with the entry ID when not found.
-
-- ID: `it.vedph.renderer-filter.mongo-thesaurus`
-- options:
-  - `ConnectionString`: connection string to the Mongo DB. This is usually omitted and supplied by the client code from its own application settings.
-  - `Pattern`: the regular expression pattern representing a thesaurus ID to lookup: it is assumed that this expression has two named captures, `t` for the thesaurus ID, and `e` for its entry ID. The default pattern is a `$` followed by the thesaurus ID, `:`, and the entry ID.
-
-## Token-based Text Extractor Filter
-
-Replace all the text locations matched via a specified regular expression pattern with the corresponding text from the base text part.
+👉 Replace all the text locations matched via a specified regular expression pattern with the corresponding text from the base text part.
 
 - ID: `it.vedph.renderer-filter.mongo-token-extractor`
 - options:
@@ -103,7 +67,23 @@ When text cutting is enabled, you can specify these additional options:
 - `Ellipsis`: the text to append as ellipsis indicator when text is cut. Default=`...`.
 - `StopChars`: characters marking a stop, in descending order of importance. Default=`.?!;:,/ -`. These are used to locate the preferred locations for a cut.
 
-## Sentence Split Filter
+## Replace
+
+👉 Perform any text replacements, either literals or based on regular expressions.
+
+- ID: `it.vedph.renderer-filter.replace`
+- options:
+  - `Replacements`: an array of objects with these properties:
+    - `Source`: the text or pattern to find.
+    - `Target`: the replacement.
+    - `Repetitions`: the max repetitions count, or 0 for no limit (=keep replacing until no more changes).
+    - `IsPattern`: `true` if `Source` is a regular expression pattern rather than a literal.
+
+>⚠️ Unless you need to effectively repeat the replacement, always set the `Repetitions` property to 1 to optimize the performance. Otherwise, the default value being 0 (=no limit), all the replacements which need to be executed just once will be repeated a second time just to discover that no repetition is required.
+
+## Sentence Split
+
+👉 Essential split text at sentences. Sentence splitting is performed on the basis of a list of end-of-sentence markers.
 
 - ID: `it.vedph.renderer-filter.sentence-split`
 - options:
@@ -113,3 +93,22 @@ When text cutting is enabled, you can specify these additional options:
   - `NewLine`: the newline marker to use. The default value is the/ newline sequence of the host OS.
   - `Trimming`: a value indicating whether trimming spaces/tabs at both sides of any inserted newline is enabled.
   - `CrLfRemoval`: a value indicating whether CR/LF should be removed when filtering. When this is true, any CR or CR+LF or LF is replaced with a space.
+
+## Source ID
+
+👉 Replace all the source identifiers delimited between a specified pair of opening and closing tags with the corresponding mapped identifiers got from the rendering context. For instance, a segment source ID with form `seg/itemId/nodeId` is mapped to a target ID like `seg123`. This assumes that the source ID is prefixed by the map name (e.g. `seg`) followed by a slash.
+
+- ID: `it.vedph.renderer-filter.source-id`
+- options:
+  - `TagOpen`: the tag opening the fragment key to be mapped (default `#[`).
+  - `TagClose`: the tag closing the fragment key to be mapped (default `]#`).
+  - `OmitUnresolved`: true to omit unresolved keys rather than passing them though.
+
+## Thesaurus
+
+👉 Lookup any thesaurus entry by its ID, replacing it with its value when found, or with the entry ID when not found.
+
+- ID: `it.vedph.renderer-filter.mongo-thesaurus`
+- options:
+  - `ConnectionString`: connection string to the Mongo DB. This is usually omitted and supplied by the client code from its own application settings.
+  - `Pattern`: the regular expression pattern representing a thesaurus ID to lookup: it is assumed that this expression has two named captures, `t` for the thesaurus ID, and `e` for its entry ID. The default pattern is a `$` followed by the thesaurus ID, `:`, and the entry ID.
