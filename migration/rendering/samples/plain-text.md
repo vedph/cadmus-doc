@@ -1,3 +1,10 @@
+---
+title: "Sample: Plain Text" 
+layout: default
+parent: "Rendering Configuration"
+nav_order: 2
+---
+
 # Rendering Sample - Plain Text Output
 
 This sample configuration exports a set of Cadmus text items (ignoring any layers) into a set of plain text files, to allow third party tools further process the resulting text.

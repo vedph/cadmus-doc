@@ -7,8 +7,6 @@ nav_order: 2
 
 # Rendering Configuration
 
->See also: [configuration samples](config-samples).
-
 The Cadmus previewer relies on a JSON configuration consumed by a factory (`CadmusPreviewerFactory`), having these sections, all modeled as arrays of objects:
 
 - `RendererFilters`: list of renderer filters, each named with a key, and having its component ID and eventual options. The key is an arbitrary string, used in the scope of the configuration to reference each filter from other sections.
