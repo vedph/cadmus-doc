@@ -68,10 +68,10 @@ In the end, this tool will allow you to build your own data with your own models
   - [geographic models](https://github.com/vedph/cadmus-geo)
   - [epigraphic models](https://github.com/vedph/cadmus-epigraphy)
   - [API layer](https://github.com/vedph/cadmus-api)
-  - [bibliographic subsystem](https://github.com/vedph/cadmus_biblioapi)
-  - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2) and [UI preview templates](https://github.com/vedph/cadmus-previews)
+  - [bibliographic subsystem](https://github.com/vedph/cadmus_biblioapi) for an independent bibliographic database in a RDBMS
+  - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2) for data import/export and editor preview, with sample [UI preview templates](https://github.com/vedph/cadmus-previews)
   - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) with its [backend API](https://github.com/vedph/cadmus-graph-studio-api)
-  - [CLI tool](https://github.com/vedph/cadmus_tool)
+  - [CLI tool](https://github.com/vedph/cadmus_tool): a command line, multiple-platforms tool with many utility functions
 - frontend:
   - [UI infrastructure](https://github.com/vedph/cadmus-shell-v3)
   - [UI widgets ("bricks")](https://github.com/vedph/cadmus-bricks-shell-v3): 👉 [online demo](http://cadmus-bricks-v3.fusi-soft.com/)
@@ -80,8 +80,8 @@ In the end, this tool will allow you to build your own data with your own models
 
 Additionally, each project has its own repositories. Typically, a project has:
 
-- a core repository for its specific models.
-- an API repository for the thin wrapper around the shared API infrastructure. This also contains the configuration file which defines items facets and thesauri.
-- an app repository for the frontend web app. According to the project's complexity, this is just a thin wrapper around the shared UI infrastructure, or can add editors for specific models.
+- a _core repository_ for its specific models.
+- an _API repository_ for the thin wrapper around the shared API infrastructure. This also contains the configuration file which defines items facets and thesauri.
+- an _app repository_ for the frontend web app. According to the project's complexity, this is just a thin wrapper around the shared UI infrastructure, or can add editors for specific models.
 
 You will find all the Cadmus projects created by myself at the [VeDPH GitHub](https://github.com/vedph).
