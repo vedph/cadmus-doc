@@ -24,7 +24,7 @@ One of the key concepts in Cadmus is **reuse**, which is obtained via modularity
 
 Using a metaphor, imagine a set of 📦 _boxes_ (named _items_), each representing a data record, whatever its type. Every box has a small 🏷️ _label_ (=an essential set of metadata), and may contain any number of 🚗 _objects_ (named _parts_; the name comes from the fact that they are the parts of a macro-model, built by aggregation). The boxes with these objects are stored on shelves, i.e. the database infrastructure.
 
->In turn, the objects contained in boxes are often built by assembling smaller pieces, known as _bricks_. For instance, the same wheels used in many different types of toy cars could be bricks. Bricks are small, frequently-reused sub-models, with their corresponding UI. For instance, a datation model can be reused in any object model including a datation; so we have a reusable brick model for it, and a corresponding brick UI component, which can be integrated in the object's editor UI. You can play with some stock bricks [here](https://cadmus-bricks.fusi-soft.com).
+>In turn, the objects contained in boxes are often built by assembling smaller pieces, known as _bricks_. For instance, the same wheels used in many different types of toy cars could be bricks. Bricks are small, frequently-reused sub-models, with their corresponding UI. For instance, a datation model can be reused in any object model including a datation; so we have a reusable brick model for it, and a corresponding brick UI component, which can be integrated in the object's editor UI. You can play with some stock bricks [here](https://cadmus-bricks-v3.fusi-soft.com).
 
 Optionally, you also have a set of 🖼️ _stickers_ you can attach to any of these objects; these are the [thesauri](models/thesauri), i.e. predefined (yet editable) taxonomies used in your data. For instance, think of an object representing a set of keywords to attach to your item; for each of these keywords, you might want to use a language identifier; and in its UI, the language might be selected from a dropdown list. This list of languages would thus be a thesaurus, having an entry for each language, with an ID (maybe an [ISO639](https://www.iso.org/iso-639-language-codes.html) language code) and a human-friendly label.
 
@@ -69,7 +69,8 @@ In the end, this tool will allow you to build your own data with your own models
   - [epigraphic models](https://github.com/vedph/cadmus-epigraphy)
   - [API layer](https://github.com/vedph/cadmus-api)
   - [bibliographic subsystem](https://github.com/vedph/cadmus_biblioapi)
-  - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2)
+  - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2) and [UI preview templates](https://github.com/vedph/cadmus-previews)
+  - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) with its [backend API](https://github.com/vedph/cadmus-graph-studio-api)
   - [CLI tool](https://github.com/vedph/cadmus_tool)
 - frontend:
   - [UI infrastructure](https://github.com/vedph/cadmus-shell-v3)
