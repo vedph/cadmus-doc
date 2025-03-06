@@ -10,8 +10,6 @@ Welcome to the Cadmus documentation. This is work in progress, and currently inc
 
 ![Cadmus](img/cadmus-300.png)
 
->🌐 Cadmus code can be found in repositories at the [VeDPH GitHub](https://github.com/vedph/). You can find more information about these repositories in the Backend and Frontend section of this documentation.
-
 ## Overview
 
 Cadmus is an open-ended, modular, and full-stack creation system for highly structured content, including text with any number of specialized annotation layers, and capable of multiple types of data export (including TEI) and import (mostly via the Proteus system).
@@ -51,8 +49,8 @@ Technically, the system is a _full-stack framework_ using a number of layers: fr
 1. database layer ([MongoDB](https://www.mongodb.com), and [PostgreSQL](https://www.postgresql.org) for indexes and graph).
 2. data layer ([C#](https://dotnet.microsoft.com/en-us/languages/csharp)).
 3. business layer ([C#](https://dotnet.microsoft.com/en-us/languages/csharp)).
-4. web API layer ([ASP.NET 9](https://www.asp.net)).
-5. web frontend layer ([Angular 19](https://angular.io)).
+4. web API layer ([ASP.NET 9](https://www.asp.net), served via Kestrel).
+5. web frontend layer ([Angular 19](https://angular.io), served via NGINX when containerized).
 
 A Cadmus editor, composed by aggregating existing parts or adding new ones, is [distributed](deploy/index) via 🐋 [Docker](https://www.docker.com/) images, so that all what you need to run it, either locally or on a server, is a machine with Docker installed. Of course, given the layered architecture, you are free to replace the layers you want, e.g. to use a different frontend, or a different storage technology. Yet, in most cases you can just put together object models created for several projects, and have your own up and running in a few hours.
 
@@ -75,7 +73,8 @@ In the end, this tool will allow you to build your own data with your own models
   - [CLI tool](https://github.com/vedph/cadmus_tool)
 - frontend:
   - [UI infrastructure](https://github.com/vedph/cadmus-shell-v3)
-  - [UI widgets ("bricks")](https://github.com/vedph/cadmus-bricks-shell-v3)
+  - [UI widgets ("bricks")](https://github.com/vedph/cadmus-bricks-shell-v3): 👉 [online demo](http://cadmus-bricks-v3.fusi-soft.com/)
+  - [Angular extensions for Annotorious](https://github.com/vedph/ngx-annotorious): used for visual annotations
 - documentation: <https://github.com/vedph/cadmus-doc> which feeds this site at <https://vedph.github.io/cadmus-doc>
 
 Additionally, each project has its own repositories. Typically, a project has:
