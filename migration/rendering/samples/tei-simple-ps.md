@@ -43,7 +43,7 @@ We now apply to this tree a filter whose task is to add branching at each point 
 
 This apparatus layer merger tree filter collects variants from apparatus fragments, merging into a single tree each version of the text as deduced from the apparatus (of course we are assuming that such information is present). The procedure is:
 
-1. assign the `lem` tag to each node of the input linear tree. This will allow us to get the base text back when traversing the newly created tree.
+1. assign an empty version tag to each node of the input linear tree. This will allow us to get the base text back when traversing the newly created tree.
 2. collect the text for each single source, whether it's a witness or an author. This implies traversing the original tree, and for each node append either its text value, when it's not linked to any fragments; or the value derived from the fragment, when it's linked to it.
 3. merge all these versions using each source ID as the tag for each version.
 
