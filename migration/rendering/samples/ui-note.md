@@ -2,7 +2,7 @@
 title: "Sample: Note UI" 
 layout: default
 parent: "Rendering Configuration"
-nav_order: 3
+nav_order: 4
 ---
 
 # Configuration Example - Note Part for UI

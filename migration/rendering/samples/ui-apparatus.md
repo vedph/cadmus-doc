@@ -1,8 +1,8 @@
 ---
-title: "Sample: Note UI" 
+title: "Sample: Apparatus UI" 
 layout: default
 parent: "Rendering Configuration"
-nav_order: 3
+nav_order: 5
 ---
 
 # Configuration Example - Apparatus Part for UI

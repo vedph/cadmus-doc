@@ -2,7 +2,7 @@
 title: "Sample: Plain Text" 
 layout: default
 parent: "Rendering Configuration"
-nav_order: 2
+nav_order: 3
 ---
 
 # Rendering Sample - Plain Text Output
