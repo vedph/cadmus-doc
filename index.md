@@ -70,7 +70,7 @@ In the end, this tool will allow you to build your own data with your own models
   - [API layer](https://github.com/vedph/cadmus-api)
   - [bibliographic subsystem](https://github.com/vedph/cadmus_biblioapi) for an independent bibliographic database in a RDBMS
   - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2) for data import/export and editor preview, with sample [UI preview templates](https://github.com/vedph/cadmus-previews)
-  - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) with its [backend API](https://github.com/vedph/cadmus-graph-studio-api)
+  - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) with its [backend API](https://github.com/vedph/cadmus-graph-studio-api): 👉 [graph studio demo](https://cadmus-graph-studio.fusi-soft.com/)
   - [CLI tool](https://github.com/vedph/cadmus_tool): a command line, multiple-platforms tool with many utility functions
 - frontend:
   - [UI infrastructure](https://github.com/vedph/cadmus-shell-v3)
