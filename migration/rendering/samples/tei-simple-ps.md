@@ -1,5 +1,5 @@
 ---
-title: "Sample: Simple TEI with PS" 
+title: "Sample: TEI with PS"
 layout: default
 parent: "Rendering Configuration"
 nav_order: 2
@@ -7,7 +7,7 @@ nav_order: 2
 
 # Rendering Sample - Simple TEI with Parallel Segmentation
 
-⚠️ This page is just a draft!
+⚠️ WARNING This page is just a draft!
 
 - [Rendering Sample - Simple TEI with Parallel Segmentation](#rendering-sample---simple-tei-with-parallel-segmentation)
   - [Version O](#version-o)
@@ -68,22 +68,22 @@ This apparatus layer merger tree filter collects variants from apparatus fragmen
 
 1. collect all the unique source identifiers from witnesses and authors. Each of these sources corresponds to a text version. The result is:
 
-   - O (witness)
-   - G (witness)
-   - R (witness)
-   - O1 (witness)
-   - Trappes-Lomax (author)
-   - MS48 (witness)
-   - Turnebus (author)
-   - Vossius (author)
-   - Heinsius (author)
+   - `O` (witness)
+   - `G` (witness)
+   - `R` (witness)
+   - `O1` (witness)
+   - `Trappes-Lomax` (author)
+   - `MS48` (witness)
+   - `Turnebus` (author)
+   - `Vossius` (author)
+   - `Heinsius` (author)
 
 2. merge the base text version into a newly created empty root node, tagging this version with an empty tag.
 3. for each collected source, build a corresponding linear tree, whose text is determined by the apparatus entries it is linked to. For instance, for source `O1` the first segment will be `secum` instead of `tecum`, because that's the variant in `O1`. Each of the nodes generated here will bear a version tag feature (`tag`) with the value equal to the source identifier, and a prefix `w:` for witnesses or `a:` for authors. Then, merge the resulting tree.
 
 The result will be a highly nested tree, representing all the versions defined by our variants. There will be one version for each source. Version tags will be stored as metadata of each node. This way, traversing the tree while filtering nodes by tag will allow us to get the text of each version.
 
-Let us follow this procedure, showing a compact ASCII dump for each tree. We start with the base text tree:
+Let us follow this procedure, showing a compact ASCII dump for each tree. We start with the base text tree, a linear tree directly derived from flattening our layers:
 
 ```txt
 + ⯈ [1.1] #1
@@ -124,7 +124,10 @@ As you can see, the only difference for `O` is `luderem` for `ludere`. By mergin
       - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
 ```
 
-As you can see we are now branching after the blank fork node inserted as a child of the space following `tecum`: the first child of the fork node is `ludere`, and the second one is `luderem`. Both are then followed by the rest of the nodes, which are duplicated.
+As you can see we are now branching after the blank fork node inserted as a child of the space following `tecum`: the first child of the fork node is `ludere`, and the second one is `luderem`. Both are then followed by the rest of the nodes, which are duplicated. We are thus representing two versions. To read them, just start from the root node, and walk downwards by selecting all the nodes having the tag feature with the value corresponding to the desired version:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
 
 ## Version G
 
@@ -139,7 +142,7 @@ The nodes for version `G` are equal to those of version `O`:
       - ■ [7.1] possem #5 → possem F1: tag=w:G
 ```
 
-The result of merge consists in simply adding version `G` tags to the nodes representing it:
+So, in this case merging simply consists in adding version `G` tags to the nodes representing it:
 
 ```txt
 + ⯈ [1.1] #1
@@ -153,6 +156,12 @@ The result of merge consists in simply adding version `G` tags to the nodes repr
      + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
       - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
 ```
+
+The resulting versions now are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
 
 ## Version R
 
@@ -182,6 +191,13 @@ So, here too we just add version tags:
       - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+
 ## Version O1
 
 Version O1 differs only by its node `secum` instead of `tecum`:
@@ -198,7 +214,7 @@ Version O1 differs only by its node `secum` instead of `tecum`:
 The result of merging is:
 
 ```txt
-+ ⯈ [1.1] #1 →  F2: tag=w:O1, tag=w:O1
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F4: tag=, tag=w:O, tag=w:G, tag=w:R
    + ⯈ [4.1]   #2 →   F4: tag=, tag=w:O, tag=w:G, tag=w:R
@@ -216,6 +232,14 @@ The result of merging is:
       - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+
 ## Version Trappers-Lomax
 
 Nodes:
@@ -232,7 +256,7 @@ Nodes:
 Merge result:
 
 ```txt
-+ ⯈ [1.1] #1 →  F3: tag=w:O1, tag=w:O1, tag=a:Trappers-Lomax
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F5: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax
    + ⯈ [4.1]   #2 →   F5: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax
@@ -255,6 +279,15 @@ Merge result:
       - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+- Trappers-Lomax: `tecum loedere sicut ipsa possem`.
+
 ## Version MS48
 
 Nodes:
@@ -271,7 +304,7 @@ Nodes:
 Merge result:
 
 ```txt
-+ ⯈ [1.1] #1 →  F4: tag=w:O1, tag=w:O1, tag=a:Trappers-Lomax, tag=w:MS48
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F6: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48
    + ⯈ [4.1]   #2 →   F6: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48
@@ -298,6 +331,16 @@ Merge result:
       - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+- Trappers-Lomax: `tecum loedere sicut ipsa possem`.
+- MS48: `tecum ludere sicut ipsa possum`.
+
 ## Version Turnebus
 
 Nodes:
@@ -314,7 +357,7 @@ Nodes:
 Merge result:
 
 ```txt
-+ ⯈ [1.1] #1 →  F5: tag=w:O1, tag=w:O1, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F7: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus
    + ⯈ [4.1]   #2 →   F7: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus
@@ -343,6 +386,17 @@ Merge result:
       - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+- Trappers-Lomax: `tecum loedere sicut ipsa possem`.
+- MS48: `tecum ludere sicut ipsa possum`.
+- Turnebus: `tecum ludere sicut ipsa possim`.
+
 ## Version Vossius
 
 Nodes:
@@ -359,7 +413,7 @@ Nodes:
 Merge result:
 
 ```txt
-+ ⯈ [1.1] #1 →  F6: tag=w:O1, tag=w:O1, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F8: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
    + ⯈ [4.1]   #2 →   F8: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
