@@ -26,9 +26,7 @@ nav_order: 2
     - [Sample Mappings](#sample-mappings)
     - [Sample Results](#sample-results)
 
-The mapping between Cadmus source data (items and parts) and nodes is defined by a number of node mappings.
-
-It should be stressed that the nodes produced from mapping are not intended to fully represent all the data from each Cadmus part. This is not the purpose of the relationships editing system, but rather a publishing task. The nodes mapped here are only those which need to be connected by users while editing, together with all the linked nodes considered useful for this purpose.
+The mapping between Cadmus source data (items and parts) and nodes is defined by node mappings.
 
 ## Sources
 
@@ -44,7 +42,7 @@ Note that for _item titles_ a couple of conventions dictate that:
 
 ## Identifiers
 
-Before illustrating these scenarios in more details, we must discuss the different identifiers used in the mapping process. In this document, these are referred to with SID (source ID), UID (entity's URI-based ID), and EID (entry's ID).
+Before illustrating the mapping process, we must discuss the different identifiers used in it. In this document, these are referred to with `SID` (source ID), `UID` (entity's URI-based ID), and `EID` (entry's ID).
 
 From the point of view of the mapping flow, it all starts with a SID, which specifies the source for the mapping. Mapping rules generate entities identified by UIDs. To this end, they may use the EIDs found in the source data.
 
@@ -83,23 +81,23 @@ The "entry" ID is just a convention followed in models of Cadmus multi-entity pa
 
 A Cadmus part corresponding to a _single entity_ is a single "entry". In this case, its ID is simply provided by the part's item.
 
-For instance, a person-information part inside a person item just adds data to the unique entity represented by the item (=the person). So, the target entity is just the one derived from the item. There is no need for an EID here, because the item will already get its own identifier.
+For instance, a person-information part inside a person item just adds data to the unique entity represented by the item (=the person). So, the target entity is simply the one derived from the item. There is no need for an EID here, because the item will already get its own identifier.
 
 Conversely, a manuscript's decorations part is a collection of decorations, each corresponding to an entry, optionally having its EID (exposed via an `eid` property). All the entries with EIDs get mapped into entities.
 
 Thus, here we call EIDs the identifiers provided by users for entries in a Cadmus collection-part. When present, such EIDs are used to build node identifiers URIs (UIDs).
 
->This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a usually human-friendly identifier for some entity contained in a data model. For instance, should the decorations of a manuscript include images, we could use their EIDs to name each image after them.
+>This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a human-friendly identifier for some entity contained in a data model. For instance, should the decorations of a manuscript include images, we could use their EIDs to name each image after them.
 
 ### Entity ID (UID)
 
 The entity ID is a _shortened URI_ where (like in Turtle) a conventional prefix replaces the namespace, calculated as defined by the entity mapping.
 
-To get relatively human-friendly UIDs, the UID is essentially derived from a template defined in the mapping rule generating a node.
+To get relatively human-friendly UIDs, the UID is essentially derived from a _template_ defined in the mapping rule generating a node.
 
 Yet, as we have to ensure that each UID is unique, whenever the template provides a result which happens to be already present and the mapping explicitly requests a unique UID, the UID gets a numeric suffix preceded by `#`. This suffix is granted to be unique in the context of our data.
 
->By convention, any UID built by mapping must end with `##` to indicate that a unique UID is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
+>💡 By convention, any UID built by mapping must end with `##` to indicate that a unique UID is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
 
 So, this mechanism ensures that the UID is unique, even though it is specified by users as a human-friendly identifier.
 
@@ -138,8 +136,10 @@ In turn, each mapping rule can include any number of _children rules_. The model
 - `partTypeFilter`: an optional part's type ID filter. When specified, the mapping will target only those items whose part type ID is _equal_ to this value.
 - `partRoleFilter`: an optional part's role ID filter. When specified, the mapping will target only those items whose part role ID is _equal_ to this value.
 - `description`: an optional, human-readable short description for the mapping rule. This is useful for documentation purposes.
+
 - `source`\*: the source expression representing the data selected by this mapping. In the current implementation this is a [JMES path](jmes-path). For instance, `events[?type=='person.birth']` matches only the entries in the `events` array property of a part's model whose type is equal to `person.birth`. When your source expression selects an object, you can refer to it as a whole with `.`, or to any of its properties by their name. When it selects an array, the mapper will implicitly loop through all its items, and be run for each of them. So, you can still define your mappings in terms of a single object, which here is the array's item. Additionally, the `index` metadatum will be used to represent the index number of the item in the array (0-N).
 - `scalarPattern`:  the optional regular expression pattern which should match against a scalar value defined by the mapping's source expression for the mapping to be applied. When this is defined and does not match, the mapping will not be applied. This can be used to overcome the limitations of the source expression in languages like JMESPath, where e.g. `.[?lost==true]` is always evaluated as a match, even when the value of the scalar property `lost` is `false`. So, in this example setting `scalarPattern` to `true` and source to `lost` will apply the mapping only if this property's value is `true`.
+
 - `output`:
   - `nodes`: an object (dictionary) where each property is the key of a node emitted by the mapping rule, whose string value is the node's identifier [template](#templates). Optionally, this template can be followed by space plus the node's label, and/or its tag between square brackets, the tag being preceded by `|`. For instance, `x:events/{$.} [label|tag]` defines the node's UID, its human-friendly label, and an optional tag.
   - `triples`: an array of strings, each representing a triple [template](#templates). Each triple is in any of these forms:
@@ -148,9 +148,10 @@ In turn, each mapping rule can include any number of _children rules_. The model
     - `S P "O"@lang`: subject, predicate, literal object in double quotes followed by an [ISO639](https://en.wikipedia.org/wiki/ISO_639) language identifier (e.g. `"sample"@en`);
     - `S P "O"^^type`: subject, predicate, literal object in double quotes followed by a type specifier (e.g. `"123"^^xs:int`).
   - `metadata`: optional metadata to be consumed in [templates](#templates). Metadata come from several sources: the source object, the mapping process itself, and these definitions in the mapping.
+
 - `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
 
->Note: the source type is a number where 0=user, 1=item, 2=part, 3=thesaurus, 4=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not an enumerated value, so that you can optionally add new values by just defining new constants.
+>Note: the _source type_ is a number where `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not a closed enumerated value, so that you can optionally add new values by just defining new constants.
 
 ## Templates
 
