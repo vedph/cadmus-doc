@@ -10,24 +10,32 @@ nav_order: 2
 ⚠️ WARNING This page is just a draft!
 
 - [Rendering Sample - Simple TEI with Parallel Segmentation](#rendering-sample---simple-tei-with-parallel-segmentation)
-  - [Version O](#version-o)
-  - [Version G](#version-g)
-  - [Version R](#version-r)
-  - [Version O1](#version-o1)
-  - [Version Trappers-Lomax](#version-trappers-lomax)
-  - [Version MS48](#version-ms48)
-  - [Version Turnebus](#version-turnebus)
-  - [Version Vossius](#version-vossius)
-  - [Version Heinsius](#version-heinsius)
+  - [Text and Apparatus](#text-and-apparatus)
+  - [Flattening](#flattening)
+  - [Filtering](#filtering)
+    - [1. Base Text](#1-base-text)
+    - [2. Version O](#2-version-o)
+    - [3. Version G](#3-version-g)
+    - [4. Version R](#4-version-r)
+    - [5. Version O1](#5-version-o1)
+    - [6. Version Trappers-Lomax](#6-version-trappers-lomax)
+    - [7. Version MS48](#7-version-ms48)
+    - [8. Version Turnebus](#8-version-turnebus)
+    - [9. Version Vossius](#9-version-vossius)
+    - [10. Version Heinsius](#10-version-heinsius)
   - [Tree Renderer](#tree-renderer)
 
 In this rendering example, we want to output a TEI document with just the apparatus layer; but this time we want to represent all the versions of a text, as defined by the apparatus, while avoiding overlap, adopting the so-called _parallel segmentation method_.
 
-In this method, the texts compared are split into matching segments in synch with one another. Whenever there is a branching, we wrap variants in an `app` element, including each one in `rdg` (or in `lem` when this is a preferred variant). This makes it easy to compare different readings side by side, and also to extract the full text of any witness (or version, in our scenario). Of course, its drawback is that this encoding may quickly become highly nested and redundant; and there might be issues when trying to adopt different levels of granularity in segmenting text, because we need to keep the branches in synch.
+In this method, the texts compared are split into matching segments in synch with one another. Whenever there is a branching, we wrap variants in an `app` element, including each one in `rdg` (or in `lem` when this is a preferred variant). This makes it easy to compare different readings side by side, and also to extract the full text of any witness (or version, in our scenario).
+
+Of course, its drawback is that this encoding may quickly become highly nested and redundant; and there might be issues when trying to adopt different levels of granularity in segmenting text, because we need to keep the branches in synch.
 
 Apart from segmentation issues anyway (which here are removed by the flattening process), high nesting and redundancy can be mitigated by generating XML encoding via software, like we are doing here.
 
-Let us consider this critical text (extracted with simplifications from a real world example; I include portions of text attached to the apparatus layer in square brackets):
+## Text and Apparatus
+
+Let us consider this critical text (extracted with simplifications from a real world example; I include portions of text attached to the [apparatus layer](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md) in square brackets):
 
 ```txt
 [tecum] [ludere] sicut ipsa [possem]
@@ -51,7 +59,9 @@ with these fragments linked to the apparatus layer:
 
 Say we are still using a single layer, the apparatus, to render this text. This time we want to adopt the parallel segmentation method.
 
-After flattening the apparatus layer, we end up with a tree:
+## Flattening
+
+The first step is flattening the text, while segmenting it into the maximum extent spans covering each a distinct set of fragment links. After flattening the apparatus layer, we end up with a linear tree, where each node represents a segment, and each segment is modeled as the child of the previous one:
 
 ```mermaid
 graph LR;
@@ -62,9 +72,11 @@ root --> 1[tecum]
 3 --> 4[possem]
 ```
 
+## Filtering
+
 We now apply to this tree a filter whose task is to add branching at each point where the text of each source (witness or author) diverges from the base text, limiting the children of each node to maximum two. To this end, whenever a branching occurs the filter inserts a new blank node which forks into two branches.
 
-This apparatus layer merger tree filter collects variants from apparatus fragments, merging into a single tree each version of the text as deduced from the apparatus (of course we are assuming that such information is present). The procedure is:
+This _apparatus layer merger tree filter_ collects variants from apparatus fragments, merging into a single tree each version of the text as deduced from the apparatus (of course we are assuming that such information is present). The procedure is:
 
 1. collect all the unique source identifiers from witnesses and authors. Each of these sources corresponds to a text version. The result is:
 
@@ -83,7 +95,11 @@ This apparatus layer merger tree filter collects variants from apparatus fragmen
 
 The result will be a highly nested tree, representing all the versions defined by our variants. There will be one version for each source. Version tags will be stored as metadata of each node. This way, traversing the tree while filtering nodes by tag will allow us to get the text of each version.
 
-Let us follow this procedure, showing a compact ASCII dump for each tree. We start with the base text tree, a linear tree directly derived from flattening our layers:
+Let us follow this procedure, showing a compact ASCII dump for each tree.
+
+### 1. Base Text
+
+We start with the base text tree, a linear tree directly derived from flattening our layers:
 
 ```txt
 BASE
@@ -97,7 +113,7 @@ BASE
 
 >In this dump the text after the arrow is the payload carried by the node; `F` is followed by the total count of features and the features themselves (when they are not too many). Here, the base text tag is just an empty string.
 
-## Version O
+### 2. Version O
 
 The nodes corresponding to the first version (`O`) are:
 
@@ -132,7 +148,7 @@ As you can see we are now branching after the blank fork node inserted as a chil
 - base (empty tag): `tecum ludere sicut ipsa possem`.
 - `O`: `tecum luderem sicut ipsa possem`.
 
-## Version G
+### 3. Version G
 
 The nodes for version `G` are equal to those of version `O`:
 
@@ -168,7 +184,7 @@ The resulting versions now are:
 - `O`: `tecum luderem sicut ipsa possem`.
 - `G`: like base.
 
-## Version R
+### 4. Version R
 
 Again, nodes for version R are equal to those of `OG`:
 
@@ -205,7 +221,7 @@ The resulting versions are:
 - `G`: like base.
 - `R`: like base.
 
-## Version O1
+### 5. Version O1
 
 Version O1 differs only by its node `secum` instead of `tecum`:
 
@@ -249,7 +265,7 @@ The resulting versions are:
 - `R`: like base.
 - `O1`: `secum ludere sicut ipsa possem`.
 
-## Version Trappers-Lomax
+### 6. Version Trappers-Lomax
 
 Nodes:
 
@@ -298,7 +314,7 @@ The resulting versions are:
 - `O1`: `secum ludere sicut ipsa possem`.
 - Trappers-Lomax: `tecum loedere sicut ipsa possem`.
 
-## Version MS48
+### 7. Version MS48
 
 Nodes:
 
@@ -350,7 +366,7 @@ The resulting versions are:
 - Trappers-Lomax: `tecum loedere sicut ipsa possem`.
 - MS48: `tecum ludere sicut ipsa possum`.
 
-## Version Turnebus
+### 8. Version Turnebus
 
 Nodes:
 
@@ -405,7 +421,7 @@ The resulting versions are:
 - MS48: `tecum ludere sicut ipsa possum`.
 - Turnebus: `tecum ludere sicut ipsa possim`.
 
-## Version Vossius
+### 9. Version Vossius
 
 Nodes:
 
@@ -451,7 +467,7 @@ MERGED VOSSIUS
       - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
-## Version Heinsius
+### 10. Version Heinsius
 
 Nodes:
 
