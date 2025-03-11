@@ -111,7 +111,7 @@ BASE
      - ■ [6.1] possem #5 → possem F1: tag=
 ```
 
->In this dump the text after the arrow is the payload carried by the node; `F` is followed by the total count of features and the features themselves (when they are not too many). Here, the base text tag is just an empty string.
+>In this dump the text after the arrow is the payload carried by the node; `F` is followed by the total count of features and the features themselves (when they are not too many). Here, the base text tag is just an empty string. The number after `#` is a numeric ID automatically assigned to each node, unique within the context of the tree.
 
 ### 2. Version O
 
@@ -235,7 +235,7 @@ VERSION O1
      - ■ [6.1] possem #5 → possem F1: tag=w:O1
 ```
 
-The result of merging is:
+This branching happens at the very beginning of the node, so we will have a blank fork node as the child of the root. The result of merging is:
 
 ```txt
 MERGED O1
@@ -467,6 +467,18 @@ MERGED VOSSIUS
       - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+- Trappers-Lomax: `tecum loedere sicut ipsa possem`.
+- MS48: `tecum ludere sicut ipsa possum`.
+- Turnebus: `tecum ludere sicut ipsa possim`.
+- Vossius: `tecum ludere sicut ipsa posse`.
+
 ### 10. Version Heinsius
 
 Nodes:
@@ -514,6 +526,19 @@ MERGED HEINSIUS
      + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
       - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
+
+The resulting versions are:
+
+- base (empty tag): `tecum ludere sicut ipsa possem`.
+- `O`: `tecum luderem sicut ipsa possem`.
+- `G`: like base.
+- `R`: like base.
+- `O1`: `secum ludere sicut ipsa possem`.
+- Trappers-Lomax: `tecum loedere sicut ipsa possem`.
+- MS48: `tecum ludere sicut ipsa possum`.
+- Turnebus: `tecum ludere sicut ipsa possim`.
+- Vossius: `tecum ludere sicut ipsa posse`.
+- Heinsius: `tecum ludere sicut ipsa posset`.
 
 The corresponding diagram shows the final result:
 
