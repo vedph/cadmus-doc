@@ -86,6 +86,7 @@ The result will be a highly nested tree, representing all the versions defined b
 Let us follow this procedure, showing a compact ASCII dump for each tree. We start with the base text tree, a linear tree directly derived from flattening our layers:
 
 ```txt
+BASE
 + ⯈ [1.1] #1
  + ⯈ [2.1] tecum #1 → tecum F1: tag=
   + ⯈ [3.1]   #2 →   F1: tag=
@@ -101,17 +102,19 @@ Let us follow this procedure, showing a compact ASCII dump for each tree. We sta
 The nodes corresponding to the first version (`O`) are:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=w:O
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=w:O
-   + ⯈ [4.1]   #2 →   F1: tag=w:O
-    + ⯈ [5.1] luderem #3 → luderem F1: tag=w:O
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
-      - ■ [7.1] possem #5 → possem F1: tag=w:O
+VERSION O
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=w:O
+  + ⯈ [3.1]   #2 →   F1: tag=w:O
+   + ⯈ [4.1] luderem #3 → luderem F1: tag=w:O
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+     - ■ [6.1] possem #5 → possem F1: tag=w:O
 ```
 
 As you can see, the only difference for `O` is `luderem` for `ludere`. By merging this version into our tree with the base text, we get this result:
 
 ```txt
+MERGED O
 + ⯈ [1.1] #1
  + ⯈ [2.1] tecum #1 → tecum F2: tag=, tag=w:O
   + ⯈ [3.1]   #2 →   F2: tag=, tag=w:O
@@ -119,9 +122,9 @@ As you can see, the only difference for `O` is `luderem` for `ludere`. By mergin
     + ⯈ [5.1] ludere #3 → ludere F1: tag=
      + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=
       - ■ [7.1] possem #5 → possem F1: tag=
-    + ⯈ [5.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-      - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
+    + ⯈ [5.2] luderem #3 → luderem F1: tag=w:O
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+      - ■ [7.1] possem #5 → possem F1: tag=w:O
 ```
 
 As you can see we are now branching after the blank fork node inserted as a child of the space following `tecum`: the first child of the fork node is `ludere`, and the second one is `luderem`. Both are then followed by the rest of the nodes, which are duplicated. We are thus representing two versions. To read them, just start from the root node, and walk downwards by selecting all the nodes having the tag feature with the value corresponding to the desired version:
@@ -134,17 +137,19 @@ As you can see we are now branching after the blank fork node inserted as a chil
 The nodes for version `G` are equal to those of version `O`:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=w:G
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=w:G
-   + ⯈ [4.1]   #2 →   F1: tag=w:G
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:G
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:G
-      - ■ [7.1] possem #5 → possem F1: tag=w:G
-```
+VERSION G
+ + ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=w:G
+  + ⯈ [3.1]   #2 →   F1: tag=w:G
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=w:G
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:G
+     - ■ [6.1] possem #5 → possem F1: tag=w:G
+ ``
 
 So, in this case merging simply consists in adding version `G` tags to the nodes representing it:
 
 ```txt
+MERGED G
 + ⯈ [1.1] #1
  + ⯈ [2.1] tecum #1 → tecum F3: tag=, tag=w:O, tag=w:G
   + ⯈ [3.1]   #2 →   F3: tag=, tag=w:O, tag=w:G
@@ -152,9 +157,9 @@ So, in this case merging simply consists in adding version `G` tags to the nodes
     + ⯈ [5.1] ludere #3 → ludere F2: tag=, tag=w:G
      + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=, tag=w:G
       - ■ [7.1] possem #5 → possem F2: tag=, tag=w:G
-    + ⯈ [5.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-      - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
+    + ⯈ [5.2] luderem #3 → luderem F1: tag=w:O
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+      - ■ [7.1] possem #5 → possem F1: tag=w:O
 ```
 
 The resulting versions now are:
@@ -168,17 +173,19 @@ The resulting versions now are:
 Again, nodes for version R are equal to those of `OG`:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=w:R
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=w:R
-   + ⯈ [4.1]   #2 →   F1: tag=w:R
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:R
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:R
-      - ■ [7.1] possem #5 → possem F1: tag=w:R
+VERSION R
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=w:R
+  + ⯈ [3.1]   #2 →   F1: tag=w:R
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=w:R
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:R
+     - ■ [6.1] possem #5 → possem F1: tag=w:R
 ```
 
 So, here too we just add version tags:
 
 ```txt
+MERGED R
 + ⯈ [1.1] #1
  + ⯈ [2.1] tecum #1 → tecum F4: tag=, tag=w:O, tag=w:G, tag=w:R
   + ⯈ [3.1]   #2 →   F4: tag=, tag=w:O, tag=w:G, tag=w:R
@@ -186,9 +193,9 @@ So, here too we just add version tags:
     + ⯈ [5.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
      + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
       - ■ [7.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-    + ⯈ [5.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-      - ■ [7.1] possem #5 → possem F2: tag=w:O, tag=w:O
+    + ⯈ [5.2] luderem #3 → luderem F1: tag=w:O
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+      - ■ [7.1] possem #5 → possem F1: tag=w:O
 ```
 
 The resulting versions are:
@@ -203,17 +210,19 @@ The resulting versions are:
 Version O1 differs only by its node `secum` instead of `tecum`:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=w:O1
-  + ⯈ [3.1] secum #1 → secum F1: tag=w:O1
-   + ⯈ [4.1]   #2 →   F1: tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
-      - ■ [7.1] possem #5 → possem F1: tag=w:O1
+VERSION O1
++ ⯈ [1.1] #6
+ + ⯈ [2.1] secum #1 → secum F1: tag=w:O1
+  + ⯈ [3.1]   #2 →   F1: tag=w:O1
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=w:O1
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+     - ■ [6.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The result of merging is:
 
 ```txt
+MERGED O1
 + ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F4: tag=, tag=w:O, tag=w:G, tag=w:R
@@ -222,14 +231,14 @@ The result of merging is:
      + ⯈ [6.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
       + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
        - ■ [8.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-     + ⯈ [6.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-       - ■ [8.1] possem #5 → possem F2: tag=w:O, tag=w:O
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+     + ⯈ [6.2] luderem #3 → luderem F1: tag=w:O
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+       - ■ [8.1] possem #5 → possem F1: tag=w:O
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The resulting versions are:
@@ -245,38 +254,39 @@ The resulting versions are:
 Nodes:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=a:Trappers-Lomax
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=a:Trappers-Lomax
-   + ⯈ [4.1]   #2 →   F1: tag=a:Trappers-Lomax
-    + ⯈ [5.1] loedere #3 → loedere F1: tag=a:Trappers-Lomax
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
-      - ■ [7.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+VERSION TRAPPERS-LOMAX
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=a:Trappers-Lomax
+  + ⯈ [3.1]   #2 →   F1: tag=a:Trappers-Lomax
+   + ⯈ [4.1] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+     - ■ [6.1] possem #5 → possem F1: tag=a:Trappers-Lomax
 ```
 
 Merge result:
 
 ```txt
+MERGED TRAPPERS-LOMAX
 + ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F5: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax
    + ⯈ [4.1]   #2 →   F5: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax
-    + ⯈ [5.1] #2 →   F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-     + ⯈ [6.1] #4
-      + ⯈ [7.1] #5
-       + ⯈ [8.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
-         - ■ [10.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-       + ⯈ [8.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-         - ■ [10.1] possem #5 → possem F2: tag=w:O, tag=w:O
-      + ⯈ [7.2] loedere #3 → loedere F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-        - ■ [9.1] possem #5 → possem F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+    + ⯈ [5.1] #2
+     + ⯈ [6.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
+       - ■ [8.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
+     + ⯈ [6.2] #4
+      + ⯈ [7.1] luderem #3 → luderem F1: tag=w:O
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+        - ■ [9.1] possem #5 → possem F1: tag=w:O
+      + ⯈ [7.2] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+        - ■ [9.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The resulting versions are:
@@ -293,42 +303,41 @@ The resulting versions are:
 Nodes:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=w:MS48
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=w:MS48
-   + ⯈ [4.1]   #2 →   F1: tag=w:MS48
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:MS48
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:MS48
-      - ■ [7.1] possum #5 → possum F1: tag=w:MS48
+VERSION MS48
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=w:MS48
+  + ⯈ [3.1]   #2 →   F1: tag=w:MS48
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=w:MS48
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:MS48
+     - ■ [6.1] possum #5 → possum F1: tag=w:MS48
 ```
 
 Merge result:
 
 ```txt
+MERGED MS48
 + ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F6: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48
    + ⯈ [4.1]   #2 →   F6: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48
-    + ⯈ [5.1] #6
-     + ⯈ [6.1] #2 →   F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-      + ⯈ [7.1] #4
+    + ⯈ [5.1] #2
+     + ⯈ [6.1] ludere #3 → ludere F4: tag=, tag=w:G, tag=w:R, tag=w:MS48
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F4: tag=, tag=w:G, tag=w:R, tag=w:MS48
        + ⯈ [8.1] #5
-        + ⯈ [9.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
-          - ■ [11.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-        + ⯈ [9.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-          - ■ [11.1] possem #5 → possem F2: tag=w:O, tag=w:O
-       + ⯈ [8.2] loedere #3 → loedere F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-         - ■ [10.1] possem #5 → possem F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-     + ⯈ [6.2] ludere #3 → ludere F2: tag=w:MS48, tag=w:MS48
-      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:MS48, tag=w:MS48
-       - ■ [8.1] possum #5 → possum F2: tag=w:MS48, tag=w:MS48
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+        - ■ [9.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
+        - ■ [9.2] possum #5 → possum F1: tag=w:MS48
+     + ⯈ [6.2] #4
+      + ⯈ [7.1] luderem #3 → luderem F1: tag=w:O
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+        - ■ [9.1] possem #5 → possem F1: tag=w:O
+      + ⯈ [7.2] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+        - ■ [9.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The resulting versions are:
@@ -346,44 +355,43 @@ The resulting versions are:
 Nodes:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=a:Turnebus
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=a:Turnebus
-   + ⯈ [4.1]   #2 →   F1: tag=a:Turnebus
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=a:Turnebus
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Turnebus
-      - ■ [7.1] possim #5 → possim F1: tag=a:Turnebus
+VERSION TURNEBUS
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=a:Turnebus
+  + ⯈ [3.1]   #2 →   F1: tag=a:Turnebus
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=a:Turnebus
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Turnebus
+     - ■ [6.1] possim #5 → possim F1: tag=a:Turnebus
 ```
 
 Merge result:
 
 ```txt
+MERGED TURNEBUS
 + ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F7: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus
    + ⯈ [4.1]   #2 →   F7: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus
-    + ⯈ [5.1] #6
-     + ⯈ [6.1] #2 →   F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-      + ⯈ [7.1] #4
+    + ⯈ [5.1] #2
+     + ⯈ [6.1] ludere #3 → ludere F5: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F5: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus
        + ⯈ [8.1] #5
-        + ⯈ [9.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
-          - ■ [11.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-        + ⯈ [9.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-          - ■ [11.1] possem #5 → possem F2: tag=w:O, tag=w:O
-       + ⯈ [8.2] loedere #3 → loedere F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-         - ■ [10.1] possem #5 → possem F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-     + ⯈ [6.2] ludere #3 → ludere F3: tag=w:MS48, tag=w:MS48, tag=a:Turnebus
-      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=w:MS48, tag=w:MS48, tag=a:Turnebus
-       + ⯈ [8.1] #7
-        - ■ [9.1] possum #5 → possum F2: tag=w:MS48, tag=w:MS48
-        - ■ [9.2] possim #5 → possim F2: tag=a:Turnebus, tag=a:Turnebus
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+        - ■ [9.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
+        + ⯈ [9.2] #6
+         - ■ [10.1] possum #5 → possum F1: tag=w:MS48
+         - ■ [10.2] possim #5 → possim F1: tag=a:Turnebus
+     + ⯈ [6.2] #4
+      + ⯈ [7.1] luderem #3 → luderem F1: tag=w:O
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+        - ■ [9.1] possem #5 → possem F1: tag=w:O
+      + ⯈ [7.2] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+        - ■ [9.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The resulting versions are:
@@ -402,47 +410,45 @@ The resulting versions are:
 Nodes:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=a:Vossius
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=a:Vossius
-   + ⯈ [4.1]   #2 →   F1: tag=a:Vossius
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=a:Vossius
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Vossius
-      - ■ [7.1] posse #5 → posse F1: tag=a:Vossius
+VERSION VOSSIUS
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=a:Vossius
+  + ⯈ [3.1]   #2 →   F1: tag=a:Vossius
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=a:Vossius
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Vossius
+     - ■ [6.1] posse #5 → posse F1: tag=a:Vossius
 ```
 
 Merge result:
 
 ```txt
+MERGED VOSSIUS
 + ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F8: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
    + ⯈ [4.1]   #2 →   F8: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
-    + ⯈ [5.1] #6
-     + ⯈ [6.1] #2 →   F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-      + ⯈ [7.1] #4
+    + ⯈ [5.1] #2
+     + ⯈ [6.1] ludere #3 → ludere F6: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F6: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
        + ⯈ [8.1] #5
-        + ⯈ [9.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
-          - ■ [11.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-        + ⯈ [9.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-          - ■ [11.1] possem #5 → possem F2: tag=w:O, tag=w:O
-       + ⯈ [8.2] loedere #3 → loedere F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-         - ■ [10.1] possem #5 → possem F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-     + ⯈ [6.2] ludere #3 → ludere F4: tag=w:MS48, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
-      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F4: tag=w:MS48, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius
-       + ⯈ [8.1] #7 →  sicut ipsa  F2: tag=a:Vossius, tag=a:Vossius
-        + ⯈ [9.1] #8
-         + ⯈ [10.1] #9
-          - ■ [11.1] possum #5 → possum F2: tag=w:MS48, tag=w:MS48
-          - ■ [11.2] possim #5 → possim F2: tag=a:Turnebus, tag=a:Turnebus
-         - ■ [10.2] posse #5 → posse F2: tag=a:Vossius, tag=a:Vossius
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+        - ■ [9.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
+        + ⯈ [9.2] #7
+         + ⯈ [10.1] #6
+          - ■ [11.1] possum #5 → possum F1: tag=w:MS48
+          - ■ [11.2] possim #5 → possim F1: tag=a:Turnebus
+         - ■ [10.2] posse #5 → posse F1: tag=a:Vossius
+     + ⯈ [6.2] #4
+      + ⯈ [7.1] luderem #3 → luderem F1: tag=w:O
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+        - ■ [9.1] possem #5 → possem F1: tag=w:O
+      + ⯈ [7.2] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+        - ■ [9.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 ## Version Heinsius
@@ -450,49 +456,47 @@ Merge result:
 Nodes:
 
 ```txt
- + ⯈ [2.1] #6 →  F1: tag=a:Heinsius
-  + ⯈ [3.1] tecum #1 → tecum F1: tag=a:Heinsius
-   + ⯈ [4.1]   #2 →   F1: tag=a:Heinsius
-    + ⯈ [5.1] ludere #3 → ludere F1: tag=a:Heinsius
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Heinsius
-      - ■ [7.1] posset #5 → posset F1: tag=a:Heinsius
+VERSION HEINSIUS
++ ⯈ [1.1] #6
+ + ⯈ [2.1] tecum #1 → tecum F1: tag=a:Heinsius
+  + ⯈ [3.1]   #2 →   F1: tag=a:Heinsius
+   + ⯈ [4.1] ludere #3 → ludere F1: tag=a:Heinsius
+    + ⯈ [5.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Heinsius
+     - ■ [6.1] posset #5 → posset F1: tag=a:Heinsius
 ```
 
 Merge results:
 
 ```txt
-+ ⯈ [1.1] #1 →  F7: tag=w:O1, tag=w:O1, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
+MERGED HEINSIUS
++ ⯈ [1.1] #1
  + ⯈ [2.1] #3
   + ⯈ [3.1] tecum #1 → tecum F9: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
    + ⯈ [4.1]   #2 →   F9: tag=, tag=w:O, tag=w:G, tag=w:R, tag=a:Trappers-Lomax, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
-    + ⯈ [5.1] #6
-     + ⯈ [6.1] #2 →   F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-      + ⯈ [7.1] #4
+    + ⯈ [5.1] #2
+     + ⯈ [6.1] ludere #3 → ludere F7: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
+      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F7: tag=, tag=w:G, tag=w:R, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
        + ⯈ [8.1] #5
-        + ⯈ [9.1] ludere #3 → ludere F3: tag=, tag=w:G, tag=w:R
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F3: tag=, tag=w:G, tag=w:R
-          - ■ [11.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
-        + ⯈ [9.2] luderem #3 → luderem F2: tag=w:O, tag=w:O
-         + ⯈ [10.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O, tag=w:O
-          - ■ [11.1] possem #5 → possem F2: tag=w:O, tag=w:O
-       + ⯈ [8.2] loedere #3 → loedere F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-        + ⯈ [9.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-         - ■ [10.1] possem #5 → possem F2: tag=a:Trappers-Lomax, tag=a:Trappers-Lomax
-     + ⯈ [6.2] ludere #3 → ludere F5: tag=w:MS48, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
-      + ⯈ [7.1]  sicut ipsa  #4 →  sicut ipsa  F5: tag=w:MS48, tag=w:MS48, tag=a:Turnebus, tag=a:Vossius, tag=a:Heinsius
-       + ⯈ [8.1] #10
-        + ⯈ [9.1] #7 →  sicut ipsa  F2: tag=a:Vossius, tag=a:Vossius
-         + ⯈ [10.1] #8
-          + ⯈ [11.1] #9
-           - ■ [12.1] possum #5 → possum F2: tag=w:MS48, tag=w:MS48
-           - ■ [12.2] possim #5 → possim F2: tag=a:Turnebus, tag=a:Turnebus
-          - ■ [11.2] posse #5 → posse F2: tag=a:Vossius, tag=a:Vossius
-        - ■ [9.2] posset #5 → posset F2: tag=a:Heinsius, tag=a:Heinsius
-  + ⯈ [3.2] secum #1 → secum F2: tag=w:O1, tag=w:O1
-   + ⯈ [4.1]   #2 →   F2: tag=w:O1, tag=w:O1
-    + ⯈ [5.1] ludere #3 → ludere F2: tag=w:O1, tag=w:O1
-     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F2: tag=w:O1, tag=w:O1
-      - ■ [7.1] possem #5 → possem F2: tag=w:O1, tag=w:O1
+        - ■ [9.1] possem #5 → possem F3: tag=, tag=w:G, tag=w:R
+        + ⯈ [9.2] #8
+         + ⯈ [10.1] #7
+          + ⯈ [11.1] #6
+           - ■ [12.1] possum #5 → possum F1: tag=w:MS48
+           - ■ [12.2] possim #5 → possim F1: tag=a:Turnebus
+          - ■ [11.2] posse #5 → posse F1: tag=a:Vossius
+         - ■ [10.2] posset #5 → posset F1: tag=a:Heinsius
+     + ⯈ [6.2] #4
+      + ⯈ [7.1] luderem #3 → luderem F1: tag=w:O
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O
+        - ■ [9.1] possem #5 → possem F1: tag=w:O
+      + ⯈ [7.2] loedere #3 → loedere F1: tag=a:Trappers-Lomax
+       + ⯈ [8.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=a:Trappers-Lomax
+        - ■ [9.1] possem #5 → possem F1: tag=a:Trappers-Lomax
+  + ⯈ [3.2] secum #1 → secum F1: tag=w:O1
+   + ⯈ [4.1]   #2 →   F1: tag=w:O1
+    + ⯈ [5.1] ludere #3 → ludere F1: tag=w:O1
+     + ⯈ [6.1]  sicut ipsa  #4 →  sicut ipsa  F1: tag=w:O1
+      - ■ [7.1] possem #5 → possem F1: tag=w:O1
 ```
 
 The corresponding diagram shows the final result:
