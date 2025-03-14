@@ -78,6 +78,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [decorations](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-decorations.md)
   - [edits](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-edits.md)
   - [hands](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-hands.md)
+  - [illuminator instructions](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-illum-instructions.md)
   - [layouts](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-layouts.md)
   - [material](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-material-dsc.md)
   - [sheet labels](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-sheet-labels.md)
