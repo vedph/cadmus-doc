@@ -7,9 +7,9 @@ nav_order: 1
 
 # Rendering Sample - Simple TEI
 
-This example shows a TEI rendition of the simplest critical text scenario: just a text and its critical apparatus, with no additional layers.
+This example shows a TEI rendition of the simplest critical text scenario: just a text and its critical apparatus, with no additional layers. The purpose of this rendition is generating a text with embedded apparatus variants.
 
-The configuration follows:
+The configuration follows; it first defines a number of components with their settings (under `Options`) and an arbitrarily chosen key; and then references these configured components via their keys.
 
 ```json
 {
@@ -100,24 +100,33 @@ The configuration follows:
 }
 ```
 
-From top to bottom:
+The pipeline defined by this configuration works as follows (see the [pipeline overview](../architecture#building-trees) for more):
 
-1. the **item ID collector** draws data from a Mongo database (the default for Cadmus), and filters items to select only those representing text items (whose facet is `text`).
-2. a flag-based **context supplier** is used to supply the context type for the text item: in the editor, a flag (whose value here happens to be 8) is used to mark those text items written in poetry. This supplies more metadata to the rendering context: when the flag is on, block type is set to poetry; when it is off, it is set to prose.
-3. a **tree text filter** is used to split nodes containing newlines in their text, so we can be sure that newlines do not appear in text and each node before newline is marked as such.
-4. two renderer filters are applied:
-   - `nl-appender` is used to append a CR-LF pair after each item rendition. This provides a tidier TEI code.
-   - `ns-remover` is used to remove the redundant namespace in the TEI output by the tree renderer. There, the namespace is required because the rendered output is a standalone TEI fragment which requires a namespace at its first-level element(s); but once in the context of a full document, this namespace would be redundant.
-5. a **text part flattener** is used to flatten the annotated text of token-based text parts.
-6. a **text tree renderer** is used to render a token-based text with a single apparatus layer into a simple TEI with embedded apparatus.
-7. the **item composer** orchestrates all these components storing results into files. It uses:
-   - the above defined context supplier (nr.2) for detecting poetry.
-   - the above defined flattener (nr.5) to flatten layers of annotations on a single linear sequence of text segments. In this example we just have a single layer, so the segmentation will just result from combining the base text with the apparatus annotations on its top.
-   - the above defined tree filter (nr.3) to properly handle newlines in text.
-   - the above defined tree renderer (nr.6) to render text and apparatus into TEI.
-   - a preset text head with all the markup before the text body.
-   - a preset text tail with all the markup after the text body.
-   - an output directory.
+1. the **item ID collector** (`it.vedph.item-id-collector.mongo`) draws data from a Mongo database (the default for Cadmus), and filters items to select only those representing text items (whose facet is `text`). In this case, each item corresponds to a self-contained portion of the text, like a `div` or a `p` in a TEI document.
+
+2. a flag-based **context supplier** (`it.vedph.renderer-context-supplier.flag`) is used to supply the context type for the text item: in the editor, a flag (whose value here happens to be 8) is used to mark those text items written in poetry. This supplies more metadata to the rendering context: when the flag is on, the block type is set to poetry; when it is off, it is set to prose.
+
+3. a **text part flattener** (`it.vedph.token-text`) is used to flatten the annotated text from token-based text parts with their apparatus layers. Each text is thus fragmented into segments, which can be linked or not to an apparatus entry. Each segment has the maximum allowed length so to minimize output complexity.
+
+4. after the text is flattened into segments possibly linked to apparatus annotations, a **tree text filter** (`it.vedph.text-tree-filter.block-linear`) is used to split nodes containing newlines in their text, so we can be sure that newlines do not appear in text and each node before newline is marked as such.
+
+5. a **text tree renderer** (`it.vedph.text-tree-renderer.tei-app-linear`) is used to render a token-based text with a single apparatus layer into a simple TEI text with embedded apparatus. In this context, two **renderer filters** are applied:
+   - `it.vedph.renderer-filter.appender` is used to append a CR-LF pair after each item rendition. This just provides a tidier TEI code.
+   - `it.vedph.renderer-filter.replace` is used to remove the redundant namespace in the TEI output by the tree renderer. There, the namespace is required because the rendered output is a standalone TEI fragment which requires a namespace at its first-level element(s); but once in the context of a full document, this namespace would be redundant.
+
+The **item composer** orchestrates all these components storing results into files. It uses:
+
+- the above defined context supplier (nr.2) for detecting poetry.
+- the above defined flattener (nr.5) to flatten layers of annotations on a single linear sequence of text segments. In this example we just have a single layer, so the segmentation will just result from combining the base text with the apparatus annotations on its top.
+- the above defined tree filter (nr.3) to properly handle newlines in text.
+- the above defined tree renderer (nr.6) to render text and apparatus into TEI.
+- a preset text head with all the markup before the text body.
+- a preset text tail with all the markup after the text body.
+- an output directory.
+
+The essential component here is the tree renderer, which has the logic for connecting data from the Cadmus database with the rendered output. Essentially, it walks the linear tree built in the previous stages node by node, and whenever a node is linked to an annotation fragment, it reads it and outputs the corresponding TEI code.
+
+## Sample TEI
 
 For a single item, this produces an output like this (I reformatted it to make it more readable here):
 
