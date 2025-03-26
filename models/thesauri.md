@@ -347,6 +347,8 @@ The ID `model-types@en` is conventionally **reserved** to provide a mapping betw
 
 This is systematically used in the editor UI to show human friendly names instead of full IDs when referring to data parts. You should thus always provide this thesaurus in your project, unless you want to deal with ugly, longer part IDs.
 
+You can provide entries for part/fragment type IDs, but also for combinations of a type ID and a role ID. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role (see the example below).
+
 >By convention, entries in this thesaurus are sorted by their ID, but all the fragment-related entries come after the others, like in the sample below.
 
 Example:
@@ -361,6 +363,10 @@ Example:
     {
         "id": "it.vedph.categories",
         "value": "categories"
+    },
+    {
+        "id": "it.vedph.categories:eras",
+        "value": "eras"
     },
     {
         "id": "it.vedph.comment",

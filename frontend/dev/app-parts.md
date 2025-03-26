@@ -255,7 +255,7 @@ export class __NAME__PartComponent
       <div mat-card-avatar>
         <mat-icon>picture_in_picture</mat-icon>
       </div>
-      <mat-card-title>__NAME__ Part</mat-card-title>
+      <mat-card-title>{{ (modelName() | titlecase) || "__NAME__ Part" }}</mat-card-title>
     </mat-card-header>
     <mat-card-content> TODO: your template here... </mat-card-content>
     <mat-card-actions>
@@ -268,6 +268,8 @@ export class __NAME__PartComponent
   </mat-card>
 </form>
 ```
+
+>Note that the `modelName()` human-friendly part name property is dynamically defined according to the `model-types` thesaurus for both pure parts and parts with a specific role. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role.
 
 ▶️ (2) ensure the component has been added to the `public-api.ts` barrel file (and, if still using modules, to the library module's `declarations` and `exports`).
 
@@ -498,7 +500,7 @@ export class __NAME__sPartComponent
       <div mat-card-avatar>
         <mat-icon>picture_in_picture</mat-icon>
       </div>
-      <mat-card-title>__NAME__s Part</mat-card-title>
+      <mat-card-title>{{ (modelName() | titlecase) || "__NAME__s Part" }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
           <div>
