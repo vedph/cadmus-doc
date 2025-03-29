@@ -25,7 +25,7 @@ In what follows, `__PRJ__` is the placeholder for your Cadmus project.
 
 ## 1. Create Angular App
 
-▶️ (1) create a **new Angular app**: when prompted, add Angular routing and use SCSS. If prompted, don't enable SSR (as per default option):
+▶️ (1) create a **new Angular app**: when prompted, use SCSS rather than CSS. If prompted, don't enable SSR (as per default option):
 
 ```sh
 ng new cadmus-__PRJ__-app
@@ -41,7 +41,7 @@ ng add @angular/material
 ng add @angular/localize
 ```
 
->For Angular Material, use a custom theme or pick the theme you prefer, answer Yes when prompted to setup global typography styles, and accept the default "Include and enable animations" option. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
+>For Angular Material, use a custom theme or pick the theme you prefer, and answer Yes when prompted to setup global typography styles. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
 
 💡 The `$localize` function should be defined when running the schematics `ng add @angular/localize`. If you did not run it, or you have legacy code from older CLI apps, it might happen that you are missing some of the changes done by it. In this case, you might get an undefined error at runtime (or build time) for `$localize`, or an error like this:
 
@@ -59,9 +59,9 @@ In this case, ensure that these settings are properly configured:
 2. you must add `@angular/localize/init` to your `polyfills` in `angular.json`, e.g. `"polyfills": ["zone.js", "@angular/localize/init"],` under `projects/NAME/architect/build/options` and `projects/NAME/architect/test/options`. In older code you might rather have a `polyfills.ts` file which is imported in `angular.json`; in this case, add the import there under the app imports.
 3. ensure `main.ts` has the reference _at the very top_:
 
-```ts
-/// <reference types="@angular/localize" />
-```
+    ```ts
+    /// <reference types="@angular/localize" />
+    ```
 
 4. in each `tsconfig` file (root `tsconfig.json`, `tsconfig.app.json`, `projects/LIB/tsconfig.lib.json`, `projects/LIB/tsconfig-prod.lib.json`) ensure that under `compilerOptions` you have:
 

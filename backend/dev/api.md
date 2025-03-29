@@ -21,41 +21,40 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Api.Config" Version="10.1.2" />
-  <PackageReference Include="Cadmus.Api.Controllers" Version="10.1.0" />
-  <PackageReference Include="Cadmus.Api.Models" Version="10.1.0" />
-  <PackageReference Include="Cadmus.Api.Services" Version="10.1.0" />
-  <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Img.Parts" Version="3.0.4" />
-  <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Core" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Mongo" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Seed" Version="8.0.0" />
-  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.0" />
-  <PackageReference Include="Cadmus.Seed.Img.Parts" Version="3.0.4" />
+  <PackageReference Include="Cadmus.Api.Config" Version="10.1.13" />
+  <PackageReference Include="Cadmus.Api.Controllers" Version="11.0.2" />
+  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.2" />
+  <PackageReference Include="Cadmus.Api.Models" Version="10.1.12" />
+  <PackageReference Include="Cadmus.Api.Services" Version="11.0.2" />
+  <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="9.0.0" />
+  <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.7" />
+  <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="9.0.0" />
+  <PackageReference Include="Cadmus.Core" Version="8.0.7" />
+  <PackageReference Include="Cadmus.Mongo" Version="8.0.7" />
+  <PackageReference Include="Cadmus.Seed" Version="8.0.7" />
+  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.3" />
   <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="9.0.0" />
-  <PackageReference Include="Fusi.Antiquity" Version="5.0.0" />
-  <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.0" />
+  <PackageReference Include="Fusi.Antiquity" Version="5.0.1" />
+  <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.2" />
   <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="4.0.0" />
   <PackageReference Include="MessagingApi" Version="5.0.0" />
-  <PackageReference Include="MessagingApi.SendGrid" Version="5.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.0" />
-  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-  <PackageReference Include="Polly" Version="8.5.0" />
-  <PackageReference Include="Scalar.AspNetCore" Version="1.2.39" />
-  <PackageReference Include="Serilog" Version="4.1.0" />
-  <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+  <PackageReference Include="MessagingApi.SendGrid" Version="5.0.1" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.3" />
+  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
+  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
+  <PackageReference Include="Polly" Version="8.5.2" />
+  <PackageReference Include="Scalar.AspNetCore" Version="2.1.3" />
+  <PackageReference Include="Serilog" Version="4.2.0" />
+  <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
-  <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+  <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
   <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
   <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.0.0" />
-  <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.1.1" />
-  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+  <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.2.0" />
+  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
 </ItemGroup>
 ```
 
