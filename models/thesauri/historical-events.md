@@ -12,12 +12,12 @@ nav_order: 11
 - 📚 `event-tags`
 - 📚 `event-types`
 - 📚 `pin-link-settings`
-- assertion-tags
-- chronotope-tags
-- doc-reference-tags
-- doc-reference-types
-- pin-link-scopes
-- pin-link-tags
+- `assertion-tags`
+- `chronotope-tags`
+- `doc-reference-tags`
+- `doc-reference-types`
+- `pin-link-scopes`
+- `pin-link-tags`
 
 ```json
 [

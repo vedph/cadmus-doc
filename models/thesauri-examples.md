@@ -24,9 +24,9 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [external IDs](external-ids)
   - [historical date](historical-date)
   - [historical events](historical-events) 🔖
-  - [index keywords](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)
-  - [metadata](https://github.com/vedph/cadmus-general/blob/master/docs/metadata.md)
-  - [names](https://github.com/vedph/cadmus-general/blob/master/docs/names.md)
+  - [index keywords](index-keywords)
+  - [metadata](metadata.md)
+  - [names](names.md)
   - [note](https://github.com/vedph/cadmus-general/blob/master/docs/note.md)
   - [physical measurements](https://github.com/vedph/cadmus-general/blob/master/docs/physical-measurements.md)
   - [physical states](https://github.com/vedph/cadmus-general/blob/master/docs/physical-states.md)
