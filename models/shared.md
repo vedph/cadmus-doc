@@ -61,7 +61,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [note](https://github.com/vedph/cadmus-general/blob/master/docs/note.md)
   - [physical measurements](https://github.com/vedph/cadmus-general/blob/master/docs/physical-measurements.md)
   - [physical states](https://github.com/vedph/cadmus-general/blob/master/docs/physical-states.md)
-  - [pin-links](https://github.com/vedph/cadmus-general/blob/master/docs/fr.pin-links.md)
+  - [pin-links](https://github.com/vedph/cadmus-general/blob/master/docs/pin-links.md)
   - [tiled text](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text.md)
   - [tiled text layer](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text-layer.md)
   - [token text](https://github.com/vedph/cadmus-general/blob/master/docs/token-text.md)
