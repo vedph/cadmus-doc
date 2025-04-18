@@ -6,9 +6,9 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 
 - parts:
   - [bibliography](bibliography)
-  - [categories](https://github.com/vedph/cadmus-general/blob/master/docs/categories.md) 🔖
-  - [chronotopes](https://github.com/vedph/cadmus-general/blob/master/docs/chronotopes.md)
-  - [comment](https://github.com/vedph/cadmus-general/blob/master/docs/comment.md)
+  - [categories](categories) 🔖
+  - [chronotopes](chronotopes)
+  - [comment](comment)
   - [decorated counts](https://github.com/vedph/cadmus-general/blob/master/docs/decorated-counts.md)
   - [district location](https://github.com/vedph/cadmus-general/blob/master/docs/district-location.md)
   - [documental references](https://github.com/vedph/cadmus-general/blob/master/docs/doc-references.md)
