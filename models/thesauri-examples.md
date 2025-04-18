@@ -31,19 +31,19 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [physical measurements](thesauri/physical-measurements)
   - [physical states](thesauri/physical-states)
   - [pin-links](thesauri/pin-links)
-  - [tiled text](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text.md)
-  - [tiled text layer](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text-layer.md)
-  - [token text](https://github.com/vedph/cadmus-general/blob/master/docs/token-text.md)
-  - [token text layer](https://github.com/vedph/cadmus-general/blob/master/docs/token-text-layer.md)
+  - tiled text: no thesauri
+  - tiled text layer: no thesauri
+  - token text: no thesauri
+  - token text layer: no thesauri
 - fragments:
-  - [chronology](https://github.com/vedph/cadmus-general/blob/master/docs/fr.chronology.md)
-  - [comment](https://github.com/vedph/cadmus-general/blob/master/docs/fr.comment.md)
-  - [pin-links]((https://github.com/vedph/cadmus-general/blob/master/docs/fr.pin-links.md).md)
+  - [chronology](thesauri/fr.chronology)
+  - comment: same as [comment part](thesauri/comment)
+  - pin-links: same as [pin-links part](thesauri/pin-links)
 
 ## Codicology
 
 - parts:
-  - [bindings](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-bindings.md)
+  - [bindings](thesauri/cod-bindings)
   - [contents](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-contents.md)
   - [decorations](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-decorations.md)
   - [edits](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-edits.md)
