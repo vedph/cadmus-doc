@@ -1,3 +1,10 @@
+---
+title: "Thesauri - Bibliography"
+layout: default
+parent: "Thesauri Examples"
+nav_order: 2
+---
+
 # Thesauri - Bibliography
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/bibliography.md)

@@ -1,19 +1,27 @@
-# Thesauri
+---
+title: "Thesauri Examples"
+layout: default
+parent: Models
+nav_order: 3
+---
+
+# Thesauri Examples
 
 Here you can find example thesauri for each general model. Parts marked by 🔖 may have [role-dependent thesauri](../thesauri#role-dependent-thesauri): a role-dependent thesaurus ID has the role suffixed to its ID after a `_` and before the `@` language identifier.
 
 ## General
 
 - parts:
+  - [asserted historical dates]()
   - [bibliography](bibliography)
   - [categories](categories) 🔖
   - [chronotopes](chronotopes)
   - [comment](comment)
   - [decorated counts](decorated-counts)
-  - [district location](https://github.com/vedph/cadmus-general/blob/master/docs/district-location.md)
-  - [documental references](https://github.com/vedph/cadmus-general/blob/master/docs/doc-references.md)
-  - [external bibliography](https://github.com/vedph/cadmus-general/blob/master/docs/ext-bibliography.md)
-  - [external IDs](https://github.com/vedph/cadmus-general/blob/master/docs/external-ids.md)
+  - [district location](district-location)
+  - [document references](doc-references)
+  - external bibliography: no thesauri
+  - [external IDs](external-ids)
   - [historical date](https://github.com/vedph/cadmus-general/blob/master/docs/historical-date.md)
   - [historical events](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md)
   - [index keywords](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)

@@ -1,6 +1,13 @@
+---
+title: "Thesauri - Categories"
+layout: default
+parent: "Thesauri Examples"
+nav_order: 3
+---
+
 # Thesauri - Categories
 
-- 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/categories.md)
+- 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/categories.md) (role-dependent)
 - 📚 `categories`
 
 ```json
