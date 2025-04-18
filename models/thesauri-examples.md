@@ -13,22 +13,22 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 
 - parts:
   - [asserted historical dates]()
-  - [bibliography](bibliography)
-  - [categories](categories) 🔖
-  - [chronotopes](chronotopes)
-  - [comment](comment)
-  - [decorated counts](decorated-counts)
-  - [district location](district-location)
-  - [document references](doc-references)
+  - [bibliography](thesauri/bibliography)
+  - [categories](thesauri/categories) 🔖
+  - [chronotopes](thesauri/chronotopes)
+  - [comment](thesauri/comment)
+  - [decorated counts](thesauri/decorated-counts)
+  - [district location](thesauri/district-location)
+  - [document references](thesauri/doc-references)
   - external bibliography: no thesauri
-  - [external IDs](external-ids)
-  - [historical date](historical-date)
-  - [historical events](historical-events) 🔖
-  - [index keywords](index-keywords)
-  - [metadata](metadata.md)
-  - [names](names.md)
-  - [note](https://github.com/vedph/cadmus-general/blob/master/docs/note.md)
-  - [physical measurements](https://github.com/vedph/cadmus-general/blob/master/docs/physical-measurements.md)
+  - [external IDs](thesauri/external-ids)
+  - [historical date](thesauri/historical-date)
+  - [historical events](thesauri/historical-events) 🔖
+  - [index keywords](thesauri/index-keywords)
+  - [metadata](thesauri/metadata)
+  - [names](thesauri/names)
+  - [note](thesauri/note)
+  - [physical measurements](thesauri/physical-measurements)
   - [physical states](https://github.com/vedph/cadmus-general/blob/master/docs/physical-states.md)
   - [pin-links](https://github.com/vedph/cadmus-general/blob/master/docs/fr.pin-links.md)
   - [tiled text](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text.md)
