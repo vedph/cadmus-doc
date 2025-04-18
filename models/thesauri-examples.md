@@ -22,8 +22,8 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [document references](doc-references)
   - external bibliography: no thesauri
   - [external IDs](external-ids)
-  - [historical date](https://github.com/vedph/cadmus-general/blob/master/docs/historical-date.md)
-  - [historical events](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md)
+  - [historical date](historical-date)
+  - [historical events](historical-events) 🔖
   - [index keywords](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)
   - [metadata](https://github.com/vedph/cadmus-general/blob/master/docs/metadata.md)
   - [names](https://github.com/vedph/cadmus-general/blob/master/docs/names.md)
