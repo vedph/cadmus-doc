@@ -1,6 +1,6 @@
 # Thesauri
 
-Here you can find example thesauri for each general model. Parts marked by 🔖 may have [role-dependent thesauri](../thesauri#role-dependent-thesauri): a role dependent thesaurus ID has the role suffixed to its ID after a `_` and before the `@` language identifier.
+Here you can find example thesauri for each general model. Parts marked by 🔖 may have [role-dependent thesauri](../thesauri#role-dependent-thesauri): a role-dependent thesaurus ID has the role suffixed to its ID after a `_` and before the `@` language identifier.
 
 ## General
 
@@ -9,7 +9,7 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [categories](categories) 🔖
   - [chronotopes](chronotopes)
   - [comment](comment)
-  - [decorated counts](https://github.com/vedph/cadmus-general/blob/master/docs/decorated-counts.md)
+  - [decorated counts](decorated-counts)
   - [district location](https://github.com/vedph/cadmus-general/blob/master/docs/district-location.md)
   - [documental references](https://github.com/vedph/cadmus-general/blob/master/docs/doc-references.md)
   - [external bibliography](https://github.com/vedph/cadmus-general/blob/master/docs/ext-bibliography.md)
