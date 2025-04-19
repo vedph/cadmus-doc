@@ -44,7 +44,7 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 
 - parts:
   - [bindings](thesauri/cod-bindings)
-  - [contents](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-contents.md)
+  - [contents](thesauri/cod-contents)
   - [decorations](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-decorations.md)
   - [edits](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-edits.md)
   - [hands](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-hands.md)
