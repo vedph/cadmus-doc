@@ -57,7 +57,7 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 ## Epigraphy
 
 - parts:
-  - [scripts](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-scripts.md)
+  - [scripts](thesauri/epi.scripts)
   - [signs](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-signs.md)
   - [support](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support.md)
   - [technique](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-technique.md)
