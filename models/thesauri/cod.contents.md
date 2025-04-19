@@ -39,11 +39,11 @@ nav_order: 21
     "entries": [
       {
         "id": "ita",
-        "value": "Italian"
+        "value": "italiano"
       },
       {
         "id": "lat",
-        "value": "Latin"
+        "value": "latino"
       }
     ]
   },
@@ -52,23 +52,23 @@ nav_order: 21
     "entries": [
       {
         "id": "rubric",
-        "value": "rubric"
+        "value": "rubrica"
       },
       {
         "id": "preface",
-        "value": "preface"
+        "value": "prefazione"
       },
       {
         "id": "dedication",
-        "value": "dedication"
+        "value": "dedica"
       },
       {
         "id": "chapter",
-        "value": "chapter"
+        "value": "capitolo"
       },
       {
         "id": "other",
-        "value": "other"
+        "value": "altro"
       }
     ]
   },
@@ -77,27 +77,27 @@ nav_order: 21
     "entries": [
       {
         "id": "headless",
-        "value": "headless"
+        "value": "acefalo"
       },
       {
         "id": "crippled",
-        "value": "crippled"
+        "value": "mutilo"
       },
       {
         "id": "gaps",
-        "value": "gaps"
+        "value": "lacunoso"
       },
       {
         "id": "interrupted",
-        "value": "interrupted"
+        "value": "interrotto"
       },
       {
         "id": "incomplete",
-        "value": "incomplete"
+        "value": "incompleto"
       },
       {
         "id": "excerpts",
-        "value": "excerpts"
+        "value": "estratti"
       }
     ]
   }
