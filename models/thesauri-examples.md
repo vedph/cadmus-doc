@@ -51,8 +51,8 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [layouts](thesauri/cod.layouts)
   - [material description](thesauri/cod.material)
   - [sheet labels](thesauri/cod.sheet-labels)
-  - [shelfmarks](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-shelfmarks.md)
-  - [watermarks](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-watermarks.md)
+  - [shelfmarks](thesauri/cod.shelfmarks)
+  - [watermarks](thesauri/cod.watermarks)
 
 ## Epigraphy
 
