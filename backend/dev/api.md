@@ -21,31 +21,31 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Api.Config" Version="10.1.13" />
-  <PackageReference Include="Cadmus.Api.Controllers" Version="11.0.2" />
-  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.2" />
-  <PackageReference Include="Cadmus.Api.Models" Version="10.1.12" />
-  <PackageReference Include="Cadmus.Api.Services" Version="11.0.2" />
+  <PackageReference Include="Cadmus.Api.Config" Version="10.1.14" />
+  <PackageReference Include="Cadmus.Api.Controllers" Version="11.0.3" />
+  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.3" />
+  <PackageReference Include="Cadmus.Api.Models" Version="10.1.13" />
+  <PackageReference Include="Cadmus.Api.Services" Version="11.0.3" />
   <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="9.0.0" />
   <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.7" />
   <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="9.0.0" />
   <PackageReference Include="Cadmus.Core" Version="8.0.7" />
   <PackageReference Include="Cadmus.Mongo" Version="8.0.7" />
   <PackageReference Include="Cadmus.Seed" Version="8.0.7" />
-  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.3" />
-  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="9.0.0" />
+  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.4" />
+  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="9.0.3" />
   <PackageReference Include="Fusi.Antiquity" Version="5.0.1" />
   <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.2" />
   <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="4.0.0" />
   <PackageReference Include="MessagingApi" Version="5.0.0" />
   <PackageReference Include="MessagingApi.SendGrid" Version="5.0.1" />
-  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
-  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.3" />
-  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
-  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.4" />
+  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
+  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
   <PackageReference Include="Polly" Version="8.5.2" />
-  <PackageReference Include="Scalar.AspNetCore" Version="2.1.3" />
+  <PackageReference Include="Scalar.AspNetCore" Version="2.1.17" />
   <PackageReference Include="Serilog" Version="4.2.0" />
   <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
@@ -54,7 +54,7 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
   <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.0.0" />
   <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.2.0" />
-  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
+  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
 </ItemGroup>
 ```
 
@@ -412,6 +412,164 @@ public static class Program
         {
             await Log.CloseAndFlushAsync();
         }
+    }
+}
+```
+
+If you are not going to use a project-specific services library, add your app services in a new `Services` folder:
+
+- `AppRepositoryProvider.cs`: parts
+- `AppPartSeederFactoryProvider.cs`: part seeders
+
+Here are two example implementations, just customize the assemblies to include:
+
+```cs
+// AppRepositoryProvider.cs (optional)
+using System;
+using System.Reflection;
+using Cadmus.Core;
+using Cadmus.Core.Config;
+using Cadmus.Core.Storage;
+using Cadmus.Epigraphy.Parts;
+using Cadmus.General.Parts;
+using Cadmus.Geo.Parts;
+using Cadmus.Mongo;
+using Cadmus.Philology.Parts;
+
+namespace CadmusDemoApi.Services;
+
+/// <summary>
+/// Application's repository provider. Usually, this is implemented in your
+/// project's Services library. Here we have no specific project, so we
+/// just provide an API app service here.
+/// </summary>
+public sealed class AppRepositoryProvider : IRepositoryProvider
+{
+    private readonly IPartTypeProvider _partTypeProvider;
+
+    /// <summary>
+    /// Gets or sets the connection string.
+    /// </summary>
+    public string ConnectionString { get; set; } = "";
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppRepositoryProvider"/> class.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">configuration</exception>
+    public AppRepositoryProvider()
+    {
+        TagAttributeToTypeMap _map = new();
+        _map.Add(
+        [
+            // TODO: add/remove assemblies as required for your app
+            // Cadmus.General.Parts
+            typeof(NotePart).GetTypeInfo().Assembly,
+            // Cadmus.Philology.Parts
+            typeof(ApparatusLayerFragment).GetTypeInfo().Assembly,
+            // Cadmus.Epigraphy.Parts
+            typeof(EpiScriptsPart).GetTypeInfo().Assembly,
+            // Cadmus.Geo.Parts
+            typeof(AssertedLocationsPart).GetTypeInfo().Assembly
+        ]);
+
+        _partTypeProvider = new StandardPartTypeProvider(_map);
+    }
+
+    /// <summary>
+    /// Gets the part type provider.
+    /// </summary>
+    /// <returns>part type provider</returns>
+    public IPartTypeProvider GetPartTypeProvider()
+    {
+        return _partTypeProvider;
+    }
+
+    /// <summary>
+    /// Creates a Cadmus repository.
+    /// </summary>
+    /// <returns>repository</returns>
+    /// <exception cref="ArgumentNullException">null database</exception>
+    public ICadmusRepository CreateRepository()
+    {
+        // create the repository (no need to use container here)
+        MongoCadmusRepository repository =
+            new(_partTypeProvider, new StandardItemSortKeyBuilder());
+
+        repository.Configure(new MongoCadmusRepositoryOptions
+        {
+            ConnectionString = ConnectionString ??
+                throw new InvalidOperationException(
+                "No connection string set for IRepositoryProvider implementation")
+        });
+
+        return repository;
+    }
+}
+```
+
+```cs
+// AppPartSeederFactoryProvider.cs (optional)
+using Cadmus.Core.Config;
+using Cadmus.Seed;
+using Cadmus.Seed.Epigraphy.Parts;
+using Cadmus.Seed.General.Parts;
+using Cadmus.Seed.Geo.Parts;
+using Cadmus.Seed.Philology.Parts;
+using Fusi.Microsoft.Extensions.Configuration.InMemoryJson;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Reflection;
+
+namespace CadmusDemoApi.Services;
+
+/// <summary>
+/// Application's part seeders factory provider. Usually, this is implemented
+/// in your project's Services library. Here we have no specific project, so we
+/// just provide an API app service here.
+/// </summary>
+public sealed class AppPartSeederFactoryProvider : IPartSeederFactoryProvider
+{
+    private static IHost GetHost(string config)
+    {
+        // build the tags to types map for parts/fragments
+        Assembly[] seedAssemblies =
+        [
+            // TODO: add/remove assemblies as required for your app
+            // Cadmus.General.Seed.Parts
+            typeof(NotePartSeeder).Assembly,
+            // Cadmus.Seed.Philology.Parts
+            typeof(ApparatusLayerFragmentSeeder).Assembly,
+            // Cadmus.Seed.Geo.Parts
+            typeof(AssertedLocationsPartSeeder).GetTypeInfo().Assembly,
+            // Cadmus.Seed.Epigraphy.Parts
+            typeof(EpiScriptsPartSeeder).GetTypeInfo().Assembly
+        ];
+        TagAttributeToTypeMap map = new();
+        map.Add(seedAssemblies);
+
+        return new HostBuilder()
+            .ConfigureServices((hostContext, services) =>
+            {
+                PartSeederFactory.ConfigureServices(services,
+                    new StandardPartTypeProvider(map),
+                    seedAssemblies);
+            })
+            // extension method from Fusi library
+            .AddInMemoryJson(config)
+            .Build();
+    }
+
+    /// <summary>
+    /// Gets the part/fragment seeders factory.
+    /// </summary>
+    /// <param name="profile">The profile.</param>
+    /// <returns>Factory.</returns>
+    /// <exception cref="ArgumentNullException">profile</exception>
+    public PartSeederFactory GetFactory(string profile)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+
+        return new PartSeederFactory(GetHost(profile));
     }
 }
 ```
