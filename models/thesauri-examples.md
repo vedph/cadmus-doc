@@ -69,8 +69,8 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 ## Geography
 
 - parts:
-  - [asserted locations](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-locations.md)
-  - [asserted toponyms](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-toponyms.md)
+  - [asserted locations](thesauri/geo.asserted-locations)
+  - [asserted toponyms](thesauri/geo.asserted-toponyms)
 
 ## Iconography
 
