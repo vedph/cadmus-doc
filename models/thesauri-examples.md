@@ -86,7 +86,7 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 ## Philology
 
 - fragments:
-  - [apparatus](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md)
-  - [orthography](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.orthography.md)
+  - [apparatus](thesauri/phi.fr.apparatus)
+  - [orthography](thesauri/phi.fr.orthography)
   - [quotations](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.quotations.md)
   - [witnesses](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.witnesses.md)

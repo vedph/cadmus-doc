@@ -1,11 +1,11 @@
 ---
-title: "Thesauri - EPI Ligatures"
+title: "Thesauri - EPI Ligatures Fragment"
 layout: default
 parent: "Thesauri Examples"
 nav_order: 35
 ---
 
-# Thesauri - Epigraphy - Ligatures
+# Thesauri - Epigraphy - Ligatures Fragment
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-ligatures.md)
 - 📚 `epi-ligature-types`
