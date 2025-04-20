@@ -61,10 +61,10 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
   - [signs](thesauri/epi.signs)
   - [support](thesauri/epi.support)
   - [support fragments](thesauri/epi.support-frr)
-  - [technique](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-technique.md)
-  - [formula patterns](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-formula-patterns.md)
+  - [technique](thesauri/epi.technique)
+  - [formula patterns](thesauri/epi.formula-patterns)
 - fragments:
-  - [ligatures](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/fr.epi-ligatures.md)
+  - [ligatures](thesauri/fr.epi.ligatures)
 
 ## Geography
 
