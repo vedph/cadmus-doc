@@ -58,10 +58,10 @@ Here you can find example thesauri for each general model. Parts marked by 🔖 
 
 - parts:
   - [scripts](thesauri/epi.scripts)
-  - [signs](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-signs.md)
-  - [support](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support.md)
+  - [signs](thesauri/epi.signs)
+  - [support](thesauri/epi.support)
+  - [support fragments](thesauri/epi.support-frr)
   - [technique](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-technique.md)
-  - [support fragments](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support-frr.md)
   - [formula patterns](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-formula-patterns.md)
 - fragments:
   - [ligatures](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/fr.epi-ligatures.md)
