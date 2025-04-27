@@ -12,8 +12,8 @@ nav_order: 1
     - [Non-Textual](#non-textual)
     - [Textual](#textual)
       - [Building Trees](#building-trees)
-        - [Collecting Annotated Ranges](#collecting-annotated-ranges)
-        - [Flattening Ranges](#flattening-ranges)
+        - [Collecting Annotated Spans](#collecting-annotated-spans)
+        - [Flattening Spans](#flattening-spans)
         - [Building Text Tree](#building-text-tree)
         - [Rendering Text Tree](#rendering-text-tree)
 
@@ -94,7 +94,7 @@ A --> B
 B --> C
 ```
 
-After the tree is first created from text ranges, it always has this linear structure. Later, branching can be introduced by tree filters, which thus transform its shape at will. For instance, this tree starts with the same segments A, B; but then continues on the first branch with C and D; and on the second one with E and F:
+After the tree is first created from text spans, it always has this linear structure. Later, branching can be introduced by tree filters, which thus transform its shape at will. For instance, this tree starts with the same segments A, B; but then continues on the first branch with C and D; and on the second one with E and F:
 
 ```mermaid
 graph LR;
@@ -132,7 +132,7 @@ Let us say that there are 3 annotation layers on top of this base text:
 
 In this example we are going to render all these layers. We thus need to segment the base text so that we can link to each segment one or more fragments, whatever the layer they come from. Starting from this stage, we have 6 steps to get to our desired rendition, whatever its target format.
 
-##### Collecting Annotated Ranges
+##### Collecting Annotated Spans
 
 ▶️ (1) **flatten layers**: use a text part flattener (`ITextPartFlattener`) to get the whole text into a multiline string, plus one range for the fragments in each of the picked layer parts.
 
@@ -145,7 +145,7 @@ que bixit|annos XX
 
 Here `|` stands for a LF character, used as the line delimiter.
 
-The resulting **ranges** collected from all the layers are:
+The resulting **spans** collected from all the layers are:
 
 1. 2-2 for `qu[e]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@0`;
 2. 4-4 for `[b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@1`;
@@ -154,25 +154,25 @@ The resulting **ranges** collected from all the layers are:
 
 >Links to each layer's fragment are made via these fragment identifiers, built by concatenating the layer part type ID (`it.vedph.token-text-layer`) with its role ID (e.g. `fr.it.vedph.orthography`), separated by a colon, followed by `@` and the index of the fragment in the layer's fragments array. Optionally, these links can be expanded with an additional suffix which starts from any non-digit character after the fragment index. For instance, an apparatus fragment has an array of entries, and when we want to target each of them we add a suffix `.` plus the index of the entry in that array.
 
-Each of the ranges has a **model** including:
+Each of the spans has a **model** including:
 
 - the _start_ and _end_ indexes referred to the whole text.
-- _fragment IDs_: the global ID of the corresponding fragment(s). After flattening, each range has just a single fragment ID, because by definition one fragment produces one range. Later, when ranges are merged, they may carry more than a single fragment ID. Each fragment ID is built by concatenating the part type ID, followed by `:` and its role ID (which is always defined for a layer part), followed by `_` and the index of the fragment in its layer part.
-- the _text_ corresponding to the range. This is assigned after flattening and merging, for performance reasons (it would be pointless to assign text to all the ranges when many of them are going to be merged into new ones in the next step).
+- _fragment IDs_: the global ID of the corresponding fragment(s). After flattening, each range has just a single fragment ID, because by definition one fragment produces one range. Later, when spans are merged, they may carry more than a single fragment ID. Each fragment ID is built by concatenating the part type ID, followed by `:` and its role ID (which is always defined for a layer part), followed by `_` and the index of the fragment in its layer part.
+- the _text_ corresponding to the range. This is assigned after flattening and merging, for performance reasons (it would be pointless to assign text to all the spans when many of them are going to be merged into new ones in the next step).
 
-At this stage we have a string with the text on one side, and a bunch of freely overlapping ranges referring to it on the other side. We are just saying that for that text, various portions of it are linked to various annotations, whatever their type, and without caring if the portions overlap.
+At this stage we have a string with the text on one side, and a bunch of freely overlapping spans referring to it on the other side. We are just saying that for that text, various portions of it are linked to various annotations, whatever their type, and without caring if the portions overlap.
 
 We have thus collected all the annotations from their layers into one set; now we must find a way for representing all of them in a linear way, as an annotated text, even if they refer to many different and often overlapping portions of it.
 
-So, the next step is merging these ranges into a single linear, contiguous sequence.
+So, the next step is merging these spans into a single linear, contiguous sequence.
 
-##### Flattening Ranges
+##### Flattening Spans
 
-▶️ (2) **flatten and merge ranges** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous ranges, covering the whole text, from start to end. In our example, we are starting from this stage, where each line below the text represents a range with its fragment ID (Figure 2):
+▶️ (2) **flatten and merge spans** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous spans, covering the whole text, from start to end. In our example, we are starting from this stage, where each line below the text represents a range with its fragment ID (Figure 2):
 
 ![flattening](img/flattening.png)
 
-- Figure 2 - Flattening layer ranges into merged ranges
+- Figure 2 - Flattening layer spans into merged spans
 
 >In this figure we represent the data item (our inscription) as a box containing 5 objects: the green ones are text and text layer parts, each with a specific type and model annotations: orthography, paleography, comment; the base text itself is another object in the box, the one labelled with `T`. The blue object is another part which is not linked to specific portions of the text, just to show that the box might include any type of data, whether it is directly related text or not. For instance, this blue object might be a datation, or a description of the material support, or of its archaeological context, etc.
 
@@ -187,7 +187,7 @@ que bixit|annos XX
 ....CCCCCCCCCCC... fr4
 ```
 
-From here we get these ranges (I am numbering the ranges to make it easier to refer to them in this documentation):
+From here we get these spans (I am numbering the spans to make it easier to refer to them in this documentation):
 
 1. 0-1 for `qu` = no fragments;
 2. 2-2 for `e` = fr1, fr3;
@@ -208,7 +208,7 @@ que bixit|annos XX
 
 ##### Building Text Tree
 
-▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting from a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged ranges. The first range is child of the blank root node; each following range is child of the previous range.
+▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting from a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged spans. The first range is child of the blank root node; each following range is child of the previous range.
 
 Each node has **payload data** with this model:
 
