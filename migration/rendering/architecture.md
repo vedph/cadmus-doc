@@ -51,7 +51,7 @@ The data flow and the main components of the Cadmus export architecture are summ
 
 It all starts from the Cadmus **database**, including items with their parts. Some of these parts may represent text (with a text part) or layered text (with a text part and any number of text layer parts). Many other parts may well represent non-textual data (e.g. the codicological description of a manuscript).
 
-When exporting into files, usually the entry point is represented by an **item ID collector**, which collects the IDs of all the matching items in their order. This is used to filter and order the items for export; currently, we just have a single [builtin collector](collectors).
+When exporting into files, usually the entry point is represented by an **item ID collector**, which collects the IDs of all the matching items in their order. This is used to filter and order the items for export; currently, we just have a single [builtin collector](components/collectors).
 
 Data are thus processed one item after another. Each item is handled by an **item composer**, which orchestrates all the components used in the rendering pipelines. Additionally, a simple data model, the rendering context, is shared across most of the components. The general flow is thus:
 
@@ -68,13 +68,13 @@ A JSON renderer component gets some JSON code representing any Cadmus data objec
 
 The JSON renderer or the text block renderer may also use a set of **renderer filters**. Such filters are executed in the order they are defined for each renderer, just after its rendition completes. Each filter has a specific task, often general enough to be reused in other renderers.
 
-For instance, some [prebuilt filters](filters) allow you to lookup thesauri (resolving their IDs into values), convert Markdown text into HTML or plain text, perform text replacements (either based on literals, and on regular expressions), resolve ISO639 language codes, or the mapping between layer IDs and target IDs in text.
+For instance, some [prebuilt rendering filters](components/renderer-filters) allow you to lookup thesauri (resolving their IDs into values), convert Markdown text into HTML or plain text, perform text replacements (either based on literals, and on regular expressions), resolve ISO639 language codes, or the mapping between layer IDs and target IDs in text.
 
 ### Textual
 
 As you can see from Figure 1, this pipeline uses:
 
-1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text ranges_. Each range is a span of text linked to annotations from layers. Text is segmented into ranges according to the layer(s) selected for rendering. With no layer, we will have a single range; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once ranges are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
+1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text spans_. Each span is a text linked to zero or more annotations from layers. Text is segmented into spans according to the layer(s) selected for rendering. With no layer, we will have a single span; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once spans are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
 
 2. zero or more **text tree filters** are applied to the tree to add metadata to its nodes or even reshape the tree as desired. Here we could also have branching, e.g. with binary trees to provide parallel segmentation strategies in TEI rendition.
 
