@@ -21,11 +21,11 @@ nav_order: 7
 
 # Creating Frontend App
 
-In what follows, `__PRJ__` is the placeholder for your Cadmus project.
+In what follows, `__PRJ__` is the placeholder for your Cadmus project's short name.
 
 ## 1. Create Angular App
 
-▶️ (1) create a **new Angular app**: when prompted, use SCSS rather than CSS. If prompted, don't enable SSR (as per default option):
+▶️ (1) create a **new Angular app**: use SCSS rather than CSS, and don't enable SSR (as per default option):
 
 ```sh
 ng new cadmus-__PRJ__-app
@@ -41,7 +41,7 @@ ng add @angular/material
 ng add @angular/localize
 ```
 
->For Angular Material, use a custom theme or pick the theme you prefer, and answer Yes when prompted to setup global typography styles. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
+>For Angular Material, use a _custom theme_ or pick the theme you prefer, and answer Yes when prompted to _setup global typography_ styles. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
 
 💡 The `$localize` function should be defined when running the schematics `ng add @angular/localize`. If you did not run it, or you have legacy code from older CLI apps, it might happen that you are missing some of the changes done by it. In this case, you might get an undefined error at runtime (or build time) for `$localize`, or an error like this:
 
@@ -159,19 +159,19 @@ mat-icon.mat-error, mat-icon.mat-warn {
 ▶️ 1. Install the typical Cadmus packages via NPM:
 
 ```bash
-npm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login
+npm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login --force
 
-npm i @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui @myrmidon/cadmus-graph-pg @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search
-npm i @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core
+npm i @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search --force
+npm i @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core --force
 
-npm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui
-npm i @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui
+npm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui --force
+npm i @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui --force
 
-npm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/cadmus-ui-pg @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers diff-match-patch ts-md5
+npm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/cadmus-ui-pg @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers diff-match-patch ts-md5 --force
 
-npm i @myrmidon/cadmus-text-ed @myrmidon/cadmus-text-ed-md @myrmidon/cadmus-text-ed-txt
+npm i @myrmidon/cadmus-text-ed @myrmidon/cadmus-text-ed-md @myrmidon/cadmus-text-ed-txt --force
 
-npm i @types/diff-match-patch --save-dev
+npm i @types/diff-match-patch --save-dev --force
 ```
 
 The above packages are fairly typical, but you might well omit those you are not interested in, e.g. general parts or philology parts, or some [bricks](https://github.com/vedph/cadmus-bricks-shell-v3). Some of the legacy third party libraries may require `--force`.
@@ -239,14 +239,14 @@ window.__env.biblioApiUrl = 'http://localhost:60058/api/';
 In this case typically you will also need to install the bibliography packages:
 
 ```bash
-npm i @myrmidon/cadmus-biblio-core @myrmidon/cadmus-biblio-api @myrmidon/cadmus-biblio-ui @myrmidon/cadmus-part-biblio-ui
+npm i @myrmidon/cadmus-biblio-core @myrmidon/cadmus-biblio-api @myrmidon/cadmus-biblio-ui @myrmidon/cadmus-part-biblio-ui --force
 ```
 
 Later, in your app's `part-editor-keys.ts`, remember to _setup the route to the bibliography part editor_ like:
 
 ```ts
 import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
-
+const BIBLIO = 'biblio';
 // ...
 
 export const PART_EDITOR_KEYS: PartEditorKeys = {
@@ -319,7 +319,7 @@ export const INDEX_LOOKUP_DEFINITIONS: IndexLookupDefinitions = {
  * long and complex names in the route by replacing the ID with an alias.
  */
 export const ITEM_BROWSER_KEYS = {
-// e.g. ['it.vedph.item-browser.mongo.hierarchy']: 'hierarchy'
+  // e.g. ['it.vedph.item-browser.mongo.hierarchy']: 'hierarchy'
 };
 ```
 
