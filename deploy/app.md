@@ -81,7 +81,7 @@ services:
       - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus__PRJ__mongo:27017/{0}
       - CONNECTIONSTRINGS__AUTH=Server=cadmus__PRJ__pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - CONNECTIONSTRINGS__BIBLIO=Server=cadmus__PRJ__pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
-      - SEED__BIBLIODELAY=50
+      - SEED__DELAY=50
       - SERILOG__CONNECTIONSTRING=mongodb://cadmus__PRJ__mongo:27017/{0}-log
       # TODO: change the default user password (same as API below)
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
