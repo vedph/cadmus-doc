@@ -86,7 +86,7 @@ services:
       # TODO: change the default user password (same as API below)
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
     networks:
-      - cadmus__PRJ__network
+      - cadmus-__PRJ__-network
 
   # Cadmus __PRJ__ API
   cadmus-__PRJ__-api:
