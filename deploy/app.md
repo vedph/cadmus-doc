@@ -116,7 +116,7 @@ services:
       - cadmus-__PRJ__-network
 
   # Cadmus __PRJ__ App
-  cadmus-app:
+  cadmus-__PRJ__-app:
     image: vedph2020/cadmus-__PRJ__-app:0.0.1
     container_name: cadmus-__PRJ__-app
     restart: unless-stopped
