@@ -5,6 +5,16 @@ layout: default
 nav_order: 1
 ---
 
+- [Adding Backend Parts](#adding-backend-parts)
+  - [Part - Single Entity](#part---single-entity)
+  - [Part - Multiple Entities](#part---multiple-entities)
+  - [Part Test Templates](#part-test-templates)
+    - [Part Test Helper](#part-test-helper)
+    - [Part Test - Single Entity](#part-test---single-entity)
+    - [Part Test - Multiple Entities](#part-test---multiple-entities)
+  - [Layer Parts](#layer-parts)
+    - [Layer Fragment Test Template](#layer-fragment-test-template)
+
 # Adding Backend Parts
 
 Guidelines for **implementing a part**:
@@ -158,15 +168,7 @@ public sealed class __NAME__Part : PartBase
     /// Gets or sets the entries.
     /// TODO: rename Entries in something more specific.
     /// </summary>
-    public List<__ENTRY__> Entries { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="__NAME__Part"/> class.
-    /// </summary>
-    public __NAME__Part()
-    {
-        Entries = [];
-    }
+    public List<__ENTRY__> Entries { get; set; } = [];
 
     /// <summary>
     /// Get all the key=value pairs (pins) exposed by the implementor.
