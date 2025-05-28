@@ -480,7 +480,7 @@ public sealed class __NAME__PartTest
         __NAME__Part part = GetPart();
         part.Entries.Clear();
 
-        List<DataPin> pins = part.GetDataPins(null).ToList();
+        List<DataPin> pins = [.. part.GetDataPins(null)];
 
         Assert.Single(pins);
         DataPin pin = pins[0];
@@ -500,7 +500,7 @@ public sealed class __NAME__PartTest
             // properties in a predictable way, so we can test them
         }
 
-        List<DataPin> pins = part.GetDataPins(null).ToList();
+        List<DataPin> pins = [.. part.GetDataPins(null)];
 
         Assert.Equal(5, pins.Count);
 
@@ -586,7 +586,7 @@ public sealed class __NAME__LayerFragmentTest
     // {
     //     CommentLayerFragment fr = GetFragment();
 
-    //     List<DataPin> pins = fr.GetDataPins(null).ToList();
+    //     List<DataPin> pins = [.. part.GetDataPins(null)];
 
     //     Assert.Single(pins);
     //     DataPin pin = pins[0];
