@@ -5,6 +5,10 @@ layout: default
 nav_order: 3
 ---
 
+- [Adding Backend Fragments](#adding-backend-fragments)
+  - [Fragment Template](#fragment-template)
+  - [Fragment Test Template](#fragment-test-template)
+
 # Adding Backend Fragments
 
 The typical procedure is:

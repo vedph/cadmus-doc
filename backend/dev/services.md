@@ -5,6 +5,11 @@ layout: default
 nav_order: 5
 ---
 
+- [Adding Backend Services](#adding-backend-services)
+  - [Create Services Project](#create-services-project)
+    - [Repository Provider](#repository-provider)
+    - [Part Seeder Factory Provider](#part-seeder-factory-provider)
+
 # Adding Backend Services
 
 ## Create Services Project

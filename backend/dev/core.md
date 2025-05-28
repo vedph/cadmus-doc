@@ -5,6 +5,15 @@ layout: default
 nav_order: 6
 ---
 
+- [Creating Backend Core](#creating-backend-core)
+  - [1. Create Solution](#1-create-solution)
+  - [2. Add Parts/Fragments](#2-add-partsfragments)
+    - [2.1. Add Models Projects](#21-add-models-projects)
+    - [2.2. Adding Parts or Fragments](#22-adding-parts-or-fragments)
+    - [2.3. Adding Part or Fragment Seeders](#23-adding-part-or-fragment-seeders)
+  - [3. Add Services](#3-add-services)
+  - [4. Publish NuGet Packages](#4-publish-nuget-packages)
+
 # Creating Backend Core
 
 The backend is a set of C# libraries, built with VS.

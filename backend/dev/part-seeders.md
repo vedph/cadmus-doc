@@ -5,6 +5,11 @@ layout: default
 nav_order: 2
 ---
 
+- [Adding Backend Part Seeders](#adding-backend-part-seeders)
+  - [Part Seeder](#part-seeder)
+  - [Test Helper](#test-helper)
+  - [Part Seeder Test](#part-seeder-test)
+
 # Adding Backend Part Seeders
 
 Part seeders are used to generate mock data for the editor.
