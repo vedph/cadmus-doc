@@ -57,6 +57,13 @@ internal static class DataPinHelper
 
 >The filter used here is a builtin utility component which preserves only letters, apostrophes and whitespaces, also removing any diacritics from the letters and lowercasing them. Whitespaces are flattened into spaces and normalized. Digits are dropped (by default) or preserved according to the options specified (pass `true` as the options argument to this filter to preserve them).
 
+💡 The suggested order of operations for creating a part is:
+
+1. create the part.
+2. create its seeder (as it is typically used in part tests).
+3. create the seeder tests.
+4. create the part tests.
+
 ## Part - Single Entity
 
 In the following template replace `__NAME__` with your part's name, minus the `Part` suffix:

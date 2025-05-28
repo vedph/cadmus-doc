@@ -9,7 +9,7 @@ nav_order: 2
 
 Part seeders are used to generate mock data for the editor.
 
->The part seeder project requires at the `Cadmus.Seed` package. Typically you add a seeder for each part or fragment.
+>The part seeder project requires at the 📦 `Cadmus.Seed` package. Typically you add a seeder for each part or fragment.
 
 ## Part Seeder
 
