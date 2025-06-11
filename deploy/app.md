@@ -33,6 +33,7 @@ Essentially, to host Cadmus app on a server you should just customize the defaul
 ## 1. Prepare Docker Compose Script
 
 ▶️ 1. create a folder for your Cadmus project in the host, e.g. `mkdir dockers/cadmus-__PRJ__-app`.
+
 ▶️ 2. place there a `docker-compose.yml` file starting with this template:
 
 ```yml
@@ -202,8 +203,11 @@ Bind mounts rely on the host machine's filesystem having a specific directory st
 In this section you will find information about all the relevant API settings. At a minimum, you must configure API-related services as follows:
 
 ▶️ 1. setup CORS for your own URLs ([AllowedOrigins](#allowedorigins)).
+
 ▶️ 2. change the JWT token key ([JWT Key](#jwt-key)).
+
 ▶️ 3. change the default user password ([StockUsers](#stockusers)).
+
 ▶️ 4. change the base API URL for the [frontend app](#4-frontend-app-settings).
 
 ### Settings and Environment Variables
@@ -592,6 +596,7 @@ This is the default content of `env.js` (local port and version numbers of cours
 As you can see, the only URI to change in this file is `apiUrl`. Optioanlly, you can also change the version label, which usually gets displayed at the bottom of the page in the app.
 
 ▶️ 1. create a copy of `env.js` in your host file system, and change it as required.
+
 ▶️ 2. add to the Docker compose script a _bind mount_ with the modified copy of `env.js`, e.g.:
 
 ```yml
