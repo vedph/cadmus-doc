@@ -268,7 +268,62 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
 </head>
 ```
 
-Also, you can change the web app's `title` in `head` to a more human-friendly name.
+💡 Also, you can change the web app's `title` in `head` to a more human-friendly name, and paste some CSS and HTML for a fancy loading message:
+
+```html
+<html>
+  <head>
+    ...
+    <style>
+      .loading-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        z-index: 9999;
+        font-family: "Roboto", sans-serif;
+        color: #3f51b5;
+        text-align: center;
+      }
+      .app-loading {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        font-weight: 300;
+      }
+      .spinner {
+        border: 4px solid rgba(63, 81, 181, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3f51b5;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="mat-typography">
+    <app-root>
+      <div class="loading-wrapper">
+        <div class="app-loading">Loading Cadmus __PRJ__...</div>
+        <div class="spinner"></div>
+      </div>
+    </app-root>
+  </body>
+</html>
+```
 
 ## 4. Fine-Tune Angular Settings
 
