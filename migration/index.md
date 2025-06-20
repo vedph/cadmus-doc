@@ -17,6 +17,4 @@ Currently, there are three main areas where migration has been implemented:
 
 >For importing taxonomies, see the section about [thesauri](../models/thesauri.md#editing-thesauri).
 
-## Migration Tool
-
-TODO
+Most of the migration functions are available from the Cadmus migration CLI tool.
