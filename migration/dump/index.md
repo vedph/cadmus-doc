@@ -99,3 +99,8 @@ In _incremental mode_, say we specify a time frame from 04-15 to 05-20. This wil
 - i2, because even if it was not directly changed in the specified time frame, its part p3 was updated on 05-10. A change in any of the item's parts counts as a change in the item itself, except when requested otherwise. Also note that this p3 will reflect the updates happened on 05-10, rather than be equal to its state on 02-02.
 - i4, because it was deleted on 05-01, which is within the time frame.
 - i5, because it was created on 05-15, which is within the time frame.
+
+Instead, it will exclude:
+
+- i1, because it was never changed after its creation. It is still an active item (it wasn't deleted), but the framer does not include it because it got no changes in the specified time frame.
+- i3, which too was not changed in the specified time frame.
