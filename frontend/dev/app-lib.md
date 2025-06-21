@@ -5,6 +5,12 @@ layout: default
 nav_order: 8
 ---
 
+- [Creating Frontend Libraries](#creating-frontend-libraries)
+  - [Adding Libraries](#adding-libraries)
+    - [Single-Component Libraries](#single-component-libraries)
+    - [Legacy Approach](#legacy-approach)
+    - [Setup](#setup)
+
 # Creating Frontend Libraries
 
 ## Adding Libraries

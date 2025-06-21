@@ -374,7 +374,7 @@ export class __NAME__sPartComponent
     // form
     this.entries = formBuilder.control([], {
       // at least 1 entry
-      validators: NgToolsValidators.strictMinLengthValidator(1),
+      validators: NgxToolsValidators.strictMinLengthValidator(1),
       nonNullable: true,
     });
   }

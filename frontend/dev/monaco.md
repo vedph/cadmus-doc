@@ -5,6 +5,10 @@ layout: default
 nav_order: 11
 ---
 
+- [Using Monaco Editor](#using-monaco-editor)
+  - [Setup](#setup)
+  - [Usage](#usage)
+
 # Using Monaco Editor
 
 To make it easier to integrate Monaco in your editor, you can use [this thin wrapper](https://cisstech.github.io/nge/docs/nge-monaco/getting-started).

@@ -5,6 +5,13 @@ layout: default
 nav_order: 10
 ---
 
+- [Creating Frontend Fragments](#creating-frontend-fragments)
+- [1. Add Fragment Model](#1-add-fragment-model)
+- [2. Add Fragment Editor](#2-add-fragment-editor)
+- [3. Add PG Editor Wrapper](#3-add-pg-editor-wrapper)
+- [3. Add Sub-Route](#3-add-sub-route)
+- [4. Add Fragment Mapping to App](#4-add-fragment-mapping-to-app)
+
 ## Creating Frontend Fragments
 
 Adding a fragment is very similar to [adding a part](app-parts). Cadmus component [libraries](app-lib) may include both parts and fragments, and are created in the same way.
