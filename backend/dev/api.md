@@ -31,6 +31,7 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 <ItemGroup>
   <PackageReference Include="Cadmus.Api.Config" Version="10.1.14" />
   <PackageReference Include="Cadmus.Api.Controllers" Version="11.0.3" />
+  <PackageReference Include="Cadmus.Api.Controllers.Export" Version="0.0.1" />
   <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.3" />
   <PackageReference Include="Cadmus.Api.Models" Version="10.1.13" />
   <PackageReference Include="Cadmus.Api.Services" Version="11.0.3" />
@@ -66,7 +67,7 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 </ItemGroup>
 ```
 
->You can remove the Serilog sinks you are not going to use, like e.g. the PostgreSQL one. Also, typically you will add your project's `Cadmus.PRJ.Services` package(s).
+>You can remove the Serilog sinks you are not going to use, like e.g. the PostgreSQL one. Also, typically you will add your project's `Cadmus.PRJ.Services` package(s). Also, if you do not use statistics in your UI you can remove `Cadmus.Api.Controllers.Export`.
 
 ## 2. Add Settings
 

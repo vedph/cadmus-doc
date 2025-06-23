@@ -176,6 +176,19 @@ npm i @types/diff-match-patch --save-dev --force
 
 The above packages are fairly typical, but you might well omit those you are not interested in, e.g. general parts or philology parts, or some [bricks](https://github.com/vedph/cadmus-bricks-shell-v3). Some of the legacy third party libraries may require `--force`.
 
+💡 If you want some data statistics in your editor, also do:
+
+1. `npm i ngx-echarts echarts @myrmidon\cadmus-statistics`
+2. remember to configure echarts adding in `app.config.ts` under `providers`:
+
+```ts
+    importProvidersFrom(
+      NgxEchartsModule.forRoot({
+        echarts: () => import('echarts'),
+      })
+    ),
+```
+
 ▶️ 2. Typically you will also need **Monaco editor** and **Markdown**:
 
 - [NG essentials](https://github.com/cisstech/nge): `npm i @cisstech/nge monaco-editor`.
@@ -389,6 +402,18 @@ export const ITEM_BROWSER_KEYS = {
 - `manage-users-page`
 - `register-user-page`
 - `reset-password`
+
+💡 If you want statistics, add the statistics page from `edit-frame-stats-page` and its route in `app.routes.ts`:
+
+```ts
+  {
+    path: 'stats',
+    component: EditFrameStatsPageComponent,
+    canActivate: [AuthJwtGuardService],
+  },
+```
+
+Of course you will then need to add links to this route in your app.
 
 ## 7. Implement App Component
 
