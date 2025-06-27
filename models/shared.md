@@ -107,7 +107,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 - parts:
   - [iconography instructions](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-instructions.md)
-  - [iconographies part](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-iconographies.md)
+  - [iconography part](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-iconography.md)
 
 ## Imaging
 
