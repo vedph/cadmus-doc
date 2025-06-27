@@ -2,7 +2,7 @@
 title: "Migration Tool" 
 layout: default
 parent: Migration
-nav_order: 2
+nav_order: 3
 
 ---
 
@@ -21,7 +21,7 @@ The migration tool provides a multi-platform CLI tool to use data migration func
 Syntax:
 
 ```sh
-./cadmus-mig <DatabaseName> [-i] [--no-part-date] [--no-deleted] [--no-parts] [-o OutputDirectory] [--max-file-items N] [--indented] [-w PartTypeKey] [-b PartTypeKey] [-u UserId] [-n MinModified] [-m MaxModified] [-t Title] [--description Description] [-f FacetId] [-g GroupId] [-l Flags] [--flag-matching AllSet|AnySet|AllClear|AnyClear] [-p PageNumber] [-s PageSize]
+./cadmus-mig dump <DatabaseName> [-i] [--no-part-date] [--no-deleted] [--no-parts] [-o OutputDirectory] [--max-file-items N] [--indented] [-w PartTypeKey] [-b PartTypeKey] [-u UserId] [-n MinModified] [-m MaxModified] [-t Title] [--description Description] [-f FacetId] [-g GroupId] [-l Flags] [--flag-matching AllSet|AnySet|AllClear|AnyClear] [-p PageNumber] [-s PageSize]
 ```
 
 - `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
@@ -46,6 +46,12 @@ Syntax:
 - `-p PageNumber`: the page number (1-N), when you want just a page of results.
 - `-s PageSize`: the page size. By default this is 0, i.e. there is no paging.
 
+Example:
+
+```sh
+./cadmus-mig dump cadmus-ndp --indented
+```
+
 ## Render Items Command
 
 🎯 [Render](./render/architecture.md) Cadmus items.
@@ -53,7 +59,7 @@ Syntax:
 Syntax:
 
 ```sh
-./cadmus-mig <DatabaseName> <ConfigPath> [-p PluginTag] [-r PluginTag] [-c ComposerKey] [-m MaxItemsCount]
+./cadmus-mig render <DatabaseName> <ConfigPath> [-p PluginTag] [-r PluginTag] [-c ComposerKey] [-m MaxItemsCount]
 ```
 
 - `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
