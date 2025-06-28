@@ -263,9 +263,9 @@ export class __NAME__PartComponent
       <div mat-card-avatar>
         <mat-icon>picture_in_picture</mat-icon>
       </div>
-      <mat-card-title
-        >{{ (modelName() | titlecase) || "__NAME__ Part" }}</mat-card-title
-      >
+      <mat-card-title>
+        {{ (modelName() | titlecase) || "__NAME__ Part" }}
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content> TODO: your template here... </mat-card-content>
     <mat-card-actions>
@@ -510,9 +510,9 @@ export class __NAME__sPartComponent
       <div mat-card-avatar>
         <mat-icon>picture_in_picture</mat-icon>
       </div>
-      <mat-card-title
-        >{{ (modelName() | titlecase) || "__NAME__s Part" }}</mat-card-title
-      >
+      <mat-card-title>
+        {{ (modelName() | titlecase) || "__NAME__ Part" }}
+      </mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div>
