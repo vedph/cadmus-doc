@@ -264,7 +264,8 @@ export class __NAME__PartComponent
         <mat-icon>picture_in_picture</mat-icon>
       </div>
       <mat-card-title>
-        {{ (modelName() | titlecase) || "__NAME__ Part" }}
+        <!-- TODO: add title for part -->
+        <!-- {{ (modelName() | titlecase) || "__NAME__ Part" }} -->
       </mat-card-title>
     </mat-card-header>
     <mat-card-content> TODO: your template here... </mat-card-content>
@@ -511,7 +512,8 @@ export class __NAME__sPartComponent
         <mat-icon>picture_in_picture</mat-icon>
       </div>
       <mat-card-title>
-        {{ (modelName() | titlecase) || "__NAME__ Part" }}
+        <!-- TODO: add title for part -->
+        <!-- {{ (modelName() | titlecase) || "__NAME__ Part" }} -->
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
