@@ -13,7 +13,8 @@ This list contains the general-purpose models used by many Cadmus-based projects
 
 Bricks are reusable UI components mostly used in part or fragment editors. Many of them are related to specific models in the backend, while others are just UI widgets which make it easier to build specific UI functionality. You can play with bricks at the bricks demo website:
 
-- <https://cadmus-bricks.fusi-soft.com>
+- 🚀 [V3 bricks demo](https://cadmus-bricks-v3.fusi-soft.com)
+- [legacy V2 bricks demo](https://cadmus-bricks.fusi-soft.com)
 
 ### Reference Bricks
 
