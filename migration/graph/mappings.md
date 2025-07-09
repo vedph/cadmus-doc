@@ -114,17 +114,17 @@ Conversely, a manuscript's decorations part is a collection of decorations, each
 
 Thus, here we call EIDs the identifiers provided by users for entries in a Cadmus collection-part. When present, such EIDs are used to build node identifiers URIs (UIDs).
 
->This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a human-friendly identifier for some entity contained in a data model. For instance, should the decorations of a manuscript include images, we could use their EIDs to name each image after them.
+>This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a human-friendly identifier for some entity contained in a data model. Often these can also be used to deep-link some data in a model to another one.
 
 ### Entity ID (UID)
 
 The entity ID is a _shortened URI_ where (like in Turtle) a conventional prefix replaces the namespace, calculated as defined by the entity mapping.
 
-To get relatively human-friendly UIDs, the UID is essentially derived from a _template_ defined in the mapping rule generating a node.
+To get relatively human-friendly UIDs, the UID is derived from a _template_ defined in the mapping rule generating a node.
 
 Yet, as we have to ensure that each UID is unique, whenever the template provides a result which happens to be already present and the mapping explicitly requests a unique UID, the UID gets a numeric suffix preceded by `#`. This suffix is granted to be unique in the context of our data.
 
->💡 By convention, any UID built by mapping must end with `##` to indicate that a unique UID is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
+>💡 By convention, any UID built by mapping and potentially requiring this suffix must end with `##`, to indicate that a unique UID via an optional numeric suffix is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
 
 So, this mechanism ensures that the UID is unique, even though it is specified by users as a human-friendly identifier.
 
@@ -178,22 +178,22 @@ In turn, each mapping rule can include any number of _children rules_. The model
 
 - `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
 
->Note: the _source type_ is a number where `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not a closed enumerated value, so that you can optionally add new values by just defining new constants.
+>💡 The _source type_ is a number where `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not a closed enumerated value, so that you can optionally add new values by just defining new constants.
 
 ## Templates
 
 Templates are extensively used in mappings to build node identifiers and triple values.
 
-A template has any number of placeholders, delimited by `{}`, where the opening brace is followed by a single character representing the placeholder type:
+A template contains text with any number of placeholders, delimited by `{}`, where the opening brace is followed by a single character representing the placeholder type:
 
 1. `{@...}` = _expression_: this represents the expression used to select some source data for the mapping.
 2. `{?...}` = _node key_: the key for a previously emitted node, optionally suffixed.
 3. `{$...}` = _metadata_: any metadata set during the mapping process.
 4. `{!...}` = _macro_: the output of a custom function, receiving the current data context from the source, and returning a string or null.
 
-These placeholders can be freely nested. The mapping rules will take care of resolving them starting from the deepest ones.
+These placeholders can also be nested. The mapping rules will take care of resolving them starting from the deepest ones.
 
->⚙️ The placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
+>⚙️ Placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
 
 ### Expressions
 
@@ -234,9 +234,9 @@ As a sample, consider this mapping fragment:
 }
 ```
 
-Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}` (where `{$.}` is a [metadatum](#metadata) representing the value of the current leaf node in the source tree). So, in this case the generated node will have an UID equal to `x:events/` plus the node's URI.
+Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}` (where `{$.}` is a [metadatum](#metadata) representing the value of the _current leaf node_ in the source tree). So, in this case the generated node will have an UID equal to `x:events/` plus the node's URI.
 
-As a node is a complex object, in a template placeholder you can pick different properties from it. These are specified by adding a **suffix** preceded by `:` to the node's key. Available suffixes are:
+As a node is a complex object, in a template placeholder you can pick different properties from it. These are specified by adding to the node's key a **suffix** preceded by `:`. Available suffixes are:
 
 - `:uri` = the node's generated URI. This is the default property; so when there is no suffix specified, the URI is picked.
 - `:label` = the node's label.
@@ -247,11 +247,11 @@ As a node is a complex object, in a template placeholder you can pick different 
 
 - syntax: `{$...}`
 
-The mapping process can set some metadata, which get stored under arbitrary keys, and are available to any template in the context of its root mapping.
+The mapping process can set some simple metadata in the form of name=value string pairs. These get stored under arbitrary keys (even if some names are reserved), and are available to any template in the context of its root mapping.
 
 Metadata can be emitted by the mapping process itself, or be defined in a mapping's output under the `metadata` property. This is an object where each property is a metadatum with its string value.
 
-Currently the mapping process emits these metadata:
+Currently the mapping process emits these metadata (whose names are thus reserved):
 
 - `item-id`: the item ID (GUID).
 - `item-eid` (*): the EID of the item, as conventionally defined by the first matching metadatum with name = `eid` from the item's `MetadataPart`, if present. As this is the typical lookup mechanism, your consumer code can provide this additional metadatum by opting in via a metadata supplier.
@@ -267,7 +267,7 @@ Currently the mapping process emits these metadata:
 - `item-eid`: the value of metadatum `eid` in the `MetadataPart` (if any) of the current item.
 - `metadata-pid`: the part ID (GUID) of the metadata part (if any) of the current item.
 
-> (*) As an example, see the Cadmus CLI tool code which by default opts into this metadatum with a code like this:
+> (*) As an example, see the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) code which by default opts into this metadatum with a code like this:
 
 ```cs
 GraphUpdater updater = new(graphRepository)
@@ -304,18 +304,18 @@ Some macros are **built-in**, and conventionally their ID start with an undersco
 
 ### Filters
 
-Whenever a template represents a URI, i.e. in all the cases except for triple's object literals, once the template has been filled the result gets filtered as follows:
+Whenever a template represents a URI, i.e. in all the cases except for triple's object literals, once the template has been filled, the result gets filtered as follows:
 
 - whitespaces are replaced with underscores;
 - only letters, digits 0-9, and characters `:-_#/&%=.?` are preserved;
 - letters are all lowercased;
 - diacritics are removed.
 
-Should you want to disable this filtering, start the template with `!`, which being a preprocessing directive will be discarded from the template itself.
+Should you want to disable this filtering (which is generally _not_ recommended, as this filtering provides fairly common URI forms), start the template with `!`, which being a preprocessing directive will be discarded from the template itself.
 
 ## Sample
 
-As a sample, consider this historical events part. This contains any number of events, optionally with their place and/or time, and directly-related entities.
+As a sample, consider a [historical events part](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md). This contains any number of events, optionally with their place and/or time, and directly-related entities.
 
 In this sample we have two events:
 
@@ -324,7 +324,12 @@ In this sample we have two events:
 
 ### Sample Data
 
-Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties. The first event has type `person.birth`, the second has type `person.death` (these types come from a [thesaurus](../../models/thesauri)).
+Our data here come from a Cadmus part. Its serialized form (stripping out some unnecessary clutter) essentially is an array of two event objects, with their properties:
+
+- the first event has type `person.birth`;
+- the second has type `person.death`.
+
+>Both these event types come from a [thesaurus](../../models/thesauri).
 
 ```json
 {
@@ -373,39 +378,43 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
 }
 ```
 
-As you can see, each event in the `events` array is identified by an arbitrarily assigned [EID](#entry-id-eid), unique only in the context of this part's scope. Event types are drawn from a thesaurus.
+As you can see, each event in the `events` array is identified by an arbitrarily assigned [EID](#entry-id-eid), unique only in the context of this part's scope.
 
-Each event usually is connected to a place (`Arezzo`) and a date (`1304`). Also, it has a human-friendly description, and a list of related entities, each having a relation type (from another thesaurus), and the ID of the related entity.
+Each event usually is connected to a place (`Arezzo`) and a date (`1304`) using a so-called _chronotope_.
+
+>Chronotopes are typically entered in the editor via bricks like those you can play with at <https://cadmus-bricks-v3.fusi-soft.com/refs/asserted-chronotope>.
+
+Also, each event has a human-friendly description, and a list of related entities, each having a relation type (from another thesaurus), and the ID of the related entity.
 
 So, here:
 
-- the _first event_ represents an event of type birth, which took place at Arezzo in 1304, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as this events part is inside a person item, which represents that person.
+- the _first event_ represents an event of type _birth_, which took place at Arezzo in 1304, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as the events part is inside a person item which represents Petrarca.
 
-- the _second event_ represents an event of type death, which took place at Arquà in 1374. Again, the person took out of existence by this event is implicit.
+- the _second event_ represents an event of type _death_, which took place at Arquà in 1374. Again, the person took out of existence by this event is implicit.
 
 ### Sample Mappings
 
 We can arrange some basic mappings to project each event from this part into a node, with linked nodes for classification, attributes, and relations.
 
-These mappings are encoded in a simple JSON document, which can be imported into the index database. In Cadmus, mappings are found in the index database (in table `node_mapping`); but it's easier to design them in a simple JSON document, to be later imported into it.
+Mappings are encoded in a simple JSON document, which can be imported into the [graph database](database). In Cadmus, mappings need to be put in the graph database, but it's easier to design them in a simple JSON document, to be later imported into it.
 
 The JSON document is an array of mapping objects. Each mapping object has some properties, and optionally any number of children mappings, nested under their `children` property.
 
 Here is a quick recap of mappings for the first event, reading the file from top to bottom:
 
-👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). Its output is just a metadatum, which will be consumed by its children mappings. This has key `eid-sid` and is built from a template, collecting the part ID and the event's EID. So, all the children of this mapping start with their source located at the birth event.
+👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). Its output is just a metadatum, which will be consumed by its children mappings. This has key `eid-sid`, and is built from a template, collecting the part ID and the event's EID. So, all the children of this mapping start with their source located at the birth event.
 
-```json
+```jsonc
 {
   "name": "birth event",
-  "sourceType": 2,
-  "facetFilter": "person",
-  "partTypeFilter": "it.vedph.historical-events",
+  "sourceType": 2, // source=part
+  "facetFilter": "person", // match only person's
+  "partTypeFilter": "it.vedph.historical-events", // match parts of type events
   "description": "Map birth event",
-  "source": "events[?type=='person.birth']",
+  "source": "events[?type=='person.birth']", // match only birth events
   "output": {
     "metadata": {
-      "eid-sid": "{$part-id}/{@eid}"
+      "eid-sid": "{$part-id}/{@eid}" // EID-based SID metadatum
     }
   }
 }
