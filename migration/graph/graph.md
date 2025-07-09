@@ -22,7 +22,7 @@ Further, the graph subsystem also provides a new editing experience, where you c
 
 ## Graph and Relationships
 
-The graph is a complement to the Cadmus architecture, which must be opted in. Many projects can do without it; but the most complex ones will probably require it, especially when dealing with relationship networks.
+The graph is a complement to the Cadmus architecture, which must be opted in. Many projects can do without it; but the most complex ones will probably require it, especially when dealing with relationship networks or exporting data into other formats.
 
 Using a [metaphor](../../index.md#overview), the basic architecture includes objects of any type (parts), contained in a box (item) with an attached label (item's metadata); boxes are stored on shelves (the database infrastructure). In this architecture, it is essential that each object _model_ is independent, as it is right this independency which allows its reuse in any other container.
 
