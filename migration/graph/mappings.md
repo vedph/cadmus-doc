@@ -26,25 +26,52 @@ nav_order: 2
     - [Sample Mappings](#sample-mappings)
     - [Sample Results](#sample-results)
 
-The mapping between Cadmus source data (items and parts) and nodes is defined by node mappings.
+The mapping between Cadmus source data (items and parts) and nodes is defined by node mappings. This is the core of the projection mechanism, which extracts a subset of source data into a graph of nodes.
+
+The mapping process may have a complex logic: on the source side, it deals with any objects, whatever their schema and complexity; on the target side, it deals with a graph where data are extremely fragmented into the atoms represented by nodes.
+
+Of course, it is up to the scholars to define this mapping, which implies:
+
+- deciding which subset of Cadmus data should be projected into a graph;
+- deciding which ontologies to use in the target graph.
+
+This implies that the Cadmus system must be:
+
+- flexible, because it must adapt to any source and target types;
+- modular, splitting a monolithic complex logic into many smaller pieces, which fit their source models;
+- reusable, providing a totally customizable system where scholars just provide mapping declarations, without having to write code, nor delving into the details of an imperative, step by step procedure.
+
+This is why the graph system is based on a set of mapping rules, each having the task of projecting a small bit of data. These rules are very simple and small, but they can be organized in a tree structure, which nicely fits the structure of Cadmus source data (objects, i.e. trees of properties). So, each mapping rule is the root of a tree structure, where each node is a mapping rule.
 
 ## Sources
 
 At the input side of mappings, there are two types of sources:
 
-- **item**: an item. You can have mappings for the item; its group; its facet.
-- **part**: a part.
+- **item**: a Cadmus item. You can have mappings for the item; its group; and its facet.
+- **part**: a Cadmus part.
 
-Note that for _item titles_ a couple of conventions dictate that:
+💡 Note that for _item titles_ a couple of conventions dictate that:
 
-- if the title ends with `[#...]`, then the text between `[#` and `]` is assumed as the UID. The only processing is prepending the prefix defined in the mapping, if any.
+- if the title ends with `[#...]`, then the text between `[#` and `]` is assumed to be the UID. The only processing applied to this UID is prepending the prefix defined in the mapping, if any.
 - if the title ends with `[@...]`, then the text between `[@` and `]` is prefixed to the generated UID. If the mapping already defines a prefix, it gets prepended to this one.
 
 ## Identifiers
 
-Before illustrating the mapping process, we must discuss the different identifiers used in it. In this document, these are referred to with `SID` (source ID), `UID` (entity's URI-based ID), and `EID` (entry's ID).
+Before illustrating the mapping process, we must discuss the different identifiers used in it. In this document, these are referred to with these abbreviations:
 
-From the point of view of the mapping flow, it all starts with a SID, which specifies the source for the mapping. Mapping rules generate entities identified by UIDs. To this end, they may use the EIDs found in the source data.
+- `SID` (source ID);
+- `UID` (entity's URI-based ID);
+- `EID` (entry's ID).
+
+From the point of view of the mapping flow, it all starts with a SID, which specifies the source for the mapping.
+
+Mapping rules generate entities which get identified by UIDs. To this end, they may use the EIDs found in source data.
+
+For instance, say we have a Cadmus part representing decorations in a manuscript:
+
+- the source ID for this part is built from its globally unique ID, which is provided for each part. This ensures that this source ID globally refers only to that part.
+- each decoration in that part (which is a collection of decorations) has its own EID (entry ID), which is an arbitrarily defined, human-friendly ID like `angel`. This entry ID is unique only within the context of that part.
+- when projecting each decoration entry with an EID (those without an EID are not intended for projection: that's ultimately the user's choice), the mapping rule builds a UID for each. This will identify the projected entity for that decoration in the target graph.
 
 ### Source ID (SID)
 
