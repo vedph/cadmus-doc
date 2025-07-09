@@ -172,8 +172,8 @@ In turn, each mapping rule can include any number of _children rules_. The model
   - `triples`: an array of strings, each representing a triple [template](#templates). Each triple is in any of these forms:
     - `S P O`: subject, predicate, object (all URIs);
     - `S P "O"`: subject, predicate, literal object in double quotes;
-    - `S P "O"@lang`: subject, predicate, literal object in double quotes followed by an [ISO639](https://en.wikipedia.org/wiki/ISO_639) language identifier (e.g. `"sample"@en`);
-    - `S P "O"^^type`: subject, predicate, literal object in double quotes followed by a type specifier (e.g. `"123"^^xs:int`).
+    - `S P "O"@lang`: subject, predicate, literal object in double quotes followed by a [BCP647](https://www.rfc-editor.org/info/bcp47) language tag (e.g. `"sample"@en`);
+    - `S P "O"^^type`: subject, predicate, literal object in double quotes followed by a [datatype IRI](https://www.w3.org/TR/xmlschema-2/) (e.g. `"123"^^xs:int`).
   - `metadata`: optional metadata to be consumed in [templates](#templates). Metadata come from several sources: the source object, the mapping process itself, and these definitions in the mapping.
 
 - `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
@@ -234,7 +234,7 @@ As a sample, consider this mapping fragment:
 }
 ```
 
-Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}` (where `{$.}` is a [macro](#macros) representing the value of the current leaf node in the source tree). So, in this case the generated node will have an UID equal to `x:events/` plus the node's URI.
+Here we map each birth event (as specified by `source`). For each of them, a child mapping matches the event's `eid` property, and outputs a node under the key `event`, whose template is `x:events/{$.}` (where `{$.}` is a [metadatum](#metadata) representing the value of the current leaf node in the source tree). So, in this case the generated node will have an UID equal to `x:events/` plus the node's URI.
 
 As a node is a complex object, in a template placeholder you can pick different properties from it. These are specified by adding a **suffix** preceded by `:` to the node's key. Available suffixes are:
 
