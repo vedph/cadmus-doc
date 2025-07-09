@@ -7,26 +7,28 @@ nav_order: 2
 
 # Graph
 
-- [adapters](adapters)
-- [mappings](mappings)
-- [updating](updating)
-- [database](database)
+- [Graph](#graph)
+  - [Graph and Relationships](#graph-and-relationships)
+  - [Mapping](#mapping)
 
 Graph components allow mapping Cadmus data into RDF-like graphs.
 
-The subsystem adds an RDF-based graph on top of the Cadmus database, integrating the edit experience so that graph nodes can be automatically created and kept in synch while editing parts, and at the same time users can add or link nodes in a visual UI, thus providing complex relationships across data at a higher abstraction level.
+The graph subsystem adds an RDF-based graph on top of the Cadmus database, integrating the edit experience so that:
 
-In a sense, just like you might be able to create a full-fledged TEI document without even knowing about XML, this subsystem allows you to create an RDF graph without even knowing about semantic web. In both cases you just edit data in GUIs; yet, the graph subsystem is not a later export, but a real-time mechanism for mapping Cadmus data models into nodes and triples, thus updating an existing graph whenever you save.
+- graph nodes can be automatically created and kept in synch while editing parts;
+- at the same time, users can add or link nodes in a visual UI, thus providing complex relationships across data at a higher abstraction level.
 
-Further, the graph subsystem also provides a new editing experience, where you can directly edit the graph by freely adding nodes or connecting them.
+In a sense, just like you might be able to create (via [rendering](../rendering/architecture)) a full-fledged TEI document without even knowing about XML, this subsystem allows you to create an RDF graph without even knowing about semantic web.
+
+In both cases, you just edit data in GUIs. Yet, the graph subsystem is not a later export process typically run once, but rather a real-time mechanism for mapping Cadmus data models into nodes and triples, thus updating an existing graph whenever you save data. Further, the graph subsystem also provides a new editing experience, where you can directly edit the graph by freely adding nodes or connecting them.
 
 ## Graph and Relationships
 
 The graph is a complement to the Cadmus architecture, which must be opted in. Many projects can do without it; but the most complex ones will probably require it, especially when dealing with relationship networks or exporting data into other formats.
 
-Using a [metaphor](../../index.md#overview), the basic architecture includes objects of any type (parts), contained in a box (item) with an attached label (item's metadata); boxes are stored on shelves (the database infrastructure). In this architecture, it is essential that each object _model_ is independent, as it is right this independency which allows its reuse in any other container.
+Using a [metaphor](../../index.md#overview), the basic Cadmus architecture includes objects of any type (parts), contained in a box (item) with an attached label (item's metadata); boxes are stored on shelves (the database infrastructure). In this architecture, it is essential that each object _model_ is independent, as it is right this independency which allows its reuse in any other container.
 
-So, in a sense our objects are _monadic_. Yet, we often need to represent relationships among them. While properties considered intrinsic or relevant to such objects are part of their model, relations with other objects are usually confined to the realm of incidental events.
+So, in a sense our objects are _monadic_. Yet, we often need to represent relationships among them. While properties considered intrinsic or relevant to such objects are part of their model, relations with other objects are usually confined to the realm of _incidental_ events.
 
 To quote a famous example used in [CIDOC-CRM](https://cidoc-crm.org/), consider the event of Caesar's murder by Brutus and others. In an event-centric ontology like CIDOC-CRM, we have 3 segments on the timeline of history, each corresponding to the lifespan of an entity:
 
@@ -34,13 +36,17 @@ To quote a famous example used in [CIDOC-CRM](https://cidoc-crm.org/), consider 
 - one for Brutus;
 - one for the sword used by Brutus to stab him.
 
-The murder is the event which at a specific point in time (March 15, 44 BC) links all these 3 entities together: it's like drawing a vertical line which crosses all these segments, connecting them at some point in history.
+The murder is the event which at a specific point in time (March 15, 44 BC) links all these 3 entities together: it's like drawing a vertical line which crosses all these parallel horizontal segments, connecting them at some point in history.
 
-Now, of course this event is something which is not _intrinsically_ part of the description of a _person_ like Caesar or Brutus; or of an object like a _sword_. It's an incidental event, which happens to bind these entities at some point in time and space. Should we have a database of persons, or of archaeological artefacts, we could not make the sword a property of the person object, or vice-versa. These are not features considered intrinsic to either a person or an object in general terms (unless we are specifically collecting cases of murder). Adding such an optional property just to make room for that information somewhere would pollute the model of each object.
+Now, of course this event is something which is not _intrinsically_ part of the description of a _person_ like Caesar or Brutus; or of an object like a _sword_. It's an incidental event, which happens to bind these entities at some point in time and space.
+
+Should we have a database of persons, or of archaeological artefacts, we could not make the sword a property of the person object, or vice-versa. These are not features considered intrinsic to either a person or an object in general terms (unless we are specifically collecting cases of murder). Adding such an optional property just to make room for that information somewhere would pollute the model of each object.
 
 >Of course, in Cadmus you can still add a lot of links to internal or external resources. Where it makes sense, or even when your model needs a section linking to other data, you can freely add them. The graph is used when you are going to build a full network of relationships, far beyond a bunch of links from a resource to another one.
 
 So, where should we place things like events or other types of less or more incidental relationships among various objects? Clearly, outside each of these types. Given that Cadmus is designed also for emitting RDF-like modeled data, thus allowing users to publish for the semantic web, it's obvious that such relations can easily be represented as edges connecting the nodes of a graph.
+
+## Mapping
 
 To this end, Cadmus has an additional layer of abstraction where we can put any of the objects edited in it, together with their relations and any other external object, e.g. imported from some LOD ontologies. This is the **graph**.
 
@@ -62,10 +68,17 @@ At any rate, given that they are a completely independent resource, this means t
 
 So, at the heart of the graph is the projection via mapping. The mapping flow includes these main steps:
 
-(1) a **source object** is provided to the mapper. This can be any type, but the current implementation relies on objects serialized into JSON. Usually, these come from MongoDB directly, so JSON is already at hand. Source object are items or parts (thesauri can be imported as nodes, but this does not happen via mapping as it's a single procedure, whatever the thesaurus). At any rate, ultimately from the point of view of the mapper any source object is just JSON code representing it.
+(1) a **source object** is provided to the mapper. This can be any type, but the current implementation relies on objects serialized into JSON. Usually, these come from MongoDB directly, so JSON is already at hand. Source object are Cadmus _items_ or _parts_ ([thesauri](../../models/thesauri.md) can be imported as nodes, but this does not happen via mapping as it's a single procedure, whatever the thesaurus). At any rate, ultimately from the point of view of the mapper any source object is just JSON code representing it.
 
->Note: between the source object and the mappings there is an intermediate layer represented by [adapter components](adapters), whose task is adapting that object to the mappings and providing additional information from it.
+>⚙️ Technically, between the _source_ object and the _mappings_ there is an intermediate layer, represented by [adapter components](adapters). Their task is adapting that object to the mappings, and providing additional information from it.
 
 (2) the mapper finds all the **[mappings](mappings)** matching the source object, and applies each of them, collecting the results (nodes and triples) into a graph set.
 
 (3) the graph set is **[merged](updating)** into the graph store.
+
+Follow-up topics:
+
+- [adapters](adapters)
+- [mappings](mappings)
+- [updating](updating)
+- [database](database)
