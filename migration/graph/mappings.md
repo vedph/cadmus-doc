@@ -34,6 +34,8 @@ nav_order: 2
       - [Birth event - related -father](#birth-event---related--father)
       - [Birth and Death Recap](#birth-and-death-recap)
     - [Sample Results](#sample-results)
+      - [Birth](#birth)
+      - [Death](#death)
 
 The mapping between Cadmus source data (items and parts) and nodes is defined by node mappings. This is the core of the projection mechanism, which extracts a subset of source data into a graph of nodes.
 
@@ -1037,7 +1039,9 @@ The document includes two main properties:
 
 ### Sample Results
 
-Starting with the birth mapping, we get these nodes:
+#### Birth
+
+Starting with the birth mapping, we get these **nodes**:
 
 | label                  | uri                    | sid                   |
 | ---------------------- | ---------------------- | --------------------- |
@@ -1073,7 +1077,7 @@ The projected triples are:
 | x:events/pid/birth | crm:p96_by_mother           | x:guys/eletta_cangiani                                                     | PID/birth/tag         |
 | x:events/pid/birth | crm:p97_from_father         | x:guys/ser_petracco                                                        | PID/birth/tag         |
 
-These triples say that:
+These **triples** say that:
 
 - the birth event is of type birth (`E67_Birth` class in CIDOC-CRM).
 - the birth event has a custom extended type, derived from thesauri.
@@ -1088,69 +1092,46 @@ These triples say that:
 
 >💡 Note that in our mapping we intentionally say nothing else about mother and father; not even that they are persons. We just provide their UID, assuming that data about them is elsewhere in the graph. All what we need here is just the identifier to bring them into our triples. As always, if a node with this identifier already exists, it will be used with no change; otherwise, it will be added to the graph.
 
-TODO: update to be completed
+#### Death
 
+As for death, **nodes** are:
 
-The results of these mapping rules are a set of nodes with their triples. First we have the nodes for each entity:
+| label             | uri                | sid                   |
+|-------------------|--------------------|-----------------------|
+| x:events/death    | x:events/pid/death | PID/death             |
+| x:places/arqua    | x:places/arqua     | PID/death/chronotopes |
+| x:timespans/ts#10 | x:timespans/ts#10  | PID/death/chronotopes |
 
-- the birth event;
-- the birth place;
-- the birth time;
-- the mother;
-- the father;
 - the death event;
-- the death place;
-- the death time.
+- the death place (Arquà);
+- the death date.
 
-| label                  | URI                    | SID                                                   |
-| ---------------------- | ---------------------- | ----------------------------------------------------- |
-| x:events/birth         | x:events/birth         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
-| x:places/arezzo        | x:places/arezzo        | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:timespans/ts         | x:timespans/ts         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:guys/eletta_cangiani | x:guys/eletta_cangiani | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
-| x:guys/ser_petracco    | x:guys/ser_petracco    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
-| x:events/death         | x:events/death         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
-| x:places/arqua         | x:places/arqua         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-| x:timespans/ts#1       | x:timespans/ts#1       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+The **triples** are:
 
-Then, these are their triples:
+| S                  | P                           | O                               | sid                   |
+|--------------------|-----------------------------|---------------------------------|-----------------------|
+| x:events/pid/death | rdf:type                    | crm:e69_death                   | PID/death             |
+| x:events/pid/death | crm:p2_has_type             | x:event-types/person.death      | PID/death             |
+| x:events/pid/death | crm:p100_was_death_of       | x:persons/mpid/alpha            | PID/death             |
+| x:events/pid/death | crm:p3_has_note             | Petrarch died in 1374 at Arquà. | PID/death/description |
+| x:places/arqua     | rdf:type                    | crm:e53_place                   | PID/death/chronotopes |
+| x:events/pid/death | crm:p7_took_place_at        | x:places/arqua                  | PID/death/chronotopes |
+| x:events/pid/death | crm:p4_has_time-span        | x:timespans/ts#10               | PID/death/chronotopes |
+| x:timespans/ts#10  | crm:p82_at_some_time_within | 1374                            | PID/death/chronotopes |
+| x:timespans/ts#10  | crm:p87_is_identified_by    | 1374 AD                         | PID/death/chronotopes |
 
-(a) for **birth**:
+These triples say that:
 
-- the event is classified as a birth event;
-- the event brought into life the entity corresponding to the item (=Petrarch);
-- Arezzo is a place;
-- the event has a timespan node;
-- this timespan is located at about 1304,
-- and is identified by text "1304 AD";
-- the birth had Eletta Cangiani as the mother;
-- the birth had ser Petracco as the father.
+- the death event is of type death (`E69_Death` class in CIDOC-CRM).
+- the death event has a custom extended type, derived from thesauri.
+- the death event was the death of the person represented by the item (via its EID in the metadata part), i.e. Petrarch.
+- the death event has a free text note with value `Petrarch died in 1374 at Arquà.`.
+- there is a place (Arquà).
+- the death event took place at that place.
+- the death event has a date (timespan).
+- the timespan is around 1374.
+- this timespan is identified by human-readable text `1374 AD`.
 
-(b) for **death**:
+So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling in a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database.
 
-- the event is classified as a death event;
-- the event took out of existence the entity corresponding to the item (=Petrarch);
-- Arquà is a place;
-- the event has a timespan node;
-- this timespan is located at about 1374.
-
-| S                | P                             | O                         | SID                                                   |
-| ---------------- | ----------------------------- | ------------------------- | ----------------------------------------------------- |
-| x:events/birth   | a                             | crm:e67_birth             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
-| x:events/birth   | crm:p98_brought_into_life     | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
-| x:places/arezzo  | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:events/birth   | crm:p7_took_place_at          | x:places/arezzo           | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:events/birth   | crm:p4_has_time_span          | x:timespans/ts            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:timespans/ts   | crm:p82_at_some_time_within   | "1304"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:timespans/ts   | crm:p87_is_identified_by      | "1304 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
-| x:events/birth   | crm:p96_by_mother             | x:guys/eletta_cangiani    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
-| x:events/birth   | crm:p97_by_father             | x:guys/ser_petracco       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
-| x:events/death   | a                             | crm:e69_death             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
-| x:events/death   | crm:p93_took_out_of_existence | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
-| x:places/arqua   | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-| x:events/death   | crm:p7_took_place_at          | x:places/arqua            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-| x:events/death   | crm:p4_has_time_span          | x:timespans/ts#1          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-| x:timespans/ts#1 | crm:p82_at_some_time_within   | "1374"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-| x:timespans/ts#1 | crm:p87_is_identified_by      | "1374 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
-
-So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database.
+Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 8 nodes and 20 triples.
