@@ -429,7 +429,7 @@ The JSON document is an array of mapping objects. Each mapping object is in a `d
   "namedMappings": {
     // ... omitted
   },
-  "documentMappings: [
+  "documentMappings": [
     {
       "name": "person_birth_event",
       "sourceType": 2, // source=part
@@ -463,7 +463,7 @@ The JSON document is an array of mapping objects. Each mapping object is in a `d
 
 👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). It outputs the event node and triples telling about it that it's a birth (a CIDOC-CRM class), has-type `person.birth`, and brought-into-life the person represented by the Cadmus item containing this events part.
 
->Note that in this compact notation the triple is a single string where subject, predicate and object are separated by space.
+> Note that in this compact notation the triple is a single string where subject, predicate and object are separated by space.
 
 The event node has its UID built from these components, separated by slash:
 
@@ -507,7 +507,7 @@ So, here is the corresponding mapping in the named mappings dictionary. It just 
       "output": {
         "triples": ["{?event} crm:P3_has_note \"{$.}\""] // EVENT has_note "..."
       }
-    },
+    }
     // ... omitted
   },
   "documentMappings": [
@@ -516,7 +516,7 @@ So, here is the corresponding mapping in the named mappings dictionary. It just 
 }
 ```
 
->💡 The expression `{$.}` wraps a simple dot, which is the path to the current node. Here, `description` being a string property (thus a scalar value, rather than an object), the current node is just the string's value, i.e. the description's text.
+> 💡 The expression `{$.}` wraps a simple dot, which is the path to the current node. Here, `description` being a string property (thus a scalar value, rather than an object), the current node is just the string's value, i.e. the description's text.
 
 So, when reading this mapping, the `"name": "event_description"` reference will be replaced with the content of `event_description` (name, description, etc.). This is very convenient because you can reuse mapping templates and make the JSON document much more compact and less error-prone.
 
@@ -624,7 +624,7 @@ The corresponding named mapping is more complex, and includes a parent mapping w
 
 - place: map the place's node, and use it in a couple of triples: as a subject to say that it's a place, as an object to say that the event took place in that place.
 
->💡 Note that whenever the mapping process emits a node or triple, this does not imply that this will be effectively added to the graph. The node or triple will be added only when they are not already present, because the generated graph will be merged into the existing, much larger one. So, emitting a node for the place ensures that we have it (otherwise, we could not create triples using it), but it will do no harm if that node already exists.
+> 💡 Note that whenever the mapping process emits a node or triple, this does not imply that this will be effectively added to the graph. The node or triple will be added only when they are not already present, because the generated graph will be merged into the existing, much larger one. So, emitting a node for the place ensures that we have it (otherwise, we could not create triples using it), but it will do no harm if that node already exists.
 
 - date: the `date` mapping looks more interesting, as it requires a macro. We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
 
@@ -688,7 +688,7 @@ The corresponding mapping template is:
           ]
         }
       ]
-    }    
+    }
   }
 }
 ```
