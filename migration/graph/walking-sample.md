@@ -65,7 +65,7 @@ The result is now filtered to include only the English label:
 
 ![walking - 9](img/walker-vid-10.png)
 
-(8) We can now expand all these groups, to see the objects of each corresponding triple: so, the object of by-mother predicate is Eletta Cangiani; the object of by-father predicate is Ser Petracco; the object of took-place-at predicate is Arezzo; and the object of has-timespan is a time span:
+(8) We can now expand all these groups, to see the objects of each corresponding triple: so, the object of by-mother predicate is Eletta Canigiani; the object of by-father predicate is Ser Petracco; the object of took-place-at predicate is Arezzo; and the object of has-timespan is a time span:
 
 ![walking - 10](img/walker-vid-11.png)
 

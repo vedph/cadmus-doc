@@ -331,7 +331,7 @@ As a sample, consider a [historical events part](https://github.com/vedph/cadmus
 
 In this sample we have two events:
 
-- the birth of Petrarch in 1304 at Arezzo from ser Petracco and Eletta Cangiani;
+- the birth of Petrarch in 1304 at Arezzo from ser Petracco and Eletta Canigiani;
 - the death of Petrarch at Arquà in 1374.
 
 ### Sample Data
@@ -361,13 +361,13 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
           }
         }
       ],
-      "description": "Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Cangiani.",
+      "description": "Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Canigiani.",
       "relatedEntities": [
         {
           "relation": "mother",
           "id": {
             "target": {
-              "gid": "x:guys/eletta_cangiani"
+              "gid": "x:guys/eletta_canigiani"
             }
           }
         },
@@ -796,7 +796,7 @@ A sibling mapping does the same for the father:
 
 Here is the full JSON document for the mappings for the birth and also the death events (which essentially has the same structure, except that it has no related entities). This document can be directly imported into the database, thus seeding the mappings table, ready to be used by the Cadmus editor.
 
->Usually, mappings are automatically run whenever data are saved in the Cadmus editor. Anyway, the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) provides commands to run mappings against a database. This can be used to even regenerate the full graph starting from Cadmus data.
+> Usually, mappings are automatically run whenever data are saved in the Cadmus editor. Anyway, the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) provides commands to run mappings against a database. This can be used to even regenerate the full graph starting from Cadmus data.
 
 The document includes two main properties:
 
@@ -1043,39 +1043,39 @@ The document includes two main properties:
 
 Starting with the birth mapping, we get these **nodes**:
 
-| label                  | uri                    | sid                   |
-| ---------------------- | ---------------------- | --------------------- |
-| x:events/birth         | x:events/pid/birth     | PID/birth             |
-| x:places/arezzo        | x:places/arezzo        | PID/birth/chronotopes |
-| x:timespans/ts#5       | x:timespans/ts#5       | PID/birth/chronotopes |
-| x:guys/eletta_cangiani | x:guys/eletta_cangiani | PID/birth/tag         |
-| x:guys/ser_petracco    | x:guys/ser_petracco    | PID/birth/tag         |
+| label                   | uri                     | sid                   |
+| ----------------------- | ----------------------- | --------------------- |
+| x:events/birth          | x:events/pid/birth      | PID/birth             |
+| x:places/arezzo         | x:places/arezzo         | PID/birth/chronotopes |
+| x:timespans/ts#5        | x:timespans/ts#5        | PID/birth/chronotopes |
+| x:guys/eletta_canigiani | x:guys/eletta_canigiani | PID/birth/tag         |
+| x:guys/ser_petracco     | x:guys/ser_petracco     | PID/birth/tag         |
 
->⚠️ Note that for readability here and below the real part's GUID is replaced with the placeholder `PID` (or `pid` -- unless specified otherwise, URIs by default are lowercased to avoid confusions arising from mixed casing, which is especially important for the underlying data store, based on PostgreSQL, where string comparison by default is case sensitive).
+> ⚠️ Note that for readability here and below the real part's GUID is replaced with the placeholder `PID` (or `pid` -- unless specified otherwise, URIs by default are lowercased to avoid confusions arising from mixed casing, which is especially important for the underlying data store, based on PostgreSQL, where string comparison by default is case sensitive).
 
 So we have:
 
 - a birth event;
 - a place (Arezzo);
 - a date;
-- a person, the mother Eletta Cangiani;
+- a person, the mother Eletta Canigiani;
 - another person, the father Ser Petracco.
 
 The projected triples are:
 
-| S                  | P                           | O                                                                          | sid                   |
-| ------------------ | --------------------------- | -------------------------------------------------------------------------- | --------------------- |
-| x:events/pid/birth | rdf:type                    | crm:e67_birth                                                              | PID/birth             |
-| x:events/pid/birth | crm:p2_has_type             | x:event-types/person.birth                                                 | PID/birth             |
-| x:events/pid/birth | crm:p98_brought_into_life   | x:persons/mpid/alpha                                                       | PID/birth             |
-| x:events/pid/birth | crm:p3_has_note             | Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Cangiani. | PID/birth/description |
-| x:places/arezzo    | rdf:type                    | crm:e53_place                                                              | PID/birth/chronotopes |
-| x:events/pid/birth | crm:p7_took_place_at        | x:places/arezzo                                                            | PID/birth/chronotopes |
-| x:events/pid/birth | crm:p4_has_time-span        | x:timespans/ts#5                                                           | PID/birth/chronotopes |
-| x:timespans/ts#5   | crm:p82_at_some_time_within | 1304                                                                       | PID/birth/chronotopes |
-| x:timespans/ts#5   | crm:p87_is_identified_by    | 1304 AD                                                                    | PID/birth/chronotopes |
-| x:events/pid/birth | crm:p96_by_mother           | x:guys/eletta_cangiani                                                     | PID/birth/tag         |
-| x:events/pid/birth | crm:p97_from_father         | x:guys/ser_petracco                                                        | PID/birth/tag         |
+| S                  | P                           | O                                                                           | sid                   |
+| ------------------ | --------------------------- | --------------------------------------------------------------------------- | --------------------- |
+| x:events/pid/birth | rdf:type                    | crm:e67_birth                                                               | PID/birth             |
+| x:events/pid/birth | crm:p2_has_type             | x:event-types/person.birth                                                  | PID/birth             |
+| x:events/pid/birth | crm:p98_brought_into_life   | x:persons/mpid/alpha                                                        | PID/birth             |
+| x:events/pid/birth | crm:p3_has_note             | Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Canigiani. | PID/birth/description |
+| x:places/arezzo    | rdf:type                    | crm:e53_place                                                               | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p7_took_place_at        | x:places/arezzo                                                             | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p4_has_time-span        | x:timespans/ts#5                                                            | PID/birth/chronotopes |
+| x:timespans/ts#5   | crm:p82_at_some_time_within | 1304                                                                        | PID/birth/chronotopes |
+| x:timespans/ts#5   | crm:p87_is_identified_by    | 1304 AD                                                                     | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p96_by_mother           | x:guys/eletta_canigiani                                                     | PID/birth/tag         |
+| x:events/pid/birth | crm:p97_from_father         | x:guys/ser_petracco                                                         | PID/birth/tag         |
 
 These **triples** say that:
 
@@ -1087,17 +1087,17 @@ These **triples** say that:
 - the event is linked to a timespan.
 - this timespan is around 1304.
 - this timespan is identified by human-readable text `1304 AD`.
-- the birth event is by mother Eletta Cangiani.
+- the birth event is by mother Eletta Canigiani.
 - the birth event is from father Ser Petracco.
 
->💡 Note that in our mapping we intentionally say nothing else about mother and father; not even that they are persons. We just provide their UID, assuming that data about them is elsewhere in the graph. All what we need here is just the identifier to bring them into our triples. As always, if a node with this identifier already exists, it will be used with no change; otherwise, it will be added to the graph.
+> 💡 Note that in our mapping we intentionally say nothing else about mother and father; not even that they are persons. We just provide their UID, assuming that data about them is elsewhere in the graph. All what we need here is just the identifier to bring them into our triples. As always, if a node with this identifier already exists, it will be used with no change; otherwise, it will be added to the graph.
 
 #### Death
 
 As for death, **nodes** are:
 
 | label             | uri                | sid                   |
-|-------------------|--------------------|-----------------------|
+| ----------------- | ------------------ | --------------------- |
 | x:events/death    | x:events/pid/death | PID/death             |
 | x:places/arqua    | x:places/arqua     | PID/death/chronotopes |
 | x:timespans/ts#10 | x:timespans/ts#10  | PID/death/chronotopes |
@@ -1109,7 +1109,7 @@ As for death, **nodes** are:
 The **triples** are:
 
 | S                  | P                           | O                               | sid                   |
-|--------------------|-----------------------------|---------------------------------|-----------------------|
+| ------------------ | --------------------------- | ------------------------------- | --------------------- |
 | x:events/pid/death | rdf:type                    | crm:e69_death                   | PID/death             |
 | x:events/pid/death | crm:p2_has_type             | x:event-types/person.death      | PID/death             |
 | x:events/pid/death | crm:p100_was_death_of       | x:persons/mpid/alpha            | PID/death             |
