@@ -356,12 +356,14 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
           },
           "date": {
             "a": {
-              "value": 1304
+              "value": 1304,
+              "day": 20,
+              "month": 7
             }
           }
         }
       ],
-      "description": "Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Canigiani.",
+      "description": "Petrarch was born on July 20, 1304 at Arezzo from ser Petracco and Eletta Canigiani.",
       "relatedEntities": [
         {
           "relation": "mother",
@@ -391,20 +393,33 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
           },
           "date": {
             "a": {
-              "value": 1374
+              "value": 1374,
+              "day": 18,
+              "month": 7
             }
           }
         }
       ],
-      "description": "Petrarch died in 1374 at Arquà."
+      "assertion": {
+        "rank": 2,
+        "references": [
+          {
+            "type": "paper",
+            "citation": "Rossi 1963 p.123"
+          }
+        ]
+      },
+      "description": "Petrarch died in 1374, July 18 (or 19) at Arquà."
     }
   ]
 }
 ```
 
+> ⚠️ Note that here we placed an assertion at the event level, with rank=2, just to keep the example short. In real world, we would rather assign the assertion at a more granular level, to the death date, if we wanted to use an assertion to represent the fact that we can't be sure about the day (18 or 19; we might also just use a range in the date value, like 18-19). While we can easily reference the same assertion mapping in different parts of the source data, here we just limited ourselves to the event as a whole. To show the assertion mapping in action, we thus decided to add an assertion at that level.
+
 As you can see, each event in the `events` array is identified by an arbitrarily assigned [EID](#entry-id-eid), unique only in the context of this part's scope.
 
-Each event usually is connected to a place (`Arezzo`) and a date (`1304`) using a so-called _chronotope_.
+Each event usually is connected to a place (`Arezzo`) and a date (July 20, 1304) using a so-called _chronotope_.
 
 > Chronotopes are typically entered in the editor via bricks like those you can play with at <https://cadmus-bricks-v3.fusi-soft.com/refs/asserted-chronotope>.
 
@@ -412,9 +427,9 @@ Also, each event has a human-friendly description, and a list of related entitie
 
 So, here:
 
-- the _first event_ represents an event of type _birth_, which took place at Arezzo in 1304, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as the events part is inside a person item which represents Petrarca.
+- the _first event_ represents an event of type _birth_, which took place at Arezzo in 1304-07-20, with a couple of related entities for the parents (mother and father). The person who was born (Petrarca) is implicit, as the events part is inside a person item which represents Petrarca.
 
-- the _second event_ represents an event of type _death_, which took place at Arquà in 1374. Again, the person took out of existence by this event is implicit.
+- the _second event_ represents an event of type _death_, which took place at Arquà in 1374-07-18 (or 19). Again, the person took out of existence by this event is implicit.
 
 ### Sample Mappings
 
@@ -1041,7 +1056,7 @@ The document includes two main properties:
 
 #### Birth
 
-Starting with the birth mapping, we get these **nodes**:
+Starting with the birth mapping, we get 5 **nodes**:
 
 | label                   | uri                     | sid                   |
 | ----------------------- | ----------------------- | --------------------- |
@@ -1061,7 +1076,7 @@ So we have:
 - a person, the mother Eletta Canigiani;
 - another person, the father Ser Petracco.
 
-The projected triples are:
+The projected **triples** are 11:
 
 | S                  | P                           | O                                                                           | sid                   |
 | ------------------ | --------------------------- | --------------------------------------------------------------------------- | --------------------- |
@@ -1094,44 +1109,74 @@ These **triples** say that:
 
 #### Death
 
-As for death, **nodes** are:
+As for death, **nodes** are 5:
 
-| label             | uri                | sid                   |
-| ----------------- | ------------------ | --------------------- |
-| x:events/death    | x:events/pid/death | PID/death             |
-| x:places/arqua    | x:places/arqua     | PID/death/chronotopes |
-| x:timespans/ts#10 | x:timespans/ts#10  | PID/death/chronotopes |
+| label              | uri                | sid                           |
+| ------------------ | ------------------ | ----------------------------- |
+| x:events/death     | x:events/pid/death | PID/death                     |
+| x:places/arqua     | x:places/arqua     | PID/death/chronotopes         |
+| x:timespans/ts#12  | x:timespans/ts#12  | PID/death/chronotopes         |
+| x:assertions/as#14 | x:assertions/as#14 | PID/death/assertion           |
+| x:citations/cit#16 | x:citations/cit#16 | PID/death/assertion/reference |
 
 - the death event;
 - the death place (Arquà);
-- the death date.
+- the death date;
+- an assertion about the event;
+- a citation to be linked to the assertion.
 
-The **triples** are:
+The **triples** are 17:
 
-| S                  | P                           | O                               | sid                   |
-| ------------------ | --------------------------- | ------------------------------- | --------------------- |
-| x:events/pid/death | rdf:type                    | crm:e69_death                   | PID/death             |
-| x:events/pid/death | crm:p2_has_type             | x:event-types/person.death      | PID/death             |
-| x:events/pid/death | crm:p100_was_death_of       | x:persons/mpid/alpha            | PID/death             |
-| x:events/pid/death | crm:p3_has_note             | Petrarch died in 1374 at Arquà. | PID/death/description |
-| x:places/arqua     | rdf:type                    | crm:e53_place                   | PID/death/chronotopes |
-| x:events/pid/death | crm:p7_took_place_at        | x:places/arqua                  | PID/death/chronotopes |
-| x:events/pid/death | crm:p4_has_time-span        | x:timespans/ts#10               | PID/death/chronotopes |
-| x:timespans/ts#10  | crm:p82_at_some_time_within | 1374                            | PID/death/chronotopes |
-| x:timespans/ts#10  | crm:p87_is_identified_by    | 1374 AD                         | PID/death/chronotopes |
+| S                  | P                                  | O                                                | sid                           |
+| ------------------ | ---------------------------------- | ------------------------------------------------ | ----------------------------- |
+| x:events/pid/death | rdf:type                           | crm:e69_death                                    | PID/death                     |
+| x:events/pid/death | crm:p2_has_type                    | x:event-types/person.death                       | PID/death                     |
+| x:events/pid/death | crm:p100_was_death_of              | x:persons/mpid/alpha                             | PID/death                     |
+| x:events/pid/death | crm:p3_has_note                    | Petrarch died in 1374, July 18 (or 19) at Arquà. | PID/death/description         |
+| x:places/arqua     | rdf:type                           | crm:e53_place                                    | PID/death/chronotopes         |
+| x:events/pid/death | crm:p7_took_place_at               | x:places/arqua                                   | PID/death/chronotopes         |
+| x:events/pid/death | crm:p4_has_time-span               | x:timespans/ts#12                                | PID/death/chronotopes         |
+| x:timespans/ts#12  | crm:p82_at_some_time_within        | 1374.63172                                       | PID/death/chronotopes         |
+|                    |                                    |                                                  |                               |
+|                    |                                    | type: xs:float                                   |                               |
+|                    |                                    | numeric: 1,374.63                                |                               |
+|                    |                                    |                                                  |                               |
+| x:timespans/ts#12  | crm:p87_is_identified_by           | 18 Jul 1374 AD                                   | PID/death/chronotopes         |
+|                    |                                    |                                                  |                               |
+|                    |                                    | language: en                                     |                               |
+|                    |                                    |                                                  |                               |
+| x:events/pid/death | x:has_probability                  | 2                                                | PID/death/assertion           |
+|                    |                                    |                                                  |                               |
+|                    |                                    | type: xsd:short                                  |                               |
+|                    |                                    | numeric: 2                                       |                               |
+|                    |                                    |                                                  |                               |
+| x:assertions/as#14 | rdf:type                           | crm:e13_attribute_assignment                     | PID/death/assertion           |
+| x:assertions/as#14 | crm:p140_assigned_attribute_to     | x:events/pid/death                               | PID/death/assertion           |
+| x:assertions/as#14 | crm:p141_assigned                  | x:has_probability                                | PID/death/assertion           |
+| x:assertions/as#14 | crm:p177_assigned_property_of_type | crm:e55_type                                     | PID/death/assertion           |
+| x:citations/cit#16 | rdf:type                           | crm:e31_document                                 | PID/death/assertion/reference |
+| x:citations/cit#16 | rdfs:label                         | Rossi 1963 p.123                                 | PID/death/assertion/reference |
+| x:assertions/as#14 | crm:p70i_is_documented_in          | x:citations/cit#16                               | PID/death/assertion/reference |
 
 These triples say that:
 
 - the death event is of type death (`E69_Death` class in CIDOC-CRM).
 - the death event has a custom extended type, derived from thesauri.
 - the death event was the death of the person represented by the item (via its EID in the metadata part), i.e. Petrarch.
-- the death event has a free text note with value `Petrarch died in 1374 at Arquà.`.
+- the death event has a free text note with value `Petrarch died in 1374, July 18 (or 19) at Arquà.`.
 - there is a place (Arquà).
 - the death event took place at that place.
-- the death event has a date (timespan).
-- the timespan is around 1374.
-- this timespan is identified by human-readable text `1374 AD`.
+- there is a timespan (for the date of the death event).
+- the timespan is around 1374 (the decimal number is due to the calculation of a single numeric value from year, month and day; this makes the date easy to filter or sort).
+- this timespan is identified by human-readable text `18 Jul 1374 AD`;
+- the death event has a probability rank of 2. As noted above, this is not the right place for the assertion: we should rather place it in the date, if any. That's just for keeping the example short;
+- the assertion is of type attribute-assignment (CIDOC-CRM E13);
+- the assertion assigned attribute to the death event;
+- the assertion assigned a property of type E55 (CIDOC-CRM);
+- there is a citation of type document;
+- the citation has label `Rossi 1963 p.123` (the reference);
+- the assertion is documented in that citation.
 
-So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling in a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database.
+So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling in a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database. Thanks to the SID, whenever the same part is changed, the mappings will be run again, and the resulting graph will be merged into the existing graph.
 
-Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 8 nodes and 20 triples.
+Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 10 nodes and 28 triples. Of course, a form with a list of events where you can insert date, place and pick related entities is generally easier to use than having to manually encode all these nodes and triples without necessarily knowing anything about RDF, much similar to the way Cadmus [renders](../rendering/architecture.md) full TEI from its data without users having to know about XML. Also, just like in rendering output from the same data we are free to completely change the target TEI scheme, here in projecting graph nodes and links we are free to completely change the target ontologies by just changing our mappings.
