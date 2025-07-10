@@ -1,5 +1,5 @@
 ---
-title: "Graph - Mappings" 
+title: "Graph - Mappings"
 layout: default
 parent: Graph
 nav_order: 2
@@ -25,9 +25,11 @@ nav_order: 2
     - [Sample Data](#sample-data)
     - [Sample Mappings](#sample-mappings)
       - [Birth event](#birth-event)
-      - [Birth event - eid](#birth-event---eid)
+      - [Birth event - description](#birth-event---description)
       - [Birth event - note](#birth-event---note)
-      - [Birth event - chronotope](#birth-event---chronotope)
+      - [Birth event - chronotopes](#birth-event---chronotopes)
+      - [Birth event - assertion](#birth-event---assertion)
+      - [Birth event - tag](#birth-event---tag)
       - [Birth event - related - mother](#birth-event---related---mother)
       - [Birth event - related -father](#birth-event---related--father)
       - [Birth Recap](#birth-recap)
@@ -121,7 +123,7 @@ Conversely, a manuscript's decorations part is a collection of decorations, each
 
 Thus, here we call EIDs the identifiers provided by users for entries in a Cadmus collection-part. When present, such EIDs are used to build node identifiers URIs (UIDs).
 
->This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a human-friendly identifier for some entity contained in a data model. Often these can also be used to deep-link some data in a model to another one.
+> This is not the unique purpose of EIDs. In general, this convention provides a mechanism to set a human-friendly identifier for some entity contained in a data model. Often these can also be used to deep-link some data in a model to another one.
 
 ### Entity ID (UID)
 
@@ -131,7 +133,7 @@ To get relatively human-friendly UIDs, the UID is derived from a _template_ defi
 
 Yet, as we have to ensure that each UID is unique, whenever the template provides a result which happens to be already present and the mapping explicitly requests a unique UID, the UID gets a numeric suffix preceded by `#`. This suffix is granted to be unique in the context of our data.
 
->💡 By convention, any UID built by mapping and potentially requiring this suffix must end with `##`, to indicate that a unique UID via an optional numeric suffix is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
+> 💡 By convention, any UID built by mapping and potentially requiring this suffix must end with `##`, to indicate that a unique UID via an optional numeric suffix is required. For instance, `itn:timespans/ts##` means that the first time such a UID is generated it will be stored as `itn:timespans/ts`; the next time, it will rather be suffixed with a number, e.g. `itn:timespans/ts#3`.
 
 So, this mechanism ensures that the UID is unique, even though it is specified by users as a human-friendly identifier.
 
@@ -172,9 +174,10 @@ In turn, each mapping rule can include any number of _children rules_. The model
 - `description`: an optional, human-readable short description for the mapping rule. This is useful for documentation purposes.
 
 - `source`\*: the source expression representing the data selected by this mapping. In the current implementation this is a [JMES path](jmes-path). For instance, `events[?type=='person.birth']` matches only the entries in the `events` array property of a part's model whose type is equal to `person.birth`. When your source expression selects an object, you can refer to it as a whole with `.`, or to any of its properties by their name. When it selects an array, the mapper will implicitly loop through all its items, and be run for each of them. So, you can still define your mappings in terms of a single object, which here is the array's item. Additionally, the `index` metadatum will be used to represent the index number of the item in the array (0-N).
-- `scalarPattern`:  the optional regular expression pattern which should match against a scalar value defined by the mapping's source expression for the mapping to be applied. When this is defined and does not match, the mapping will not be applied. This can be used to overcome the limitations of the source expression in languages like JMESPath, where e.g. `.[?lost==true]` is always evaluated as a match, even when the value of the scalar property `lost` is `false`. So, in this example setting `scalarPattern` to `true` and source to `lost` will apply the mapping only if this property's value is `true`.
+- `scalarPattern`: the optional regular expression pattern which should match against a scalar value defined by the mapping's source expression for the mapping to be applied. When this is defined and does not match, the mapping will not be applied. This can be used to overcome the limitations of the source expression in languages like JMESPath, where e.g. `.[?lost==true]` is always evaluated as a match, even when the value of the scalar property `lost` is `false`. So, in this example setting `scalarPattern` to `true` and source to `lost` will apply the mapping only if this property's value is `true`.
 
 - `output`:
+
   - `nodes`: an object (dictionary) where each property is the key of a node emitted by the mapping rule, whose string value is the node's identifier [template](#templates). Optionally, this template can be followed by space plus the node's label, and/or its tag between square brackets, the tag being preceded by `|`. For instance, `x:events/{$.} [label|tag]` defines the node's UID, its human-friendly label, and an optional tag.
   - `triples`: an array of strings, each representing a triple [template](#templates). Each triple is in any of these forms:
     - `S P O`: subject, predicate, object (all URIs);
@@ -185,7 +188,7 @@ In turn, each mapping rule can include any number of _children rules_. The model
 
 - `children`: children mappings. Each child mapping has the same properties of a root mapping, except for those which would make no sense in children, as noted above.
 
->💡 The _source type_ is a number where `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not a closed enumerated value, so that you can optionally add new values by just defining new constants.
+> 💡 The _source type_ is a number where `0`=user, `1`=item, `2`=part, `3`=thesaurus, `4`=implicit (assigned to nodes automatically added because used in a triple without yet being present in the graph). This is not a closed enumerated value, so that you can optionally add new values by just defining new constants.
 
 ## Templates
 
@@ -200,7 +203,7 @@ A template contains text with any number of placeholders, delimited by `{}`, whe
 
 These placeholders can also be nested. The mapping rules will take care of resolving them starting from the deepest ones.
 
->⚙️ Placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
+> ⚙️ Placeholder resolution is driven by a simple tree shaped representation of the template (`TemplateTree`).
 
 ### Expressions
 
@@ -234,7 +237,7 @@ As a sample, consider this mapping fragment:
       "output": {
         "nodes": {
           "event": "x:events/{$.}"
-        },
+        }
       }
     }
   ]
@@ -261,7 +264,7 @@ Metadata can be emitted by the mapping process itself, or be defined in a mappin
 Currently the mapping process emits these metadata (whose names are thus reserved):
 
 - `item-id`: the item ID (GUID).
-- `item-eid` (*): the EID of the item, as conventionally defined by the first matching metadatum with name = `eid` from the item's `MetadataPart`, if present. As this is the typical lookup mechanism, your consumer code can provide this additional metadatum by opting in via a metadata supplier.
+- `item-eid` (\*): the EID of the item, as conventionally defined by the first matching metadatum with name = `eid` from the item's `MetadataPart`, if present. As this is the typical lookup mechanism, your consumer code can provide this additional metadatum by opting in via a metadata supplier.
 - `part-id`: the part ID (GUID).
 - `group-id`: the item's group ID.
 - `facet-id`: the item's facet ID.
@@ -274,7 +277,7 @@ Currently the mapping process emits these metadata (whose names are thus reserve
 - `item-eid`: the value of metadatum `eid` in the `MetadataPart` (if any) of the current item.
 - `metadata-pid`: the part ID (GUID) of the metadata part (if any) of the current item.
 
-> (*) As an example, see the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) code which by default opts into this metadatum with a code like this:
+> (\*) As an example, see the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) code which by default opts into this metadatum with a code like this:
 
 ```cs
 GraphUpdater updater = new(graphRepository)
@@ -297,7 +300,7 @@ Macros are a modular way for customizing the mapping process when more complex l
 - the macro `Id` (an arbitrary string). This is used to call the macro from the template.
 - the `Run` method, which runs the macro receiving the current data context, the placeholder position in the template and the template itself, and any arguments following the macro's ID; and returning a string or null.
 
-The macro syntax in the placeholder is very simple: it consists of the macro ID, optionally followed by any number of arguments, separated by ` & `, included in brackets. For instance:
+The macro syntax in the placeholder is very simple: it consists of the macro ID, optionally followed by any number of arguments, separated by `&`, included in brackets. For instance:
 
 ```txt
 !{some_macro(arg1 & arg2)}
@@ -336,7 +339,7 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
 - the first event has type `person.birth`;
 - the second has type `person.death`.
 
->Both these event types come from a [thesaurus](../../models/thesauri).
+> Both these event types come from a [thesaurus](../../models/thesauri).
 
 ```json
 {
@@ -344,41 +347,53 @@ Our data here come from a Cadmus part. Its serialized form (stripping out some u
     {
       "eid": "birth",
       "type": "person.birth",
-      "chronotope": {
-        "place": {
-          "value": "Arezzo"
-        },
-        "date": {
-          "a": {
-            "value": 1304
+      "chronotopes": [
+        {
+          "place": {
+            "value": "Arezzo"
+          },
+          "date": {
+            "a": {
+              "value": 1304
+            }
           }
         }
-      },
+      ],
       "description": "Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Cangiani.",
       "relatedEntities": [
         {
           "relation": "mother",
-          "id": "eletta_cangiani"
+          "id": {
+            "target": {
+              "gid": "x:guys/eletta_cangiani"
+            }
+          }
         },
         {
           "relation": "father",
-          "id": "ser_petracco"
+          "id": {
+            "target": {
+              "gid": "x:guys/ser_petracco"
+            }
+          }
         }
       ]
     },
     {
       "eid": "death",
       "type": "person.death",
-      "chronotope": {
-        "place": {
-          "value": "Arquà"
-        },
-        "date": {
-          "a": {
-            "value": 1374
+      "chronotopes": [
+        {
+          "place": {
+            "value": "Arquà"
+          },
+          "date": {
+            "a": {
+              "value": 1374
+            }
           }
         }
-      },
+      ],
       "description": "Petrarch died in 1374 at Arquà."
     }
   ]
@@ -389,7 +404,7 @@ As you can see, each event in the `events` array is identified by an arbitrarily
 
 Each event usually is connected to a place (`Arezzo`) and a date (`1304`) using a so-called _chronotope_.
 
->Chronotopes are typically entered in the editor via bricks like those you can play with at <https://cadmus-bricks-v3.fusi-soft.com/refs/asserted-chronotope>.
+> Chronotopes are typically entered in the editor via bricks like those you can play with at <https://cadmus-bricks-v3.fusi-soft.com/refs/asserted-chronotope>.
 
 Also, each event has a human-friendly description, and a list of related entities, each having a relation type (from another thesaurus), and the ID of the related entity.
 
@@ -405,347 +420,615 @@ We can arrange some basic mappings to project each event from this part into a n
 
 Mappings are encoded in a simple JSON document, which can be imported into the [graph database](database). In Cadmus, mappings need to be put in the graph database, but it's easier to design them in a simple JSON document, to be later imported into it.
 
-The JSON document is an array of mapping objects. Each mapping object has some properties, and optionally any number of children mappings, nested under their `children` property.
-
-Here is a quick recap of mappings for the first event, reading the file from top to bottom.
+The JSON document is an array of mapping objects. Each mapping object is in a `documentMappings` array, has some properties, and optionally any number of children mappings, nested under their `children` property. Let us consider these mappings one at a time.
 
 #### Birth event
 
-👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). Its output is just a metadatum, which will be consumed by its children mappings.
-
-The metadatum has key `eid-sid`, and is built from a template, collecting the part ID and the event's EID. So, all the children of this mapping start with their source located at the birth event.
-
 ```jsonc
 {
-  "name": "birth event",
-  "sourceType": 2, // source=part
-  "facetFilter": "person", // match only person's
-  "partTypeFilter": "it.vedph.historical-events", // match parts of type events
-  "description": "Map birth event",
-  "source": "events[?type=='person.birth']", // match only birth events
-  "output": {
-    "metadata": { // the only output is a metadatum
-      "eid-sid": "{$part-id}/{@eid}" // EID-based SID metadatum
+  "namedMappings": {
+    // ... omitted
+  },
+  "documentMappings: [
+    {
+      "name": "person_birth_event",
+      "sourceType": 2, // source=part
+      "facetFilter": "person", // only for person items
+      "partTypeFilter": "it.vedph.historical-events", // only for events part
+      "description": "Map person birth event",
+      "source": "events[?type=='person.birth']", // only for birth events
+      "sid": "{$part-id}/{@eid}", // SID = part GUID + "/" + event EID
+      "output": {
+        "metadata": {
+          "sid": "{$part-id}/{@eid}", // store SID for use in descendants
+          "person": "x:persons/{$metadata-pid}/{$item-eid}" // UID of the person (in item with metadata part)
+        },
+        "nodes": {
+          "event": "x:events/{$sid} [x:events/{@eid}]" // event node
+        },
+        "triples": [
+          "{?event} a crm:E67_birth", // EVENT is-a birth
+          "{?event} crm:P2_has_type x:event-types/person.birth", // EVENT has_type person.birth (thesaurus)
+          "{?event} crm:P98_brought_into_life {$person}" // EVENT brought_into_life PERSON
+        ],
+        "children": [
+          // ... omitted
+        ]
+      }
     }
-  }
+  ]
+  // ... omitted
 }
 ```
 
->Note that this root mapping effectively does not create any node. It just defines a metadatum which will be consumed by its descendant mappings. This tree-shaped set of mappings follows the tree-shaped data from the events part, and starts selecting the `events` array from it. Children mappings will then be applied to each entry in that array.
+👉 (1) the first mapping matches any event of type `person.birth` (see its `source` property: this is the JMES path). It outputs the event node and triples telling about it that it's a birth (a CIDOC-CRM class), has-type `person.birth`, and brought-into-life the person represented by the Cadmus item containing this events part.
 
-#### Birth event - eid
+>Note that in this compact notation the triple is a single string where subject, predicate and object are separated by space.
 
-👉 (2) the first child of this mapping matches the event's [EID](#entry-id-eid) property, and uses it to emit a node for that event. Its template has a prefix (`x:events/`, where `x:` stands for some URI namespace), and the EID from the event. These build the node's UID.
+The event node has its UID built from these components, separated by slash:
 
-This node is keyed under `event`: this key will be used by other mappings to refer to the UID of this node (cfr. `{?event}` in the mapped triples).
+1. the prefix `x:events` (assuming that `x` is the prefix for our target ontology);
+2. the events part GUID;
+3. the event's EID. This is unique only in the context of its part; but given that the part's GUID is globally unique and precedes this in the UID, we can be sure we have a globally unique identifier for this event.
 
->As you know, the [UID](#entity-id-uid) cannot be known in advance, as it might receive a numeric suffix to disambiguate it. So, having a key for each emitted node allows us to refer to it in other mappings. Of course, the key is meaningful only in the scope of the process of this mapping; it will have no existence outside of the mapping process. Think of it as a sort of variable name, to be used in mapping templates.
+For instance, if the part GUID is `d162c70d-5787-4ebb-b922-3196518dbd24` and the event's EID in it is `birth`, the UID would be `x:events/d162c70d-5787-4ebb-b922-3196518dbd24/birth`. So, even if we just used `birth` to identify our event in the events part, that's a globally unique identifier for it. The prefix and the EID make this UID more human-friendly, as we can see that it's an event entity and it refers to a birth.
 
-The same mapping, once emitted the event node, uses it as the subject of a couple of triples:
+All the other mappings are children of this event mappings, because they map data in the event object model. If you look at the object model as a tree of properties, then having a tree of mappings makes sense.
 
-- one tells that this event is a birth event;
-- another tells that it brought into life the entity corresponding to the item containing this part (that is, Petrarch). This item corresponds to the person who was born.
+So, let us examine each child in the `children` array.
 
-Note that triples use node and metadata placeholders:
-
-- `{?event}` represents the event's node UID, as generated by this mapping. Here we are using the node's key to refer to it, as the UID cannot be known in advance.
-- `{$item-uri}` represents the UID of the item containing this part, i.e. the UID of the person who was born. This is a metadatum injected by the context, before the mapping process starts. Every object mapped - be it an item, a part, or a thesaurus - injects into the context some metadata, besides providing JSON code representing it.
-
-```jsonc
-{
-  "name": "birth event - eid",
-  "source": "eid", // match the event's eid
-  "sid": "{$eid-sid}", // the SID for this mapping
-  "output": {
-    "nodes": { // nodes to output
-      "event": "x:events/{$.}" // the event node
-    },
-    "triples": [ // triples to output
-      "{?event} a crm:E67_Birth", // EVENT is-a birth
-      "{?event} crm:P98_brought_into_life {$item-uri}" // EVENT brought-into-life PETRARCH
-    ]
-  }
-}
-```
-
-#### Birth event - note
-
-👉 (3) this child mapping matches the event's `note` property. It then emits a node representing a free textual annotation, and a corresponding triple using it.
-
-The triple links the event (referred to via its key) to the note's literal text The expression `{$.}` wraps a simple dot, which is the path to the current node. Here, `note` being a string property (thus a scalar value, rather than an object), the current node is just the string's value, i.e. the note's text.
-
-```jsonc
-{
-   "name": "birth event - note",
-   "source": "note", // match the event's note
-   "sid": "{$eid-sid}/note", // the SID for this mapping
-   "output": {
-     "triples": [
-        "{?event} crm:P3_has_note \"{$.}\"" // EVENT has_note "..."
-      ]
-   }
-}
-```
-
-#### Birth event - chronotope
-
-👉 (4) the third child walks down the event's `chronotope` property, including place and/or date. As such, it has no output, but it just provides an ad hoc SID and a number of children mappings. As you can see, here the hierarchy of mappings reflects the hierarchy of the object. That's a very intuitive way of designing such processes.
-
-```jsonc
-{
-  "name": "birth event - chronotope",
-  "source": "chronotope",
-  "sid": "{$eid-sid}/chronotope", // the SID for children mappings
-}
-```
-
-👉 (5-6) down to the `chronotope`'s mapping children, we have a couple of them, for `place` and `date`:
-
-- the `place` mapping emits a place node, and a couple of triples telling that this is a place, and that the event took place there.
-- the `date` mapping looks more interesting, as it requires a macro. We want to emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. So, the logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
+#### Birth event - description
 
 ```jsonc
 "children": [
   {
-    "name": "birth event - chronotope - place",
-    "source": "place", // match chronotope.place
-    "output": {
-      "nodes": {
-        "place": "x:places/{@value}" // PLACE node
-      },
-      "triples": [
-        "{?place} a crm:E53_Place", // PLACE is-a place
-        "{?event} crm:P7_took_place_at {?place}" // EVENT took_place_at PLACE
-      ]
-    }
+    "name": "event_description"
   },
-  {
-    "name": "birth event - chronotope - date",
-    "source": "date", // match chronotope.date
-    "output": {
-      "metadata": { // define metadata:
-        "date_value": "{!_hdate({@.} & value)}", // use macro _hdate for date value (float)
-        "date_text": "{!_hdate({@.} & text)}" // use macro _hdate for date text
-      },
-      "nodes": {
-        "timespan": "x:timespans/ts" // date is a timespan node
-      },
-      "triples": [
-        "{?event} crm:P4_has_time_span {?timespan}", // EVENT has_time_span TIMESPAN
-        "{?timespan} crm:P82_at_some_time_within \"{$date_value}\"^^xs:float", // TIMESPAN at_some_time_within VALUE
-        "{?timespan} crm:P87_is_identified_by \"{$date_text}\"@en" // TIMESPAN is_identified_by "..."
-      ]
-    }
-  }
+  // ... omitted
 ]
 ```
 
-#### Birth event - related - mother
+👉 (2) this child mapping refers to the child property `description` of the event object. As we typically have a lot of events, it would not make sense to repeat this mapping whenever we want to map the event's description. Thus, here we just have a reference to a reusable mapping, named `event_description`. This is found in another section of our JSON document, named `namedMappings`. This is a 'dictionary' object where each property is a mapping with its reference name. This provides templates which are then embedded in the mapping being read, replacing the `name` reference.
 
-👉 (7) at this point, we're done with the `chronotope` property. The next mapping is child of the `event` object, and matches all the related entities whose `relation` property has value `mother`, i.e. the mother of this person.
+So, here is the corresponding mapping in the named mappings dictionary. It just adds a triple where:
 
->Of course, `mother` here is just a mock identifier for that relationship. Usually you would get some class identifier, but here we use a single word to keep the example short.
-
-The mapping outputs a node for the mother, using the received `id` with some prefix, just to show how we can still manipulate the received ID if needed, so users can enter a shortened version if useful. The corresponding triple links the event and the mother.
+1. subject is the event (which got a temporary name of `event`, defined above in the tree);
+2. predicate is a CRM-CIDOC predicate: `crm:P3_has_note` (assume that we have defined `crm` as the prefix for CIDOC-CRM).
+3. object is a literal, equal to the content of the description property (metadatum `{$.}`).
 
 ```jsonc
 {
-  "name": "birth event - related - mother",
-  "sid": "{$eid-sid}/related", // SID
-  "source": "relatedEntities[?relation=='mother']", // event.relatedEntities with relation='mother'
-  "output": {
-    "nodes": {
-      "mother": "x:persons/{@id}" // node for mother
+  "namedMappings": {
+    "event_description": {
+      "name": "event_description",
+      "description": "Map the description of an event to EVENT crm:P3_has_note LITERAL.",
+      "source": "description", // map event.description
+      "sid": "{$sid}/description", // SID is built from inherited sid metadatum
+      "output": {
+        "triples": ["{?event} crm:P3_has_note \"{$.}\""] // EVENT has_note "..."
+      }
     },
-    "triples": [
-      "{?event} crm:P96_by_mother {?mother}" // EVENT by_mother MOTHER
-    ]
+    // ... omitted
+  },
+  "documentMappings": [
+    // ... omitted
+  ]
+}
+```
+
+>💡 The expression `{$.}` wraps a simple dot, which is the path to the current node. Here, `description` being a string property (thus a scalar value, rather than an object), the current node is just the string's value, i.e. the description's text.
+
+So, when reading this mapping, the `"name": "event_description"` reference will be replaced with the content of `event_description` (name, description, etc.). This is very convenient because you can reuse mapping templates and make the JSON document much more compact and less error-prone.
+
+#### Birth event - note
+
+Again, this is a reference:
+
+```jsonc
+"children": [
+  {
+    "name": "event_note"
+  },
+  // ... omitted
+]
+```
+
+The corresponding named mapping is:
+
+```jsonc
+{
+  "namedMappings": {
+    "event_note": {
+      "name": "event_note",
+      "description": "Map the note of an event to EVENT crm:P3_has_note LITERAL.",
+      "source": "note", // map event.note
+      "sid": "{$sid}/note", // SID is built from inherited sid metadatum
+      "output": {
+        "triples": ["{?event} crm:P3_has_note \"{$.}\""] // EVENT has_note "..."
+      }
+    },
+  }
+  "documentMappings": [
+    // ... omitted
+  ]
+}
+```
+
+👉 (2) this mapping is almost equal to the previous one. It just outputs a triple for the event's note, which is a free text. The only difference is the source property name. Of course, it's up to you to decide whether you want to map both the description and the note (which usually is rather an editorial annotation).
+
+#### Birth event - chronotopes
+
+Again, this is a reference:
+
+```jsonc
+"children": [
+  {
+    "name": "event_chronotopes"
+  },
+  // ... omitted
+]
+```
+
+The corresponding named mapping is more complex, and includes a parent mapping with a couple of children mappings. The mapping refers to the `chronotopes` property of an event, which is an array of chronotopes, each providing date and/or place indications.
+
+```jsonc
+{
+  "namedMappings": {
+    "event_chronotopes": {
+      "name": "event_chronotopes",
+      "description": "For each chronotope, map the place/date of an event to triples which create a place node for the place and link it to the event via a triple using crm:P7_took_place_at for places; and to triples using crm:P4_has_time_span which in turn has a new timespan node has object.",
+      "source": "chronotopes", // map event.chronotopes (array)
+      "sid": "{$sid}/chronotopes", // SID
+      "children": [
+        {
+          "name": "event_chronotopes/place",
+          "source": "place", // map event.chronotopes[i].place
+          "output": {
+            "nodes": {
+              "place": "x:places/{@value}" // node for place (assuming a place's canonical name)
+            },
+            "triples": [
+              "{?place} a crm:E53_Place", // PLACE is-a place
+              "{?event} crm:P7_took_place_at {?place}" // EVENT took-place-at PLACE
+            ]
+          }
+        },
+        {
+          "name": "event_chronotopes/date",
+          "source": "date", // map event.chronotopes[i].date
+          "output": {
+            "metadata": {
+              "date_value": "{!_hdate({@.} & value)}", // date_value is numeric value
+              "date_text": "{!_hdate({@.} & text)}" // date_text is textual representation
+            },
+            "nodes": {
+              "timespan": "x:timespans/ts##" // timespan node
+            },
+            "triples": [
+              "{?event} crm:P4_has_time-span {?timespan}", // EVENT has-time-span TIMESPAN
+              "{?timespan} crm:P82_at_some_time_within \"{$date_value}\"^^xs:float", // TIMESPAN at-some-time-within VALUE
+              "{?timespan} crm:P87_is_identified_by \"{$date_text}\"@en" // TIMESPAN is-identified-by TEXT
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "documentMappings": [
+    // ... omitted
+  ]
+}
+```
+
+👉 (3) the `chronotopes` property is an array. For each item in it, a chronotope, we map its place and date:
+
+- place: map the place's node, and use it in a couple of triples: as a subject to say that it's a place, as an object to say that the event took place in that place.
+
+>💡 Note that whenever the mapping process emits a node or triple, this does not imply that this will be effectively added to the graph. The node or triple will be added only when they are not already present, because the generated graph will be merged into the existing, much larger one. So, emitting a node for the place ensures that we have it (otherwise, we could not create triples using it), but it will do no harm if that node already exists.
+
+- date: the `date` mapping looks more interesting, as it requires a macro. We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
+
+#### Birth event - assertion
+
+An _assertion_ is a generic data structure used whenever data are subject to some degree of doubt. An assertion typically provides a numeric rank representing how much you are confident in data, and possibly a generic tag and a set of documental references (for instance, a paper cited about the reconstruction of an event). Each event can have an assertion in its `assertion` property, which is handled by this mapping.
+
+Again, this is a reference:
+
+```jsonc
+"children": [
+  {
+    "name": "event_assertion"
+  },
+  // ... omitted
+]
+```
+
+The corresponding mapping template is:
+
+```jsonc
+{
+  "namedMappings": {
+    "event_assertion": {
+      "name": "event_assertion",
+      "description": "Map the assertion of an event to EVENT x:has_probability RANK^^xsd:short.",
+      "source": "assertion", // map event.assertion
+      "sid": "{$sid}/assertion", // SID
+      "output": {
+        "nodes": {
+          "assertion": "x:assertions/as##" // assertion node
+        },
+        "triples": [
+          "{?event} x:has_probability \"{@rank}\"^^xsd:short", // EVENT has_probability RANK^^xsd:short
+          "{?assertion} a crm:E13_attribute_assignment", // ASSERTION is-a attribute-assignment
+          "{?assertion} crm:P140_assigned_attribute_to {?event}", // ASSERTION assigned-attribute-to EVENT
+          "{?assertion} crm:P141_assigned x:has_probability", // ASSERTION assigned has-probability
+          "{?assertion} crm:P177_assigned_property_of_type crm:E55_type" // ASSERTION assigned-property-of-type type
+        ]
+      },
+      "children": [
+        {
+          "name": "event_assertion/references",
+          "source": "references", // map assertion.references (array)
+          "sid": "{$sid}/assertion/reference", // SID
+          "children": [
+            {
+              "name": "event/references/citation",
+              "source": "citation", // map assertion.references[i].citation
+              "output": {
+                "nodes": {
+                  "citation": "x:citations/cit##" // citation node
+                },
+                "triples": [
+                  "{?citation} a crm:E31_Document", // CITATION is-a document
+                  "{?citation} rdfs:label \"{@.}\"", // CITATION has-label VALUE
+                  "{?assertion} crm:P70i_is_documented_in {?citation}" // ASSERTION is-documented-in CITATION
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }    
   }
 }
 ```
 
+👉 (4) this mapping refers to the `assertion` object and to its references. In this case, we chose a simple projection of the assertion, still inside the CIDOC-CRM context:
+
+- we assign the event a probability rank.
+- if present, we add a citation for each reference, making it a document. Each citation value becomes its label, and the event is said to be documented in the citation document.
+
+#### Birth event - tag
+
+This is connected to a specific conventional usage of the generic event's tag in this example. Events have a general purpose `tag` property, an optional string with arbitrary content which can be used for grouping or tagging the event according to some criteria.
+
+In this example, we assume that the event's tag refers to a named period, like "early Middle Ages", "late Middle Ages", etc. Typically, this comes from a [thesaurus](../../models/thesauri.md). Of course, this is something specific to each project; that's just a demo.
+
+Again, this is a reference:
+
+```jsonc
+"children": [
+  {
+    "name": "event_tag"
+  },
+  // ... omitted
+]
+```
+
+The corresponding mapping template is:
+
+```jsonc
+{
+  "namedMappings": {
+    "event_tag": {
+      "name": "event_tag",
+      "description": "Map the tag of an event to EVENT P9i_forms_part_of GROUP.",
+      "source": "tag", // map event.tag
+      "sid": "{$sid}/tag", // SID
+      "output": {
+        "nodes": {
+          "period": "x:periods/{$part-id}/{@value}" // period node
+        },
+        "triples": ["{?event} P9i_forms_part_of {?period}"] // EVENT forms-part-of PERIOD
+      }
+    }
+  }
+}
+```
+
+👉 (5) this mapping just maps the event's tag value into a corresponding period, assuming that the value is right the period's identifier. Thus, it projects a node for the period, and uses a triple to say that the event is part of that period.
+
+#### Birth event - related - mother
+
+The next mapping is no longer a reference, but it's a direct child of the event mapping, and matches all the related entities whose `relation` property has value `mother`, i.e. the mother of this person.
+
+> Of course, `mother` here is just a mock identifier for that relationship. Usually you would get some class identifier, but here we use a single word to keep the example short.
+
+```jsonc
+{
+  // ... omitted
+  "children": [
+    {
+      "name": "person_birth_event/related/by_mother",
+      "source": "relatedEntities[?relation=='mother']", // map events[i].relatedEntities with relation=mother
+      "output": {
+        "nodes": {
+          "mother": "{@id.target.gid}" // mother node
+        },
+        "triples": [
+          "{?event} crm:P96_by_mother {?mother}" // EVENT by-mother MOTHER
+        ]
+      }
+    }
+  ]
+}
+```
+
+👉 (6) this mapping matches an entity whose relation to the event is `mother`, and projects a node for the mother, having as its UID the globally unique identifier already present in source data (under `id.target.gid`). It then projects a triple which says that the (birth) event is by the specified mother.
+
 #### Birth event - related -father
 
-👉 (8) finally, a sibling mapping does the same for the father.
+A sibling mapping does the same for the father:
+
+```jsonc
+{
+  // ... omitted
+  "children": [
+    {
+      "name": "person_birth_event/related/from_father",
+      "source": "relatedEntities[?relation=='father']",
+      "output": {
+        "nodes": {
+          "father": "{@id.target.gid}"
+        },
+        "triples": ["{?event} crm:P97_from_father {?father}"]
+      }
+    }
+  ]
+}
+```
+
+👉 (7) this mapping is similar to the previous one; it projects a node for the father, and a triple saying that the event is from the specified father.
 
 #### Birth Recap
 
-Here is the full code for the mappings for the birth and death events (the death event has the same structure):
+Here is the full code for the mappings for the birth and also the death events (which essentially has the same structure, except that it has no related entities):
 
 ```json
-[
-  {
-    "name": "birth event",
-    "sourceType": 2,
-    "facetFilter": "person",
-    "partTypeFilter": "it.vedph.historical-events",
-    "description": "Map birth event",
-    "source": "events[?type=='person.birth']",
-    "output": {
-      "metadata": {
-        "eid-sid": "{$part-id}/{@eid}"
+{
+  "namedMappings": {
+    "event_description": {
+      "name": "event_description",
+      "description": "Map the description of an event to EVENT crm:P3_has_note LITERAL.",
+      "source": "description",
+      "sid": "{$sid}/description",
+      "output": {
+        "triples": ["{?event} crm:P3_has_note \"{$.}\""]
       }
     },
-    "children": [
-      {
-        "name": "birth event - eid",
-        "source": "eid",
-        "sid": "{$eid-sid}",
-        "output": {
-          "nodes": {
-            "event": "x:events/{$.}"
-          },
-          "triples": [
-            "{?event} a crm:E67_Birth",
-            "{?event} crm:P98_brought_into_life {$item-uri}"
-          ]
-        }
-      },
-      {
-        "name": "birth event - note",
-        "source": "note",
-        "sid": "{$eid-sid}/note",
-        "output": {
-          "triples": [ "{?event} crm:P3_has_note \"{$.}\"" ]
-        }
-      },
-      {
-        "name": "birth event - chronotope",
-        "source": "chronotope",
-        "sid": "{$eid-sid}/chronotope",
-        "children": [
-          {
-            "source": "place",
-            "output": {
-              "nodes": {
-                "place": "x:places/{@value}"
-              },
-              "triples": [
-                "{?place} a crm:E53_Place",
-                "{?event} crm:P7_took_place_at {?place}"
-              ]
-            }
-          },
-          {
-            "name": "birth event - chronotope - date",
-            "source": "date",
-            "output": {
-              "metadata": {
-                "date_value": "{!_hdate({@.} & value)}",
-                "date_text": "{!_hdate({@.} & text)}"
-              },
-              "nodes": {
-                "timespan": "x:timespans/ts"
-              },
-              "triples": [
-                "{?event} crm:P4_has_time_span {?timespan}",
-                "{?timespan} crm:P82_at_some_time_within \"{$date_value}\"^^xs:float",
-                "{?timespan} crm:P87_is_identified_by \"{$date_text}\"@en"
-              ]
-            }
+    "event_note": {
+      "name": "event_note",
+      "description": "Map the note of an event to EVENT crm:P3_has_note LITERAL.",
+      "source": "note",
+      "sid": "{$sid}/note",
+      "output": {
+        "triples": ["{?event} crm:P3_has_note \"{$.}\""]
+      }
+    },
+    "event_chronotopes": {
+      "name": "event_chronotopes",
+      "description": "For each chronotope, map the place/date of an event to triples which create a place node for the place and link it to the event via a triple using crm:P7_took_place_at for places; and to triples using crm:P4_has_time_span which in turn has a new timespan node has object.",
+      "source": "chronotopes",
+      "sid": "{$sid}/chronotopes",
+      "children": [
+        {
+          "name": "event_chronotopes/place",
+          "source": "place",
+          "output": {
+            "nodes": {
+              "place": "x:places/{@value}"
+            },
+            "triples": [
+              "{?place} a crm:E53_Place",
+              "{?event} crm:P7_took_place_at {?place}"
+            ]
           }
+        },
+        {
+          "name": "event_chronotopes/date",
+          "source": "date",
+          "output": {
+            "metadata": {
+              "date_value": "{!_hdate({@.} & value)}",
+              "date_text": "{!_hdate({@.} & text)}"
+            },
+            "nodes": {
+              "timespan": "x:timespans/ts##"
+            },
+            "triples": [
+              "{?event} crm:P4_has_time-span {?timespan}",
+              "{?timespan} crm:P82_at_some_time_within \"{$date_value}\"^^xs:float",
+              "{?timespan} crm:P87_is_identified_by \"{$date_text}\"@en"
+            ]
+          }
+        }
+      ]
+    },
+    "event_assertion": {
+      "name": "event_assertion",
+      "description": "Map the assertion of an event to EVENT x:has_probability RANK^^xsd:short.",
+      "source": "assertion",
+      "sid": "{$sid}/assertion",
+      "output": {
+        "nodes": {
+          "assertion": "x:assertions/as##"
+        },
+        "triples": [
+          "{?event} x:has_probability \"{@rank}\"^^xsd:short",
+          "{?assertion} a crm:E13_attribute_assignment",
+          "{?assertion} crm:P140_assigned_attribute_to {?event}",
+          "{?assertion} crm:P141_assigned x:has_probability",
+          "{?assertion} crm:P177_assigned_property_of_type crm:E55_type"
         ]
       },
-      {
-        "name": "birth event - related - mother",
-        "sid": "{$eid-sid}/related",
-        "source": "relatedEntities[?relation=='mother']",
-        "output": {
-          "nodes": {
-            "mother": "x:guys/{@id}"
-          },
-          "triples": [ "{?event} crm:P96_by_mother {?mother}" ]
+      "children": [
+        {
+          "name": "event_assertion/references",
+          "source": "references",
+          "sid": "{$sid}/assertion/reference",
+          "children": [
+            {
+              "name": "event/references/citation",
+              "source": "citation",
+              "output": {
+                "nodes": {
+                  "citation": "x:citations/cit##"
+                },
+                "triples": [
+                  "{?citation} a crm:E31_Document",
+                  "{?citation} rdfs:label \"{@.}\"",
+                  "{?assertion} crm:P70i_is_documented_in {?citation}"
+                ]
+              }
+            }
+          ]
         }
-      },
-      {
-        "name": "birth event - related - father",
-        "sid": "{$eid-sid}/related",
-        "source": "relatedEntities[?relation=='father']",
-        "output": {
-          "nodes": {
-            "father": "x:guys/{@id}"
-          },
-          "triples": [ "{?event} crm:P97_by_father {?father}" ]
-        }
+      ]
+    },
+    "event_tag": {
+      "name": "event_tag",
+      "description": "Map the tag of an event to EVENT P9i_forms_part_of GROUP.",
+      "source": "tag",
+      "sid": "{$sid}/tag",
+      "output": {
+        "nodes": {
+          "period": "x:periods/{$part-id}/{@value}"
+        },
+        "triples": ["{?event} P9i_forms_part_of {?period}"]
       }
-    ]
+    }
   },
-  {
-    "name": "death event",
-    "sourceType": 2,
-    "facetFilter": "person",
-    "partTypeFilter": "it.vedph.historical-events",
-    "description": "Map death event",
-    "source": "events[?type=='person.death']",
-    "output": {
-      "metadata": {
-        "eid-sid": "{$part-id}/{@eid}"
+  "documentMappings": [
+    {
+      "name": "person",
+      "sourceType": 2,
+      "facetFilter": "person",
+      "partTypeFilter": "it.vedph.metadata",
+      "description": "Map a person item to a node via the item's EID extracted from its MetadataPart.",
+      "source": "metadata[?name=='eid']",
+      "sid": "{$part-id}/{@value}",
+      "output": {
+        "nodes": {
+          "person": "x:persons/{$part-id}/{@value} [x:persons/{@value}]"
+        },
+        "triples": ["{?person} a crm:E21_person"]
       }
     },
-    "children": [
-      {
-        "name": "death event - eid",
-        "source": "eid",
-        "sid": "{$eid-sid}",
-        "output": {
-          "nodes": {
-            "event": "x:events/{$.}"
-          },
-          "triples": [
-            "{?event} a crm:E69_Death",
-            "{?event} crm:P93_took_out_of_existence {$item-uri}"
-          ]
-        }
-      },
-      {
-        "name": "death event - note",
-        "source": "note",
-        "sid": "{$eid-sid}/note",
-        "output": {
-          "triples": [ "{?event} crm:P3_has_note \"{$.}\"" ]
-        }
-      },
-      {
-        "name": "death event - chronotope",
-        "source": "chronotope",
-        "sid": "{$eid-sid}/chronotope",
-        "children": [
-          {
-            "source": "place",
-            "output": {
-              "nodes": {
-                "place": "x:places/{@value}"
-              },
-              "triples": [
-                "{?place} a crm:E53_Place",
-                "{?event} crm:P7_took_place_at {?place}"
-              ]
-            }
-          },
-          {
-            "name": "death event - chronotope - date",
-            "source": "date",
-            "output": {
-              "metadata": {
-                "date_value": "{!_hdate({@.} & value)}",
-                "date_text": "{!_hdate({@.} & text)}"
-              },
-              "nodes": {
-                "timespan": "x:timespans/ts"
-              },
-              "triples": [
-                "{?event} crm:P4_has_time_span {?timespan}",
-                "{?timespan} crm:P82_at_some_time_within \"{$date_value}\"^^xs:float",
-                "{?timespan} crm:P87_is_identified_by \"{$date_text}\"@en"
-              ]
-            }
-          }
+    {
+      "name": "person_birth_event",
+      "sourceType": 2,
+      "facetFilter": "person",
+      "partTypeFilter": "it.vedph.historical-events",
+      "description": "Map person birth event",
+      "source": "events[?type=='person.birth']",
+      "sid": "{$part-id}/{@eid}",
+      "output": {
+        "metadata": {
+          "sid": "{$part-id}/{@eid}",
+          "person": "x:persons/{$metadata-pid}/{$item-eid}"
+        },
+        "nodes": {
+          "event": "x:events/{$sid} [x:events/{@eid}]"
+        },
+        "triples": [
+          "{?event} a crm:E67_birth",
+          "{?event} crm:P2_has_type x:event-types/person.birth",
+          "{?event} crm:P98_brought_into_life {$person}"
         ]
-      }
-    ]
-  }
-]
+      },
+      "children": [
+        {
+          "name": "event_description"
+        },
+        {
+          "name": "event_note"
+        },
+        {
+          "name": "event_chronotopes"
+        },
+        {
+          "name": "event_assertion"
+        },
+        {
+          "name": "event_tag"
+        },
+        {
+          "name": "person_birth_event/related/by_mother",
+          "source": "relatedEntities[?relation=='mother']",
+          "output": {
+            "nodes": {
+              "mother": "{@id.target.gid}"
+            },
+            "triples": ["{?event} crm:P96_by_mother {?mother}"]
+          }
+        },
+        {
+          "name": "person_birth_event/related/from_father",
+          "source": "relatedEntities[?relation=='father']",
+          "output": {
+            "nodes": {
+              "father": "{@id.target.gid}"
+            },
+            "triples": ["{?event} crm:P97_from_father {?father}"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "person_death_event",
+      "sourceType": 2,
+      "facetFilter": "person",
+      "partTypeFilter": "it.vedph.historical-events",
+      "description": "Map person death event",
+      "source": "events[?type=='person.death']",
+      "sid": "{$part-id}/{@eid}",
+      "output": {
+        "metadata": {
+          "sid": "{$part-id}/{@eid}",
+          "person": "x:persons/{$metadata-pid}/{$item-eid}"
+        },
+        "nodes": {
+          "event": "x:events/{$sid} [x:events/{@eid}]"
+        },
+        "triples": [
+          "{?event} a crm:E69_death",
+          "{?event} crm:P2_has_type x:event-types/person.death",
+          "{?event} crm:P100_was_death_of {$person}"
+        ]
+      },
+      "children": [
+        {
+          "name": "event_description"
+        },
+        {
+          "name": "event_note"
+        },
+        {
+          "name": "event_chronotopes"
+        },
+        {
+          "name": "event_assertion"
+        },
+        {
+          "name": "event_tag"
+        }
+      ]
+    }
+  ]
+}
 ```
+
+TODO: update to be completed
 
 ### Sample Results
 
@@ -760,16 +1043,16 @@ The results of these mapping rules are a set of nodes with their triples. First 
 - the death place;
 - the death time.
 
-label                  | URI                    | SID
------------------------|------------------------|------------------------------------------------------
-x:events/birth         | x:events/birth         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth
-x:places/arezzo        | x:places/arezzo        | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:timespans/ts         | x:timespans/ts         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:guys/eletta_cangiani | x:guys/eletta_cangiani | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related
-x:guys/ser_petracco    | x:guys/ser_petracco    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related
-x:events/death         | x:events/death         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death
-x:places/arqua         | x:places/arqua         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
-x:timespans/ts#1       | x:timespans/ts#1       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
+| label                  | URI                    | SID                                                   |
+| ---------------------- | ---------------------- | ----------------------------------------------------- |
+| x:events/birth         | x:events/birth         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
+| x:places/arezzo        | x:places/arezzo        | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:timespans/ts         | x:timespans/ts         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:guys/eletta_cangiani | x:guys/eletta_cangiani | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
+| x:guys/ser_petracco    | x:guys/ser_petracco    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
+| x:events/death         | x:events/death         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
+| x:places/arqua         | x:places/arqua         | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+| x:timespans/ts#1       | x:timespans/ts#1       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
 
 Then, these are their triples:
 
@@ -792,23 +1075,23 @@ Then, these are their triples:
 - the event has a timespan node;
 - this timespan is located at about 1374.
 
-S                | P                             | O                         | SID
------------------|-------------------------------|---------------------------|------------------------------------------------------
-x:events/birth   | a                             | crm:e67_birth             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth
-x:events/birth   | crm:p98_brought_into_life     | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth
-x:places/arezzo  | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:events/birth   | crm:p7_took_place_at          | x:places/arezzo           | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:events/birth   | crm:p4_has_time_span          | x:timespans/ts            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:timespans/ts   | crm:p82_at_some_time_within   | "1304"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:timespans/ts   | crm:p87_is_identified_by      | "1304 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope
-x:events/birth   | crm:p96_by_mother             | x:guys/eletta_cangiani    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related
-x:events/birth   | crm:p97_by_father             | x:guys/ser_petracco       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related
-x:events/death   | a                             | crm:e69_death             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death
-x:events/death   | crm:p93_took_out_of_existence | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death
-x:places/arqua   | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
-x:events/death   | crm:p7_took_place_at          | x:places/arqua            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
-x:events/death   | crm:p4_has_time_span          | x:timespans/ts#1          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
-x:timespans/ts#1 | crm:p82_at_some_time_within   | "1374"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
-x:timespans/ts#1 | crm:p87_is_identified_by      | "1374 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope
+| S                | P                             | O                         | SID                                                   |
+| ---------------- | ----------------------------- | ------------------------- | ----------------------------------------------------- |
+| x:events/birth   | a                             | crm:e67_birth             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
+| x:events/birth   | crm:p98_brought_into_life     | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth            |
+| x:places/arezzo  | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:events/birth   | crm:p7_took_place_at          | x:places/arezzo           | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:events/birth   | crm:p4_has_time_span          | x:timespans/ts            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:timespans/ts   | crm:p82_at_some_time_within   | "1304"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:timespans/ts   | crm:p87_is_identified_by      | "1304 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/chronotope |
+| x:events/birth   | crm:p96_by_mother             | x:guys/eletta_cangiani    | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
+| x:events/birth   | crm:p97_by_father             | x:guys/ser_petracco       | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/birth/related    |
+| x:events/death   | a                             | crm:e69_death             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
+| x:events/death   | crm:p93_took_out_of_existence | x:guys/francesco_petrarca | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death            |
+| x:places/arqua   | a                             | crm:e53_place             | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+| x:events/death   | crm:p7_took_place_at          | x:places/arqua            | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+| x:events/death   | crm:p4_has_time_span          | x:timespans/ts#1          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+| x:timespans/ts#1 | crm:p82_at_some_time_within   | "1374"^^xs:float          | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
+| x:timespans/ts#1 | crm:p87_is_identified_by      | "1374 AD"@en              | bdd152f1-2ae2-4189-8a4a-e3d68c6a9d7e/death/chronotope |
 
 So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database.
