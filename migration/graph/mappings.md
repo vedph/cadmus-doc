@@ -32,7 +32,7 @@ nav_order: 2
       - [Birth event - tag](#birth-event---tag)
       - [Birth event - related - mother](#birth-event---related---mother)
       - [Birth event - related -father](#birth-event---related--father)
-      - [Birth Recap](#birth-recap)
+      - [Birth and Death Recap](#birth-and-death-recap)
     - [Sample Results](#sample-results)
 
 The mapping between Cadmus source data (items and parts) and nodes is defined by node mappings. This is the core of the projection mechanism, which extracts a subset of source data into a graph of nodes.
@@ -626,7 +626,7 @@ The corresponding named mapping is more complex, and includes a parent mapping w
 
 > 💡 Note that whenever the mapping process emits a node or triple, this does not imply that this will be effectively added to the graph. The node or triple will be added only when they are not already present, because the generated graph will be merged into the existing, much larger one. So, emitting a node for the place ensures that we have it (otherwise, we could not create triples using it), but it will do no harm if that node already exists.
 
-- date: the `date` mapping looks more interesting, as it requires a macro. We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
+- date: the `date` mapping looks more interesting, as dealing with its complex [model](https://github.com/vedph/cadmus-bricks/blob/master/docs/historical-date.md) requires a macro (you can play with this model using the corresponding UI widget in [this demo page](https://cadmus-bricks-v3.fusi-soft.com/refs/historical-date)). We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
 
 #### Birth event - assertion
 
@@ -790,9 +790,16 @@ A sibling mapping does the same for the father:
 
 👉 (7) this mapping is similar to the previous one; it projects a node for the father, and a triple saying that the event is from the specified father.
 
-#### Birth Recap
+#### Birth and Death Recap
 
-Here is the full code for the mappings for the birth and also the death events (which essentially has the same structure, except that it has no related entities):
+Here is the full JSON document for the mappings for the birth and also the death events (which essentially has the same structure, except that it has no related entities). This document can be directly imported into the database, thus seeding the mappings table, ready to be used by the Cadmus editor.
+
+>Usually, mappings are automatically run whenever data are saved in the Cadmus editor. Anyway, the [Cadmus CLI tool](https://github.com/vedph/cadmus_tool) provides commands to run mappings against a database. This can be used to even regenerate the full graph starting from Cadmus data.
+
+The document includes two main properties:
+
+- `namedMappings`: the dictionary of shared mappings, each keyed by its internal name.
+- `documentMappings`: the mappings instances, which may include references to the mappings in the above dictionary.
 
 ```json
 {
@@ -1028,9 +1035,61 @@ Here is the full code for the mappings for the birth and also the death events (
 }
 ```
 
+### Sample Results
+
+Starting with the birth mapping, we get these nodes:
+
+| label                  | uri                    | sid                   |
+| ---------------------- | ---------------------- | --------------------- |
+| x:events/birth         | x:events/pid/birth     | PID/birth             |
+| x:places/arezzo        | x:places/arezzo        | PID/birth/chronotopes |
+| x:timespans/ts#5       | x:timespans/ts#5       | PID/birth/chronotopes |
+| x:guys/eletta_cangiani | x:guys/eletta_cangiani | PID/birth/tag         |
+| x:guys/ser_petracco    | x:guys/ser_petracco    | PID/birth/tag         |
+
+>⚠️ Note that for readability here and below the real part's GUID is replaced with the placeholder `PID` (or `pid` -- unless specified otherwise, URIs by default are lowercased to avoid confusions arising from mixed casing, which is especially important for the underlying data store, based on PostgreSQL, where string comparison by default is case sensitive).
+
+So we have:
+
+- a birth event;
+- a place (Arezzo);
+- a date;
+- a person, the mother Eletta Cangiani;
+- another person, the father Ser Petracco.
+
+The projected triples are:
+
+| S                  | P                           | O                                                                          | sid                   |
+| ------------------ | --------------------------- | -------------------------------------------------------------------------- | --------------------- |
+| x:events/pid/birth | rdf:type                    | crm:e67_birth                                                              | PID/birth             |
+| x:events/pid/birth | crm:p2_has_type             | x:event-types/person.birth                                                 | PID/birth             |
+| x:events/pid/birth | crm:p98_brought_into_life   | x:persons/mpid/alpha                                                       | PID/birth             |
+| x:events/pid/birth | crm:p3_has_note             | Petrarch was born in 1304 at Arezzo from ser Petracco and Eletta Cangiani. | PID/birth/description |
+| x:places/arezzo    | rdf:type                    | crm:e53_place                                                              | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p7_took_place_at        | x:places/arezzo                                                            | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p4_has_time-span        | x:timespans/ts#5                                                           | PID/birth/chronotopes |
+| x:timespans/ts#5   | crm:p82_at_some_time_within | 1304                                                                       | PID/birth/chronotopes |
+| x:timespans/ts#5   | crm:p87_is_identified_by    | 1304 AD                                                                    | PID/birth/chronotopes |
+| x:events/pid/birth | crm:p96_by_mother           | x:guys/eletta_cangiani                                                     | PID/birth/tag         |
+| x:events/pid/birth | crm:p97_from_father         | x:guys/ser_petracco                                                        | PID/birth/tag         |
+
+These triples say that:
+
+- the birth event is of type birth (`E67_Birth` class in CIDOC-CRM).
+- the birth event has a custom extended type, derived from thesauri.
+- the birth event brought into life the item identified by the EID metadatum in the item's metadata part, here `alpha` (just a default mock value used in the Studio UI; one could replace it with something more meaningful, like `petrarch`).
+- there is a place node of type place.
+- the event took place in this place.
+- the event is linked to a timespan.
+- this timespan is around 1304.
+- this timespan is identified by human-readable text `1304 AD`.
+- the birth event is by mother Eletta Cangiani.
+- the birth event is from father Ser Petracco.
+
+>💡 Note that in our mapping we intentionally say nothing else about mother and father; not even that they are persons. We just provide their UID, assuming that data about them is elsewhere in the graph. All what we need here is just the identifier to bring them into our triples. As always, if a node with this identifier already exists, it will be used with no change; otherwise, it will be added to the graph.
+
 TODO: update to be completed
 
-### Sample Results
 
 The results of these mapping rules are a set of nodes with their triples. First we have the nodes for each entity:
 
