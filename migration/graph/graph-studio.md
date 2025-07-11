@@ -7,8 +7,10 @@ nav_order: 6
 
 # Graph Studio
 
-- 🛠️ [GitHub code repository](https://github.com/vedph/cadmus-graph-studio-app)
+- 🛠️ [source code](https://github.com/vedph/cadmus-graph-studio-app)
 - 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/)
+
+⚠️ Links still point to the older version of the app. New links will appear here as soon as the new version is out.
 
 Cadmus Graph Studio is an essential tool designed to ease the creation of [graph mappings](mappings). This minimalist tool is almost server-less, except for the fact that an API backend is provided to test [JMES Path expressions](https://jmespath.org) and mappings.
 
@@ -21,7 +23,7 @@ No database is required; you just create your mappings, and get the correspondin
 
 ## Mappings List
 
-The tool's homepage provides a paged list of mappings. To start with, some preset mappings are used as examples. You can import your own mappings, or just delete these samples and start from scratch.
+The tool's homepage provides a paged list of mappings. To start with, some preset mappings are used as examples. You can import your own mappings, or just delete these samples and start from scratch. Different preset mappings and sample data can be selected from the selectors at the top of the list.
 
 ![mappings list](img/gs-mapping-list.png)
 
@@ -47,12 +49,12 @@ Also, as often mappings have descendant mappings, these are represented as a tre
 
 The metadata section includes the mapping's metadata:
 
-- a user friendly name.
+- a user-friendly name. It is suggested you apply some naming conventions for the mappings, as they can grow very quickly. Typically we name mappings after their source, e.g. `events` for an events part, `events - type` (or any other conventional syntax, e.g. `events.type`) for the `type` property of an event, and the like.
 - the type of data source: item or part.
 - the source ID (SID).
 - the facet, group, and flags filters.
 - the part type and role filters.
-- a short description of the mapping.
+- a short description of the mapping. It is suggested you summarize here the mapping's task and its output.
 
 ### Input
 
