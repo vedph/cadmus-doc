@@ -13,6 +13,14 @@ The typical steps for designing a graph for a Cadmus projects are:
 2. define the [mappings](mappings) for each model you want to project into the graph.
 3. prepare a list of nodes for at least the most commonly used classes and predicates from your ontologies.
 
+As all the resources you will create are just text files (JSON documents and their optional documentation, typically using Markdown), a commonly used approach here is creating a GitHub repository to include:
+
+- nodes to pre-load in the database.
+- triples to pre-load in the database.
+- various files for your mappings and their documentation. 💡 It is suggested that you store all of your shared mappings to reuse in a single file, and then copy-paste it into a JSON document for each logically distinct set of mappings. This way you will be able to keep all the shared mappings in a single source, and then inject them into each specific mapping (either manually or using some simple script).
+
+An example of such repository is the [Itinera RDF repository](https://github.com/vedph/cadmus-itinera-rdf).
+
 ## (1) Ontologies
 
 Defining the ontologies you are going to use (including your own) is completely up to you. The mapping process is neutral, and can project data into nodes and triples from any mix of ontologies. Just decide a conventional prefix for each ontology, and fill the graph database `namespace_lookup` table accordingly.
@@ -94,4 +102,21 @@ The main purpose of this step is providing a clearer set of nodes in advance, so
 
 ```sh
 ./cadmus-tool graph-import c:/users/dfusi/desktop/nodes.json cadmus-itinera -g repository-provider.itinera
+```
+
+If you need to preload some preset triples too, you can use the same command with different parameters to load triples from a JSON document having at its root an array of objects, e.g.:
+
+```json
+[
+  {
+    "subjectUri": "crm:e7_activity",
+    "predicateUri": "rdfs:subClassOf",
+    "objectUri": "crm:e5_event"
+  },
+  {
+    "subjectUri": "crm:e8_acquisition",
+    "predicateUri": "rdfs:subClassOf",
+    "objectUri": "crm:e7_activity"
+  }
+]
 ```

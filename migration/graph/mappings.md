@@ -1180,3 +1180,16 @@ These triples say that:
 So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling in a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database. Thanks to the SID, whenever the same part is changed, the mappings will be run again, and the resulting graph will be merged into the existing graph.
 
 Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 10 nodes and 28 triples. Of course, a form with a list of events where you can insert date, place and pick related entities is generally easier to use than having to manually encode all these nodes and triples without necessarily knowing anything about RDF, much similar to the way Cadmus [renders](../rendering/architecture.md) full TEI from its data without users having to know about XML. Also, just like in rendering output from the same data we are free to completely change the target TEI scheme, here in projecting graph nodes and links we are free to completely change the target ontologies by just changing our mappings.
+
+To make things easier, a UI is provided also for creating and testing the mappings themselves.
+
+You can test how each mapping works in an interactive mapping editor by using the [Graph Studio App](graph-studio). In the screenshot below, you can see the death mapping described above under test:
+
+![Graph Studio mapping tester](img/gs-editor-test.png)
+
+The test UI is part of the mapping editor. Here you see the full death mappings tree in the left pane. In the central pane, we have loaded some preset data (we can type or paste some JSON here, or just pick a preset datum from a list we can provide and enrich): these are right the data shown above for our example.
+
+Once we load data, we just click the `run` button to execute the mappings tree. The result is in the right pane, having:
+
+- a list of projected nodes, with their label, URI, and SID.
+- a list of projected triples, with their subject, predicate, object, and SID. In objects, the green color represents entities and the cyan color represents literal values, which may have additional metadata like type or language.
