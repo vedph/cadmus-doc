@@ -7,10 +7,8 @@ nav_order: 6
 
 # Graph Studio
 
-- 🛠️ [source code](https://github.com/vedph/cadmus-graph-studio-app)
-- 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/)
-
-⚠️ Links still point to the older version of the app. New links will appear here as soon as the new version is out.
+- 🛠️ [source code](https://github.com/vedph/cadmus-graph-studio-app-v2)
+- 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/): ⚠️ this link still point to the older version of the app. As soon as the new version is out, it will replace the old one at the same URL.
 
 Cadmus Graph Studio is an essential tool designed to ease the creation of [graph mappings](mappings). This minimalist tool is almost server-less, except for the fact that an API backend is provided to test [JMES Path expressions](https://jmespath.org) and mappings.
 
@@ -93,7 +91,7 @@ To test your mapping:
    - part role ID: the part role ID.
    - facet ID: the item's facet ID.
    - item title: the item's title.
-   - item URI
+   - item URI: the URI of the item, e.g. `x:persons/petrarch`. In real-world, this is built by the mapping infrastructure from item data, and passed to mappers via metadata.
    - item label: the item's label.
    - item EID: the item's EID (a human-friendly identifier for the item, typically used in linking or here to build user-friendly UIDs). This comes from the `eid` metadatum in the metadata part of any item.
    - metadata part ID: the ID of the metadata part of the item. This is a GUID, but again the default is just `MPID`.
