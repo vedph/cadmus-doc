@@ -8,7 +8,7 @@ nav_order: 6
 # Graph Studio
 
 - 🛠️ [source code](https://github.com/vedph/cadmus-graph-studio-app-v2)
-- 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/): ⚠️ this link still point to the older version of the app. As soon as the new version is out, it will replace the old one at the same URL.
+- 💼 [online tool](https://cadmus-graph-studio.fusi-soft.com/) ⚠️ This is a preview of the new app, which was being rebuilt for Angular 20+ and a newer set of libraries. Currently it's mostly used for testing mappings, as its editing functions have not yet been tested.
 
 Cadmus Graph Studio is an essential tool designed to ease the creation of [graph mappings](mappings). This minimalist tool is almost server-less, except for the fact that an API backend is provided to test [JMES Path expressions](https://jmespath.org) and mappings.
 
