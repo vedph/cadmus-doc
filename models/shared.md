@@ -86,6 +86,8 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [shelfmarks](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-shelfmarks.md)
   - [watermarks](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-watermarks.md)
 
+>This project is connected to the [codicological layout view](https://github.com/vedph/cod-layout-view) web component library, which contains services and models representing manuscript layout formulas, and is a generalization inspired by Cadmus codicology layout formulas.
+
 ## Epigraphy
 
 - parts:
