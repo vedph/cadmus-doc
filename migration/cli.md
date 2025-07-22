@@ -8,6 +8,7 @@ nav_order: 3
 
 - [Migration Tool](#migration-tool)
   - [Dump Command](#dump-command)
+  - [Dump Thesauri Command](#dump-thesauri-command)
   - [Render Items Command](#render-items-command)
 
 # Migration Tool
@@ -52,6 +53,20 @@ Example:
 ./cadmus-mig dump cadmus-ndp --indented
 ```
 
+## Dump Thesauri Command
+
+🎯 Dump all the thesauri into a JSON file.
+
+Syntax:
+
+```sh
+./cadmus-mig dump-thesauri <DatabaseName> [-o OutputPath] [--indented]
+```
+
+- `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
+- `-o OutputPath`: the output JSON file path.
+- `--indented`: indent JSON output.
+
 ## Render Items Command
 
 🎯 [Render](./render/architecture.md) Cadmus items.
@@ -63,7 +78,7 @@ Syntax:
 ```
 
 - `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
-- <ConfigPath>: the path to the rendering pipeline configuration file.
+- `ConfigPath`: the path to the rendering pipeline configuration file.
 - `-p PluginTag`: the tag of the factory provider plugin for preview (`ICadmusRenderingFactoryProvider`).
 - `-r PluginTag`: the tag of the Cadmus repository provider plugin (`IRepositoryProvider`).
 - `-c ComposerKey`: the item composer key to use (default is `default`).
