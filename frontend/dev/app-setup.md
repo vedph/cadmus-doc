@@ -63,6 +63,8 @@ In this case, ensure that these settings are properly configured:
     /// <reference types="@angular/localize" />
     ```
 
+>For Angular Material animations you should also add this: `npm i @angular/animations`.
+
 4. in each `tsconfig` file (root `tsconfig.json`, `tsconfig.app.json`, `projects/LIB/tsconfig.lib.json`, `projects/LIB/tsconfig-prod.lib.json`) ensure that under `compilerOptions` you have:
 
 ```json
@@ -161,7 +163,7 @@ mat-icon.mat-error, mat-icon.mat-warn {
 ```bash
 npm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login --force
 
-npm i @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search --force
+npm i @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search --force
 npm i @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core --force
 
 npm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui --force
@@ -178,10 +180,13 @@ The above packages are fairly typical, but you might well omit those you are not
 
 💡 If you want some data statistics in your editor, also do:
 
-1. `npm i ngx-echarts echarts @myrmidon\cadmus-statistics`
+1. `npm i ngx-echarts echarts @myrmidon/cadmus-statistics`
 2. remember to configure echarts adding in `app.config.ts` under `providers`:
 
 ```ts
+import { NgxEchartsModule } from 'ngx-echarts';
+
+// in providers array:
     importProvidersFrom(
       NgxEchartsModule.forRoot({
         echarts: () => import('echarts'),
@@ -191,8 +196,8 @@ The above packages are fairly typical, but you might well omit those you are not
 
 ▶️ 2. Typically you will also need **Monaco editor** and **Markdown**:
 
-- [NG essentials](https://github.com/cisstech/nge): `npm i @cisstech/nge monaco-editor`.
-- [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `npm i ngx-markdown marked`.
+- [NG essentials](https://github.com/cisstech/nge): `npm i @cisstech/nge monaco-editor --force`.
+- [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `npm i ngx-markdown marked --force`.
 
 ⚠️ Note that for such libraries you should also import the providers in `app.config.ts` like:
 
@@ -252,7 +257,7 @@ window.__env.biblioApiUrl = 'http://localhost:60058/api/';
 In this case typically you will also need to install the bibliography packages:
 
 ```bash
-npm i @myrmidon/cadmus-biblio-core @myrmidon/cadmus-biblio-api @myrmidon/cadmus-biblio-ui @myrmidon/cadmus-part-biblio-ui --force
+npm i @myrmidon/cadmus-biblio-core @myrmidon/cadmus-biblio-api @myrmidon/cadmus-biblio-ui @myrmidon/cadmus-part-biblio-ui @myrmidon/cadmus-part-biblio-pg --force
 ```
 
 Later, in your app's `part-editor-keys.ts`, remember to _setup the route to the bibliography part editor_ like:
