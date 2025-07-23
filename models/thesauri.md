@@ -34,7 +34,8 @@ To deal with thesauri, you will need:
 💡 Also, there are some **tools** you can use:
 
 - [Cadmus command line tool](https://github.com/vedph/cadmus_tool): this tool has functions to variously import thesauri into an existing database with different modes (replacing, patching, or synching), and from different formats (JSON, CSV, XLSX, XLS).
-- [online tools](https://cadmus.fusi-soft.com/#/profile): the Cadmus presentation website has some visual editing tools to help you work with thesauri.
+- [Cadmus migration command line tool](https://github.com/vedph/cadmus-migration-v3): this tool has a function to export all the thesauri at once. You can still use the Cadmus UI itself to export a single thesaurus: in most Cadmus editors, there is an admin area where you can import or export thesauri via the UI.
+- [online tools](https://cadmus.fusi-soft.com/#/profile): the old Cadmus presentation website has some visual editing tools to help you work with thesauri.
 
 ## Overview
 
