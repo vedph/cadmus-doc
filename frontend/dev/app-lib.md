@@ -237,12 +237,12 @@ Once you create a library, whatever its type:
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^18.0.0",
-    "@angular/core": "^18.0.0",
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/cadmus-core": "^12.0.0",
-    "@myrmidon/cadmus-state": "^13.0.0",
-    "@myrmidon/cadmus-ui": "^13.0.0"
+    "@myrmidon/cadmus-core": "^12.0.1",
+    "@myrmidon/cadmus-state": "^14.0.0",
+    "@myrmidon/cadmus-ui": "^14.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

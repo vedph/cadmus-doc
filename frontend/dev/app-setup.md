@@ -246,7 +246,7 @@ This step is essential to let the frontend find the server, while allowing us to
 })(this);
 ```
 
->💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, etc.
+>💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, a MUFI root URI, etc.
 
 📖 If you are going to use the [external bibliography API](https://github.com/vedph/cadmus_biblioapi), also add its URL here, e.g.:
 
@@ -414,7 +414,7 @@ export const ITEM_BROWSER_KEYS = {
   {
     path: 'stats',
     component: EditFrameStatsPageComponent,
-    canActivate: [AuthJwtGuardService],
+    canActivate: [jwtGuard],
   },
 ```
 

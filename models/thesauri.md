@@ -68,7 +68,7 @@ The import methods provided in the Cadmus editor allow for 3 behaviors:
 - _patch_: the existing thesaurus is patched with the imported one: any existing entry has its value overwritten; any non existing entry is just added.
 - _synch_: equal to patch, with the addition that any existing entry not found in the imported thesaurus is removed.
 
-⚙️ If you are not using the UI, you can use the Cadmus [command line tool](https://github.com/vedph/cadmus_tool?tab=readme-ov-file#thesaurus-import-command) for more fine-grained imports, or also generic MongoDB commands, should you need to directly patch the database. To manually patch the database (for advanced users!):
+⚙️ If you are not using the UI, you can use the Cadmus [command line tool](https://github.com/vedph/cadmus_tool?tab=readme-ov-file#thesaurus-import-command) for more fine-grained imports, or also generic MongoDB commands, should you need to directly patch the database. You can also use the Cadmus [data migration command line tool](https://github.com/vedph/cadmus-migration-v3) for bulk thesauri export. To manually patch the database (for advanced users!):
 
 1. export the `thesauri` collection from an up-to-date database. This can be created by just launching the editor with updated thesauri in an environment where there is no database for that project. In this case, the databases will be created anew, together with their thesauri. The fastest export type is probably a gzipped archive resulting in a single compressed file, like e.g. `thesauri.agz`.
 2. login into the target database with MongoDB shell, and drop the thesauri collection:
