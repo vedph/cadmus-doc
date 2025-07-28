@@ -21,7 +21,7 @@ Guidelines for **implementing a part**:
 
 - _derive_ from `PartBase`, even if this is not strictly a requirement, but rather a commodity. The part class must anyway implement the `IPart` interface.
 - _decorate_ the class with a `TagAttribute` providing the part's type ID.
-- _do not add any logic_ to the part. The part is just a POCO object modeling the data it represents, and should have no logic. The only piece of logic required is the method returning the part's data pins, which is just a form of reflecting on the part's data themselves, e.g. for indexing or semantic projection.
+- _do not add any logic_ to the part. The part is just a POCO object modeling the data it represents, and should have no logic. The only piece of logic required is the method returning the part's data pins, which is just a form of reflecting on the part's data themselves, e.g. for indexing.
 - if creating a part representing a _base text_ for text layers, implement the `IHasText` interface by providing a `GetText()` method which, whatever the part's model, produces a single string representing its whole text. The same interface should be implemented whenever your part has some rather long piece of free, unstructured text you might want to be included in processes like full-text indexing. Also, when the part represents the base text in a stack of textual layers, set the role ID to `base-text` (defined in `PartBase.BASE_TEXT_ROLE_ID`).
 - consider that the part will be subject to automatic serialization and deserialization. As the part is just a POCO object, this should not pose any issue.
 
