@@ -151,8 +151,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 // ... etc.
 
 import { AuthJwtService } from "@myrmidon/auth-jwt-login";
-import { ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
-import { EditedObject, ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
+import { EditedObject, ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
+import { ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
 
 import { __NAME__Part, __NAME___PART_TYPEID } from "../__NAME__-part";
 
@@ -319,8 +319,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { NgxToolsValidators } from "@myrmidon/ngx-tools";
 import { DialogService } from "@myrmidon/ngx-mat-tools";
 import { AuthJwtService } from "@myrmidon/auth-jwt-login";
-import { EditedObject, ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
-import { ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
+import { ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
+import { EditedObject, ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
 
 import {
   __NAME__,
