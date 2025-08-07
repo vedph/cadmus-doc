@@ -54,6 +54,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [document references](https://github.com/vedph/cadmus-general/blob/master/docs/doc-references.md)
   - [external bibliography](https://github.com/vedph/cadmus-general/blob/master/docs/ext-bibliography.md)
   - [external IDs](https://github.com/vedph/cadmus-general/blob/master/docs/external-ids.md)
+  - [flags](https://github.com/vedph/cadmus-general/blob/master/docs/flags.md)
   - [historical date](https://github.com/vedph/cadmus-general/blob/master/docs/historical-date.md)
   - [historical events](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md)
   - [index keywords](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)
