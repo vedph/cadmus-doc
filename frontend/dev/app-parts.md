@@ -264,8 +264,8 @@ export class __NAME__PartComponent
         <mat-icon>picture_in_picture</mat-icon>
       </div>
       <mat-card-title>
-        <!-- TODO: add title for part -->
-        <!-- {{ (modelName() | titlecase) || "__NAME__ Part" }} -->
+        <!-- TODO: add title for part in interpolation like:
+             (modelName() | titlecase) || "__NAME__ Part" -->
       </mat-card-title>
     </mat-card-header>
     <mat-card-content> TODO: your template here... </mat-card-content>
@@ -280,7 +280,7 @@ export class __NAME__PartComponent
 </form>
 ```
 
-> Note that the `modelName()` human-friendly part name property is dynamically defined according to the `model-types` thesaurus for both pure parts and parts with a specific role. That's why we have a template title like `{{ (modelName() | titlecase) || "__NAME__ Part" }}`. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role.
+> Note that the `modelName()` human-friendly part name property is dynamically defined according to the `model-types` thesaurus for both pure parts and parts with a specific role. That's why we have a template title like (between double braces) `(modelName() | titlecase) || "__NAME__ Part"`. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role.
 
 ▶️ (2) ensure the component has been added to the `public-api.ts` barrel file (and, if still using modules, to the library module's `declarations` and `exports`).
 
