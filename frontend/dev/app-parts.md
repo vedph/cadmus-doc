@@ -356,8 +356,8 @@ export class __NAME__sPartComponent
   extends ModelEditorComponentBase<__NAME__sPart>
   implements OnInit
 {
-  public editedIndex: number;
-  public edited: __NAME__ | undefined;
+  public readonly editedIndex = signal<number>(-1);
+  public readonly edited = signal<__NAME__ | undefined>(undefined);
 
   // TODO: add your thesauri entries here, e.g.:
   // cod-binding-tags
@@ -371,7 +371,6 @@ export class __NAME__sPartComponent
     private _dialogService: DialogService
   ) {
     super(authService, formBuilder);
-    this.editedIndex = -1;
     // form
     this.entries = formBuilder.control([], {
       // at least 1 entry
@@ -433,21 +432,21 @@ export class __NAME__sPartComponent
   }
 
   public edit__NAME__(entry: __NAME__, index: number): void {
-    this.editedIndex = index;
-    this.edited = entry;
+    this.editedIndex.set(index);
+    this.edited.set(entry);
   }
 
   public close__NAME__(): void {
-    this.editedIndex = -1;
-    this.edited = undefined;
+    this.editedIndex.set(-1);
+    this.edited.set(undefined);
   }
 
   public save__NAME__(entry: __NAME__): void {
     const entries = [...this.entries.value];
-    if (this.editedIndex === -1) {
+    if (this.editedIndex()) {
       entries.push(entry);
     } else {
-      entries.splice(this.editedIndex, 1, entry);
+      entries.splice(this.editedIndex(), 1, entry);
     }
     this.entries.setValue(entries);
     this.entries.markAsDirty();
@@ -460,7 +459,7 @@ export class __NAME__sPartComponent
       .confirm("Confirmation", "Delete __NAME__?")
       .subscribe((yes: boolean | undefined) => {
         if (yes) {
-          if (this.editedIndex === index) {
+          if (this.editedIndex() === index) {
             this.close__NAME__();
           }
           const entries = [...this.entries.value];
@@ -538,7 +537,7 @@ export class __NAME__sPartComponent
         <tbody>
           @for (entry of entries.value; track entry; let i = $index; let first =
           $first; let last = $last) {
-          <tr [class.selected]="entry === edited">
+          <tr [class.selected]="entry === edited()">
             <td class="fit-width">
               <button
                 type="button"
@@ -582,13 +581,13 @@ export class __NAME__sPartComponent
           }
         </tbody>
       </table>
-      } @if (edited) {
+      } @if (edited()) {
       <fieldset>
-        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
-            <mat-panel-title>__NAME__ #{{ editedIndex + 1 }}</mat-panel-title>
+            <mat-panel-title>__NAME__ #{{ editedIndex() + 1 }}</mat-panel-title>
           </mat-expansion-panel-header>
-          TODO: editor control with: [model]="edited"
+          TODO: editor control with: [model]="edited()"
           (modelChange)="save__NAME__($event)" (editorClose)="close__NAME__()"
         </mat-expansion-panel>
       </fieldset>
