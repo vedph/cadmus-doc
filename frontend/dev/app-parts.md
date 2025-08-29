@@ -130,7 +130,7 @@ Two different templates are provided here.
 ```ts
 // NAME-part.component.ts
 
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import {
   FormControl,
   FormBuilder,
@@ -189,7 +189,7 @@ export class __NAME__PartComponent
   // public text: FormControl<string | null>;
 
   // TODO: add your thesauri entries here, e.g.:
-  // public tagEntries?: ThesaurusEntry[];
+  // public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
     super(authService, formBuilder);
@@ -215,9 +215,9 @@ export class __NAME__PartComponent
     // TODO: setup thesauri entries here, e.g.:
     // const key = 'note-tags';
     // if (this.hasThesaurus(key)) {
-    //  this.tagEntries = thesauri[key].entries;
+    //  this.tagEntries.set(thesauri[key].entries);
     // } else {
-    //  this.tagEntries = undefined;
+    //  this.tagEntries.set(undefined);
     // }
   }
 
@@ -295,7 +295,7 @@ export class __NAME__PartComponent
 ```ts
 // NAME-part.component.ts
 
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import {
   FormControl,
   FormBuilder,
@@ -361,7 +361,7 @@ export class __NAME__sPartComponent
 
   // TODO: add your thesauri entries here, e.g.:
   // cod-binding-tags
-  // public tagEntries: ThesaurusEntry[] | undefined;
+  // public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   public entries: FormControl<__NAME__[]>;
 
@@ -394,9 +394,9 @@ export class __NAME__sPartComponent
     // TODO setup your thesauri entries here, e.g.:
     // let key = 'cod-binding-tags';
     // if (this.hasThesaurus(key)) {
-    //   this.tagEntries = thesauri[key].entries;
+    //   this.tagEntries.set(thesauri[key].entries);
     // } else {
-    //   this.tagEntries = undefined;
+    //   this.tagEntries.set(undefined);
     // }
   }
 
