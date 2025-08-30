@@ -869,9 +869,42 @@ export class __NAME__PartFeatureComponent
 
 ## 4. Add Sub-Route
 
-This is optional, and is required only when you are providing a library with a module containing sub-routes to a set of related PG editor wrapper components.
+This is optional, and is required only when you are providing a library sub-routes to a set of related PG editor wrapper components. In legacy Cadmus applications, a module was used to export these sub-routes. In modern, module-less Angular instead, you can just export an array of routes.
 
 ▶️ (1) add the corresponding **route** in the PG library's module, e.g.:
+
+Modern approach:
+
+```ts
+import { Routes } from '@angular/router';
+
+// cadmus
+import { PendingChangesGuard } from '@myrmidon/cadmus-core';
+
+import {
+  PRINT_FONTS_PART_TYPEID,
+  PrintFontsPartFeatureComponent,
+} from '@myrmidon/cadmus-part-ndpbooks-fonts';
+
+import {
+  PRINT_FIG_PLAN_PART_TYPEID,
+  PRINT_FIG_PLAN_IMPL_PART_TYPEID,
+  PrintFigPlanImplPartFeatureComponent,
+  PrintFigPlanPartFeatureComponent,
+} from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
+
+export const CADMUS_PART_NDPBOOKS_PG_ROUTES: Routes = [
+  {
+    path: `${__NAME___PART_TYPEID}/:pid`,
+    pathMatch: "full",
+    component: __NAME__PartFeatureComponent,
+    canDeactivate: [PendingChangesGuard],
+  },
+  // ... etc.
+];
+```
+
+Legacy approach using modules:
 
 ```ts
 export const RouterModuleForChild = RouterModule.forChild([
