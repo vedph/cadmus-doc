@@ -882,18 +882,11 @@ import { Routes } from '@angular/router';
 import { PendingChangesGuard } from '@myrmidon/cadmus-core';
 
 import {
-  PRINT_FONTS_PART_TYPEID,
-  PrintFontsPartFeatureComponent,
-} from '@myrmidon/cadmus-part-ndpbooks-fonts';
+  __NAME___PART_TYPEID,
+  __NAME__PartFeatureComponent,
+} from '@myrmidon/cadmus-part-TODO';
 
-import {
-  PRINT_FIG_PLAN_PART_TYPEID,
-  PRINT_FIG_PLAN_IMPL_PART_TYPEID,
-  PrintFigPlanImplPartFeatureComponent,
-  PrintFigPlanPartFeatureComponent,
-} from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
-
-export const CADMUS_PART_NDPBOOKS_PG_ROUTES: Routes = [
+export const CADMUS_PART_PRJ_PG_ROUTES: Routes = [
   {
     path: `${__NAME___PART_TYPEID}/:pid`,
     pathMatch: "full",
@@ -901,6 +894,24 @@ export const CADMUS_PART_NDPBOOKS_PG_ROUTES: Routes = [
     canDeactivate: [PendingChangesGuard],
   },
   // ... etc.
+];
+```
+
+>💡 This is imported in `app.routes.ts` like e.g.:
+
+```ts
+export const routes: Routes = [
+  // ...
+  // ndp-books part
+  {
+    path: 'items/:iid/ndp-books',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-part-ndpbooks-pg').then(
+        (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES
+      ),
+    canActivate: [jwtGuard],
+  },
+  // ...
 ];
 ```
 
