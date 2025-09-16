@@ -316,7 +316,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
 // ... etc.
 
-import { NgxToolsValidators } from "@myrmidon/ngx-tools";
+import { deepCopy, NgxToolsValidators } from "@myrmidon/ngx-tools";
 import { DialogService } from "@myrmidon/ngx-mat-tools";
 import { AuthJwtService } from "@myrmidon/auth-jwt-login";
 import { ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
@@ -433,7 +433,7 @@ export class __NAME__sPartComponent
 
   public edit__NAME__(entry: __NAME__, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(entry);
+    this.edited.set(deepCopy(entry));
   }
 
   public close__NAME__(): void {
@@ -879,19 +879,19 @@ Modern approach:
 import { Routes } from '@angular/router';
 
 // cadmus
-import { PendingChangesGuard } from '@myrmidon/cadmus-core';
+import { pendingChangesGuard } from '@myrmidon/cadmus-core';
 
 import {
   __NAME___PART_TYPEID,
   __NAME__PartFeatureComponent,
 } from '@myrmidon/cadmus-part-TODO';
 
-export const CADMUS_PART_PRJ_PG_ROUTES: Routes = [
+export const CADMUS_PART___PRJ___PG_ROUTES: Routes = [
   {
     path: `${__NAME___PART_TYPEID}/:pid`,
     pathMatch: "full",
     component: __NAME__PartFeatureComponent,
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
   // ... etc.
 ];
