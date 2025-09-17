@@ -443,7 +443,7 @@ export class __NAME__sPartComponent
 
   public save__NAME__(entry: __NAME__): void {
     const entries = [...this.entries.value];
-    if (this.editedIndex()) {
+    if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex(), 1, entry);
