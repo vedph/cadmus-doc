@@ -50,7 +50,7 @@ Technically, the system is a _full-stack framework_ using a number of layers: fr
 2. data layer ([C#](https://dotnet.microsoft.com/en-us/languages/csharp)).
 3. business layer ([C#](https://dotnet.microsoft.com/en-us/languages/csharp)).
 4. web API layer ([ASP.NET 9](https://www.asp.net), served via Kestrel).
-5. web frontend layer ([Angular 19](https://angular.io), served via NGINX when containerized).
+5. web frontend layer ([Angular 20](https://angular.io), served via NGINX when containerized).
 
 A Cadmus editor, composed by aggregating existing parts or adding new ones, is [distributed](deploy/index) via 🐋 [Docker](https://www.docker.com/) images, so that all what you need to run it, either locally or on a server, is a machine with Docker installed. Of course, given the layered architecture, you are free to replace the layers you want, e.g. to use a different frontend, or a different storage technology. Yet, in most cases you can just put together object models created for several projects, and have your own up and running in a few hours.
 
