@@ -112,7 +112,7 @@ echo "Cleanup completed."
 
 Of course, you can then **transfer** your files somewhere else, e.g. (this script is placed in `backup` folder):
 
-```bash
+```sh
 #!/bin/bash
 # Transfer script to upload the latest backup archive using lftp
 
@@ -150,6 +150,68 @@ else
 fi
 
 echo "Transfer process finished."
+```
+
+This script just uses some FTP account. Another popular option is using **GDrive** as your backup target. To this end, you could use a script like this:
+
+```sh
+#!/bin/bash
+# Backup and upload script using rclone to Google Drive
+
+# --- Configuration ---
+BASE_BACKUP_DIR="./backup"
+DATE_DIR_NAME=$(date +%Y%m%d)
+ARCHIVE_NAME="cadmus-backup-${DATE_DIR_NAME}.tar.gz"
+RCLONE_REMOTE="gdrive"           # Name of your rclone remote
+RCLONE_DESTINATION="backups"     # Folder in Google Drive
+
+# --- Archiving ---
+echo "Creating archive: ${ARCHIVE_NAME}"
+tar -czf "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}" -C "${BASE_BACKUP_DIR}" "${DATE_DIR_NAME}"
+
+# --- Upload ---
+echo "Uploading to Google Drive via rclone..."
+rclone copy "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}" "${RCLONE_REMOTE}:${RCLONE_DESTINATION}" --progress
+
+if [ $? -eq 0 ]; then
+    echo "Upload successful. Cleaning up local archive..."
+    rm "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}"
+else
+    echo "ERROR: Upload failed. Archive retained for inspection."
+fi
+
+echo "Backup process complete."
+```
+
+>💡 Use `rclone move` instead of `copy` if you want to delete local files after upload.
+
+To **setup rclone** in the VM:
+
+```sh
+curl -O https://downloads.rclone.org/rclone-current-linux-amd64.deb
+sudo apt install ./rclone-current-linux-amd64.deb
+```
+
+To test the installation and see the GDrive files listed:
+
+```sh
+rclone ls gdrive:
+```
+
+If you need to create the target folder:
+
+```sh
+rclone mkdir gdrive:backups
+```
+
+To **configure rclone** with your GDrive account you need a headless setup via its `--copy-config` method. These are the instructions for the machine with access to your GDrive account:
+
+1. install rclone from <https://rclone.org/downloads>.
+2. run `rclone config` and create a remote named `gdrive`: choose Google Drive and follow the OAuth flow in browser, then save the configuration.
+3. locate the configuration file you saved (e.g. in Windows it's usually under your user folder `.config\rclone\rclone.conf`) and copy it to the VM hosting Cadmus, e.g. via SCP:
+
+```sh
+scp ~/.config/rclone/rclone.conf user@your-vm:/home/user/.config/rclone/rclone.conf
 ```
 
 ### Crontab
