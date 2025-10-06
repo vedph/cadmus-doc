@@ -13,6 +13,7 @@ nav_order: 2
   - [Editing Thesauri](#editing-thesauri)
   - [Role-Dependent Thesauri](#role-dependent-thesauri)
   - [Model](#model)
+    - [Naming Conventions](#naming-conventions)
     - [Hierarchical Thesauri](#hierarchical-thesauri)
     - [Aliases](#aliases)
     - [Models Thesaurus](#models-thesaurus)
@@ -225,6 +226,23 @@ Here is a sample thesaurus with a couple of entries:
 ```
 
 >If you manually edit thesauri, please pay attention to the JSON syntax for the usage of quotes wrapping any identifier or value, commas for separating properties, square brackets for lists, and braces for objects. It is recommended that you use a code editor which is aware of this syntax and can thus help you quickly write JSON code and spot eventual errors.
+
+### Naming Conventions
+
+As for **ID naming conventions**:
+
+- use English only. These are internal IDs for machine use.
+- use short, meaningful names.
+- do not use abbreviated names unless there is a reason (either because the abbreviation is standard, or because the word would be too long).
+- use only lowercase letters, without spaces, diacritics or punctuation except for `-` (and possibly `:` for pseudo-hierarchical entries), used for composite names (e.g. `margin-top`).
+- in case of composite names, components are ordered according to their semantic relevance, descending. So `margin-top`, `margin-bottom`, etc. rather than `top-margin`, `bottom-margin`, etc. because in this case the margin is the entity and top, bottom, etc. it's just the position of that entity; so it makes sense to first address the entity, and then its properties. This is also more machine-friendly, because we could easily determine which are all the properties of a margin, i.e. all those whose ID starts with `margin-`.
+- think twice about your name choice, so that it's focused on semantics and aligns with the global set of identifiers used in all the thesauri. Once an ID is assigned, it will be forever; of course we will always be able to _alias_ it, and anyway an ID is for the _machine_, NOT for the end user (e.g. `margin-top` is the machine ID, while `top margin` is the human-readable label); but the purpose of the identifier being identifying things, it is immutable by definition.
+
+As for **value naming conventions**:
+
+- use English for the primary (default fallback) language, or just the language you prefer for the editor. Of course, once you publish data you might provide as many thesauri as you want for all the languages you want to support; every localized label will refer to the same ID.
+- try avoiding a long text, because this is designed to fit in some UI control which would otherwise be cut or take too much space in the UI.
+- try avoiding very specialized characters which might be missing from commonly used fonts in the web.
 
 ### Hierarchical Thesauri
 
