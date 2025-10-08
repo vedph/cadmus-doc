@@ -78,7 +78,19 @@ pg_dump --username=postgres -h 127.0.0.1 cadmus-PRJ | gzip > "${TODAY_BACKUP_DIR
 # Dump cadmus-PRJ-auth (accounts)
 pg_dump --username=postgres -h 127.0.0.1 cadmus-PRJ-auth | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-auth-pgsql.gz"
 
-echo "Backup completed successfully in ${TODAY_BACKUP_DIR}!"```
+echo "Backup completed successfully in ${TODAY_BACKUP_DIR}!"
+```
+
+⚠️ Note that for PostgreSQL you should set the password in the home folder of your user (get it via `echo $HOME`) in a file named `.pgpass` with this content:
+
+```txt
+127.0.0.1:5432:*:postgres:YOURPASSWORDHERE
+```
+
+Be sure to set its permissions:
+
+```sh
+chmod 0600 /root/.pgpass
 ```
 
 ### Cleanup
@@ -232,48 +244,59 @@ The host would require the database client tools and FTP utility. Should you nee
 
 ### MongoDB Client
 
-1. Import the MongoDB Public Key (⚠️ change the key and version as required for all these commands!):
+(1) Import the MongoDB Public Key (⚠️ change the key and version as required for all these commands!):
 
-    ```sh
-    wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-    ```
+```sh
+wget -qO - https://www.mongodb.org/static/pgp/server-8.0.asc | sudo apt-key add -
+```
 
-2. Add MongoDB repository to the list:
+(2) Add MongoDB repository to the list:
 
-    ```sh
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-    ```
+```sh
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+```
 
-3. Update the package list:
+(3) Update the package list:
 
-    ```sh
-    sudo apt update
-    ```
+```sh
+sudo apt update
+```
 
-4. Install the MongoDB Database Tools (which includes mongodump):
+(4) Install the MongoDB Database Tools (which includes mongodump):
 
-    ```sh
-    sudo apt install -y mongodb-database-tools
-    ```
+```sh
+sudo apt install -y mongodb-database-tools
+```
 
 ### PostgreSQL Client
 
-1. Update the package list (if not recently done):
+(1) add the APT repository:
 
-    ```sh
-    sudo apt update
-    Install the PostgreSQL Client:
-    ```
+```sh
+echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+```
 
-2. Install the client package:
+(2) import its GPG key:
 
-    ```sh
-    sudo apt install -y postgresql-client
-    ```
+```sh
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+```
+
+(3) Update the package list (if not recently done):
+
+```sh
+sudo apt update
+```
+
+(4) Install the client package (change client version accordingly):
+
+```sh
+sudo apt install -y postgresql-client-17
+```
 
 ### LFTP Tool
 
-1. Install the `lftp` tool:
+Install the `lftp` tool:
 
 ```sh
 sudo apt install -y lftp
