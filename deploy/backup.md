@@ -93,6 +93,8 @@ Be sure to set its permissions:
 chmod 0600 /root/.pgpass
 ```
 
+💡 If you want to download files, just connect to your VM (using your account credentials) via SCP (use your VM IP and port 22). You can either use GUI like WinSCP or command line tools.
+
 ### Cleanup
 
 This script can be periodically run to cleanup the backup folder from oldest dumps.
