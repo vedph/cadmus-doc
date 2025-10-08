@@ -279,6 +279,8 @@ sudo apt update
 sudo apt install -y mongodb-mongosh
 ```
 
+>💡 To restore a whole MongoDB database, use a command like: `mongorestore --drop --archive="cadmus-PRJ-mongo.gz" --gzip --db cadmus-PRJ`. To restore a single collection, e.g. the facets, in an easy way, export the `facets` collection via a tool like Studio3T: you will get a folder named after the database, including a couple of `.gz` files for the `facets` collection. Upload this folder to the VM (e.g. via SCP) and run a command like this from the PARENT folder of the folder containing the uploaded folder: `mongorestore --drop --nsInclude "cadmus-PRJ.facets" --gzip ./xfer`. So, if the folder was uploaded to `/opt/xfer`, you must run this command from `/opt`.
+
 ### PostgreSQL Client
 
 (1) add the APT repository:
