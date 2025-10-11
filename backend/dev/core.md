@@ -191,9 +191,9 @@ dotnet add package Cadmus.Seed
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Bogus" Version="35.5.1" />
-  <PackageReference Include="Cadmus.Core" Version="7.0.3" />
-  <PackageReference Include="Cadmus.Seed" Version="7.0.2" />
+  <PackageReference Include="Bogus" Version="35.6.4" />
+  <PackageReference Include="Cadmus.Core" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Seed" Version="8.0.11" />
 </ItemGroup>
 ```
 
