@@ -24,14 +24,14 @@ If the models you created are part of a specific project, you will typically req
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Core" Version="7.0.3" />
-  <PackageReference Include="Cadmus.General.Parts" Version="6.1.0" />
-  <PackageReference Include="Cadmus.Index.Sql" Version="7.0.3" />
-  <PackageReference Include="Cadmus.Mongo" Version="7.0.3" />
-  <PackageReference Include="Cadmus.Philology.Parts" Version="8.2.0" />
-  <PackageReference Include="Cadmus.Seed.General.Parts" Version="6.1.0" />
-  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="8.2.0" />
-  <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="3.0.1" />
+  <PackageReference Include="Cadmus.Core" Version="8.0.11" />
+  <PackageReference Include="Cadmus.General.Parts" Version="7.0.7" />
+  <PackageReference Include="Cadmus.Index.Sql" Version="9.0.4" />
+  <PackageReference Include="Cadmus.Mongo" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Philology.Parts" Version="10.0.1" />
+  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.7" />
+  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="10.0.1" />
+  <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="4.0.0" />
 </ItemGroup>
 ```
 
