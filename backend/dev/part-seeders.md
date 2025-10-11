@@ -12,15 +12,14 @@ nav_order: 2
 
 # Adding Backend Part Seeders
 
-Part seeders are used to generate mock data for the editor.
+Part seeders are used to generate mock data for the editor. There can be a part seeder class for each [part class](parts.md).
 
 >The part seeder project requires at the 📦 `Cadmus.Seed` package. Typically you add a seeder for each part or fragment.
 
 ## Part Seeder
 
-Add a `<NAME>PartSeeder.cs` for the seeder (replace `__NAME__` with the part name, using the proper case, and adjust the namespace).
-
-If the seeder does not require configuration options (as it happens in most cases), remove the `__NAME__PartSeederOptions` class, the corresponding `_options` member, and the `IConfigurable<T>` interface.
+1. add a `<NAME>PartSeeder.cs` for the seeder class using the template below (replace `__NAME__` with the part name, using the proper case, and `__PRJ__` with the project name).
+2. if the seeder does not require configuration options (as it happens in most cases), remove the `__NAME__PartSeederOptions` class, the corresponding `_options` member, and the `IConfigurable<T>` interface of this template.
 
 ```cs
 using Bogus;
@@ -36,19 +35,22 @@ namespace Cadmus.Seed.__PRJ__.Parts;
 /// </summary>
 /// <seealso cref="PartSeederBase" />
 [Tag("seed.it.vedph.__PRJ__.__NAME__")]
-public sealed class __NAME__PartSeeder : PartSeederBase,
-    IConfigurable<__NAME__PartSeederOptions>
+public sealed class __NAME__PartSeeder : PartSeederBase
+    // TODO: uncomment for configurable seeders, remove otherwise
+    // , IConfigurable<__NAME__PartSeederOptions>
 {
-    private __NAME__PartSeederOptions _options;
+    // TODO: uncomment for configurable seeders, remove otherwise
+    // private __NAME__PartSeederOptions _options;
 
-    /// <summary>
-    /// Configures the object with the specified options.
-    /// </summary>
-    /// <param name="options">The options.</param>
-    public void Configure(__NAME__PartSeederOptions options)
-    {
-        _options = options;
-    }
+    // TODO: uncomment for configurable seeders, remove otherwise
+    // /// <summary>
+    // /// Configures the object with the specified options.
+    // /// </summary>
+    // /// <param name="options">The options.</param>
+    // public void Configure(__NAME__PartSeederOptions options)
+    // {
+    //     _options = options;
+    // }
 
     /// <summary>
     /// Creates and seeds a new part.
@@ -63,24 +65,28 @@ public sealed class __NAME__PartSeeder : PartSeederBase,
         PartSeederFactory? factory)
     {
         ArgumentNullException.ThrowIfNull(item);
-        // for layer parts only:
+        // for layer parts only, add this check:
         // if (factory == null)
         //    throw new ArgumentNullException(nameof(factory));
 
-        // TODO: add more options validation check; if invalid, ret null
-        if (_options == null)
-        {
-            return null;
-        }
+        // TODO: uncomment for configurable seeders, remove otherwise
+        // (add more options validation check; if invalid, ret null)
+        // if (_options == null)
+        // {
+        //     return null;
+        // }
 
-        __NAME__Part part = new();
-        // or with Bogus, which usually is easier:
-        // __NAME__Part part = new Faker<__NAME__Part>()
-        //    .RuleFor(p => p.X, f => TODO)
-        //    .Generate();
+        __NAME__Part part = new Faker<__NAME__Part>()
+            // TODO: add rules for most of the part properties
+            // (suggestion: use private methods to mock objects nested
+            // in the part), e.g.:
+            // .RuleFor(p => p.X, f => TODO: set value or call method)
+           .Generate();
+
+        // alternatively, create and fill the part manually:
+        // __NAME__Part part = new();
+
         SetPartMetadata(part, roleId, item);
-
-        // TODO: add seed code here if not using Bogus...
 
         return part;
     }
@@ -212,44 +218,10 @@ static internal class TestHelper
 }
 ```
 
-This template was updated after the [component factory upgrade](../history.md#2023-02-01---backend-infrastructure-upgrade). The **old** GetFactory() helper method using `Fusi.Tools.Config` is:
-
-```cs
-static public PartSeederFactory GetFactory()
-{
-    // map
-    TagAttributeToTypeMap map = new();
-    map.Add(new[]
-    {
-        // Cadmus.Core
-        typeof(StandardItemSortKeyBuilder).Assembly,
-        // Cadmus.Philology.Parts
-        typeof(ApparatusLayerFragment).Assembly
-    });
-
-    // container
-    Container container = new();
-    PartSeederFactory.ConfigureServices(
-        container,
-        new StandardPartTypeProvider(map),
-        new[]
-        {
-            // Cadmus.Seed.Parts
-            typeof(NotePartSeeder).Assembly,
-            // Cadmus.Seed.Philology.Parts
-            typeof(ApparatusLayerFragmentSeeder).Assembly
-        });
-
-    // config
-    IConfigurationBuilder builder = new ConfigurationBuilder()
-        .AddInMemoryJson(LoadResourceText("SeedConfig.json"));
-    var configuration = builder.Build();
-
-    return new PartSeederFactory(container, configuration);
-}
-```
-
 ## Part Seeder Test
+
+1. for each part seeder, add a test using the following template (replace `__NAME__` with the part name, `__PRJ__` with the project name).
+2. implement at least `Seed_Ok` or create more test methods if you are going to test conditioned seeders.
 
 This test template requires some [infrastructure](#test-helper).
 
