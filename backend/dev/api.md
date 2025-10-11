@@ -25,45 +25,109 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 
 ▶️ (2) remove the mock `WeatherForecast.cs` class and its corresponding `WeatherForecastController.cs` class from the `Controllers` folder.
 
-▶️ (3) add NuGet packages: just paste this code in the project file and then use NuGet package manager to update all the packages (replace `__PRJ__` with your project name, removing project's parts if they are not present):
+▶️ (3) add NuGet packages (run these from the project folder; remove the packages you do not need):
+
+```ps1
+dotnet add package Cadmus.Api.Config
+dotnet add package Cadmus.Api.Controllers
+dotnet add package Cadmus.Api.Controllers.Export
+dotnet add package Cadmus.Api.Controllers.Import
+dotnet add package Cadmus.Api.Models
+dotnet add package Cadmus.Api.Services
+dotnet add package Cadmus.Graph.Ef.PgSql
+dotnet add package Cadmus.Graph.Extras
+dotnet add package Cadmus.Index.Ef.PgSql
+dotnet add package Cadmus.Core
+dotnet add package Cadmus.Mongo
+dotnet add package Cadmus.Seed
+dotnet add package Cadmus.Seed.General.Parts
+dotnet add package Cadmus.Seed.Philology.Parts
+dotnet add package Fusi.Antiquity
+dotnet add package Fusi.Api.Auth.Controllers
+dotnet add package Fusi.Microsoft.Extensions.Configuration.InMemoryJson
+dotnet add package MessagingApi
+dotnet add package MessagingApi.SendGrid
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package Microsoft.AspNetCore.OpenApi
+dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
+dotnet add package Microsoft.Extensions.Configuration
+dotnet add package Microsoft.Extensions.Logging.Debug
+dotnet add package Polly
+dotnet add package Scalar.AspNetCore
+dotnet add package Serilog
+dotnet add package Serilog.AspNetCore
+dotnet add package Serilog.Exceptions
+dotnet add package Serilog.Extensions.Hosting
+dotnet add package Serilog.Sinks.Console
+dotnet add package Serilog.Sinks.File
+dotnet add package Serilog.Sinks.MongoDB
+dotnet add package Serilog.Sinks.Postgresql.Alternative
+dotnet add package System.IdentityModel.Tokens.Jwt
+```
+
+💡 You can use a Powershell batch like this if you do not want to copy-paste each command:
+
+```ps1
+$packages = @(
+  "Cadmus.Api.Config", "Cadmus.Api.Controllers", "Cadmus.Api.Controllers.Export",
+  "Cadmus.Api.Controllers.Import", "Cadmus.Api.Models", "Cadmus.Api.Services",
+  "Cadmus.Graph.Ef.PgSql", "Cadmus.Graph.Extras", "Cadmus.Index.Ef.PgSql",
+  "Cadmus.Core", "Cadmus.Mongo", "Cadmus.Seed", "Cadmus.Seed.General.Parts",
+  "Cadmus.Seed.Philology.Parts", "Fusi.Antiquity", "Fusi.Api.Auth.Controllers",
+  "Fusi.Microsoft.Extensions.Configuration.InMemoryJson", "MessagingApi",
+  "MessagingApi.SendGrid", "Microsoft.AspNetCore.Authentication.JwtBearer",
+  "Microsoft.AspNetCore.OpenApi", "Microsoft.AspNetCore.Mvc.NewtonsoftJson",
+  "Microsoft.Extensions.Configuration", "Microsoft.Extensions.Logging.Debug",
+  "Polly", "Scalar.AspNetCore", "Serilog", "Serilog.AspNetCore",
+  "Serilog.Exceptions", "Serilog.Extensions.Hosting", "Serilog.Sinks.Console",
+  "Serilog.Sinks.File", "Serilog.Sinks.MongoDB", "Serilog.Sinks.Postgresql.Alternative",
+  "System.IdentityModel.Tokens.Jwt"
+)
+
+foreach ($pkg in $packages) {
+  dotnet add package $pkg
+}
+```
+
+💡 Alternatively, just paste this code in the project file and then use NuGet package manager to update all the packages (replace `__PRJ__` with your project name, removing project's parts if they are not present):
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Api.Config" Version="10.1.14" />
-  <PackageReference Include="Cadmus.Api.Controllers" Version="11.0.3" />
-  <PackageReference Include="Cadmus.Api.Controllers.Export" Version="0.0.1" />
-  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.3" />
-  <PackageReference Include="Cadmus.Api.Models" Version="10.1.13" />
-  <PackageReference Include="Cadmus.Api.Services" Version="11.0.3" />
-  <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="9.0.0" />
-  <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.7" />
-  <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="9.0.0" />
-  <PackageReference Include="Cadmus.Core" Version="8.0.7" />
-  <PackageReference Include="Cadmus.Mongo" Version="8.0.7" />
-  <PackageReference Include="Cadmus.Seed" Version="8.0.7" />
-  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.4" />
-  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="9.0.3" />
-  <PackageReference Include="Fusi.Antiquity" Version="5.0.1" />
-  <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.2" />
+  <PackageReference Include="Cadmus.Api.Config" Version="10.1.23" />
+  <PackageReference Include="Cadmus.Api.Controllers" Version="12.0.8" />
+  <PackageReference Include="Cadmus.Api.Controllers.Export" Version="0.0.7" />
+  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.12" />
+  <PackageReference Include="Cadmus.Api.Models" Version="10.1.18" />
+  <PackageReference Include="Cadmus.Api.Services" Version="12.0.8" />
+  <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="9.0.4" />
+  <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="9.0.4" />
+  <PackageReference Include="Cadmus.Core" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Mongo" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Seed" Version="8.0.11" />
+  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.7" />
+  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="10.0.1" />
+  <PackageReference Include="Fusi.Antiquity" Version="5.1.1" />
+  <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.5" />
   <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="4.0.0" />
   <PackageReference Include="MessagingApi" Version="5.0.0" />
   <PackageReference Include="MessagingApi.SendGrid" Version="5.0.1" />
-  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
-  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.4" />
-  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
-  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
-  <PackageReference Include="Polly" Version="8.5.2" />
-  <PackageReference Include="Scalar.AspNetCore" Version="2.1.17" />
-  <PackageReference Include="Serilog" Version="4.2.0" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.9" />
+  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+  <PackageReference Include="Polly" Version="8.6.4" />
+  <PackageReference Include="Scalar.AspNetCore" Version="2.8.11" />
+  <PackageReference Include="Serilog" Version="4.3.0" />
   <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
   <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
   <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-  <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-  <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.0.0" />
+  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.1.0" />
   <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.2.0" />
-  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
+  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
 </ItemGroup>
 ```
 
