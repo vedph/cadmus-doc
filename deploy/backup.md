@@ -307,6 +307,12 @@ sudo apt update
 sudo apt install -y postgresql-client-17
 ```
 
+To open the client shell:
+
+```sh
+psql -h 127.0.0.1 -p 5432 -U postgres
+```
+
 ### LFTP Tool
 
 Install the `lftp` tool:
