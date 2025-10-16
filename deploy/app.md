@@ -145,6 +145,25 @@ networks:
 
 Additionally, if your project uses external bibliography you will have another service for the bibliographic API. Of course, you are free to add as many other services as your app requires, but in most cases these are all what you need.
 
+💡 Should you need an admin UI frontend for MongoDB, you could add other services e.g. from the [mongo-express Docker image](https://hub.docker.com/_/mongo-express):
+
+```yml
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8082:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=cadmus-__PRJ__-mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      - cadmus-__PRJ__-mongo
+    networks:
+      - cadmus-__PRJ__-network
+```
+
 ## 2. Configure Data Persistence
 
 ▶️ Once you are sure that everything works as intended, you should configure the script to provide data persistence. Otherwise, data will be destroyed when you destroy the corresponding database service containers.
