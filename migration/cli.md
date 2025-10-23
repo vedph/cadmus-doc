@@ -97,7 +97,7 @@ Syntax:
 
 - `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
 - `OutputPath`: the output file path.
-- `-f Format`: the format to export (`turtle`, `rdfxml`, `ntriples`, `jsonld`). Default is `turtle`.
+- `-f Format`: the format to export (`turtle`, `rdfxml`, `rdfowlxml`, `ntriples`, `jsonld`). Default is `turtle`.
 - `-p` or `--include-prefixes`: include prefix declarations in the output. Default is `true`.
 - `-c` or `--include-comments`: include comments in the output. Default is `true`.
 - `--base-uri URI`: the base URI to use for relative URIs. If null or empty, no base URI is used.
@@ -171,6 +171,37 @@ x:events/pid/birth crm:p97_from_father x:persons/ser_petracco .
     <crm:p82_at_some_time_within xml:lang="en">1304</crm:p82_at_some_time_within>
     <crm:p87_is_identified_by xml:lang="en">20 Jul 1304 AD</crm:p87_is_identified_by>
   </rdf:Description>
+</rdf:RDF>
+```
+
+💡 A variant of the XML format uses **OWL elements**:
+
+```sh
+./cadmus-mig export-rdf cadmus-rdf-test c:/users/dfusi/desktop/triples.xml -f rdfowlxml
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:crm="http://www.cidoc-crm.org/cidoc-crm/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:x="http://test.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <!-- RDF data exported from Cadmus Graph database -->
+  <!-- Export date: 2025-10-23T16:34:21Z -->
+  <owl:NamedIndividual rdf:about="http://test.org/events/pid/birth">
+    <rdf:type rdf:resource="http://www.cidoc-crm.org/cidoc-crm/e67_birth" />
+    <crm:p2_has_type rdf:resource="http://test.org/event-types/person.birth" />
+    <crm:p98_brought_into_life rdf:resource="http://test.org/persons/petrarch" />
+    <crm:p3_has_note xml:lang="en">Petrarch was born on July 20, 1304 at Arezzo from ser Petracco and Eletta Canigiani.</crm:p3_has_note>
+    <crm:p7_took_place_at rdf:resource="http://test.org/places/arezzo" />
+    <crm:p4_has_time-span rdf:resource="http://test.org/timespans/ts#4" />
+    <crm:p96_by_mother rdf:resource="http://test.org/persons/eletta_canigiani" />
+    <crm:p97_from_father rdf:resource="http://test.org/persons/ser_petracco" />
+  </owl:NamedIndividual>
+  <owl:NamedIndividual rdf:about="http://test.org/places/arezzo">
+    <rdf:type rdf:resource="http://www.cidoc-crm.org/cidoc-crm/e53_place" />
+  </owl:NamedIndividual>
+  <owl:NamedIndividual rdf:about="http://test.org/timespans/ts#4">
+    <crm:p82_at_some_time_within xml:lang="en">1304</crm:p82_at_some_time_within>
+    <crm:p87_is_identified_by xml:lang="en">20 Jul 1304 AD</crm:p87_is_identified_by>
+  </owl:NamedIndividual>
 </rdf:RDF>
 ```
 
