@@ -40,7 +40,7 @@ public sealed class __NAME__PartSeeder : PartSeederBase
     // , IConfigurable<__NAME__PartSeederOptions>
 {
     // TODO: uncomment for configurable seeders, remove otherwise
-    // private __NAME__PartSeederOptions _options;
+    // private __NAME__PartSeederOptions? _options;
 
     // TODO: uncomment for configurable seeders, remove otherwise
     // /// <summary>
@@ -92,13 +92,14 @@ public sealed class __NAME__PartSeeder : PartSeederBase
     }
 }
 
-/// <summary>
-/// Options for <see cref="__NAME__PartSeeder"/>.
-/// </summary>
-public sealed class __NAME__PartSeederOptions
-{
-    // TODO: add options here...
-}
+// TODO: uncomment for configurable seeders, remove otherwise
+// /// <summary>
+// /// Options for <see cref="__NAME__PartSeeder"/>.
+// /// </summary>
+// public sealed class __NAME__PartSeederOptions
+// {
+//     // TODO: add options here...
+// }
 ```
 
 ## Test Helper
