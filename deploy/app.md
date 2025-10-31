@@ -9,7 +9,7 @@ nav_order: 2
 
 - [App Setup](#app-setup)
   - [1. Prepare Docker Compose Script](#1-prepare-docker-compose-script)
-  - [2. Configure Data Persistence](#2-configure-data-persistence)
+    - [Data Persistence](#data-persistence)
     - [Named Volumes and Bind Mounts](#named-volumes-and-bind-mounts)
   - [3. Customize API Settings](#3-customize-api-settings)
     - [Settings and Environment Variables](#settings-and-environment-variables)
@@ -45,10 +45,11 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    command: mongod --logpath=/dev/null
     ports:
-      - 27017:27017
+      # expose port only in loopback (for local backup)
+      - 127.0.0.1:27017:27017
+    volumes:
+      - mongo-vol:/data/db
     networks:
       - cadmus-__PRJ__-network
 
@@ -62,18 +63,21 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - 5432:5432
+      # expose port only in loopback (for local backup)
+      - 127.0.0.1:5432:5432
+    volumes:
+      - pgsql-vol:/var/lib/postgresql/data
     networks:
       - cadmus-__PRJ__-network
 
   # Biblio API
   # TODO: remove this service if not required
   cadmus-biblio-api:
-    image: vedph2020/cadmus-biblio-api:7.0.1
+    image: vedph2020/cadmus-biblio-api:8.1.0
     container_name: cadmus-biblio-api
     restart: unless-stopped
     ports:
-      - 60058:8080
+      - 5000:8080
     depends_on:
       - cadmus__PRJ__mongo
       - cadmus__PRJ__pgsql
@@ -86,6 +90,10 @@ services:
       - SERILOG__CONNECTIONSTRING=mongodb://cadmus__PRJ__mongo:27017/{0}-log
       # TODO: change the default user password (same as API below)
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
+      # TODO: change the secure key
+      - JWT__SECUREKEY=4TuqXv8UrXDxdR9PC42dKZ9bNnphVRR1XJBL6yrxr80J5QNi
+      # TODO: set domain or subdomain pointing to the frontend app
+      - ALLOWEDORIGINS__0=https://YOURDOMAINHERE
     networks:
       - cadmus-__PRJ__-network
 
@@ -108,11 +116,15 @@ services:
       - SERILOG__CONNECTIONSTRING=mongodb://cadmus-__PRJ__-mongo:27017/{0}-log
       # TODO: change the default user password
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
+      # TODO: change the secure key
+      - JWT__SECUREKEY=4TuqXv8UrXDxdR9PC42dKZ9bNnphVRR1XJBL6yrxr80J5QNi
       - SEED__DELAY=20
       # TODO: if email is enabled, set the URLs and email as desired
       - MESSAGING__APIROOTURL=http://cadmusapi.azurewebsites.net
       - MESSAGING__APPROOTURL=http://cadmusapi.com/
       - MESSAGING__SUPPORTEMAIL=support@cadmus.com
+      # TODO: set domain or subdomain pointing to the frontend app
+      - ALLOWEDORIGINS__0=https://YOURDOMAINHERE
     networks:
       - cadmus-__PRJ__-network
 
@@ -125,25 +137,29 @@ services:
       - 4200:80
     depends_on:
       - cadmus-__PRJ__-api
+      - cadmus-biblio-api
     volumes:
-      # TODO: bind host env.js to container to configure base API URL
-      - /opt/dockers/cadmus-__PRJ__/env.js:/usr/share/nginx/html/env.js
+      # TODO: add env.js file with overrides in the same folder of this compose script
+      - ./env.js:/usr/share/nginx/html/env.js
     networks:
       - cadmus-__PRJ__-network
 
 networks:
   cadmus-__PRJ__-network:
     driver: bridge
+
+volumes:
+  mongo-vol:
+  pgsql-vol:
 ```
 
-💡 This template includes 4 services:
+💡 This template includes 5 services:
 
 - `cadmus-PRJ-mongo`: MongoDB service.
 - `cadmus-PRJ-pgsql`: PostgreSQL service used for indexes and semantic graphs (and optionally for logging).
+- `cadmus-biblio-api`: this is the external bibliography from Cadmus. Remove it if you do not use it.
 - `cadmus-PRJ-api`: API backend service. This is exposed at some port in `localhost`. This is ASP.NET 8 served by [Kestrel](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel) at port 8080.
 - `cadmus-PRJ-app`: web app service, exposed at port 4200 in `localhost`. This is Angular served by [NGINX](https://www.nginx.com/).
-
-Additionally, if your project uses external bibliography you will have another service for the bibliographic API. Of course, you are free to add as many other services as your app requires, but in most cases these are all what you need.
 
 💡 Should you need an admin UI frontend for MongoDB, you could add other services e.g. from the [mongo-express Docker image](https://hub.docker.com/_/mongo-express):
 
@@ -164,11 +180,11 @@ Additionally, if your project uses external bibliography you will have another s
       - cadmus-__PRJ__-network
 ```
 
-## 2. Configure Data Persistence
+### Data Persistence
 
-▶️ Once you are sure that everything works as intended, you should configure the script to provide data persistence. Otherwise, data will be destroyed when you destroy the corresponding database service containers.
+▶️ The script is configured for data persistence, which means that databases are stored in Docker volumes. Otherwise, data would be destroyed when you destroy the corresponding database service containers.
 
-Change the above template to include a volume for each database service, defining the volumes in an additional section:
+This is the essential template for data persistence; you might want to comment volumes out when you are just testing and you want to wipe out all data by destroying and recreating containers.
 
 ```yml
 services:
