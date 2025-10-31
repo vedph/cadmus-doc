@@ -32,7 +32,7 @@ Essentially, to host Cadmus app on a server you should just customize the defaul
 
 ## 1. Prepare Docker Compose Script
 
-▶️ 1. create a folder for your Cadmus project in the host, e.g. `mkdir dockers/cadmus-__PRJ__-app`.
+▶️ 1. create a folder for your Cadmus project in the host, e.g. `mkdir stacks/cadmus-__PRJ__-app`.
 
 ▶️ 2. place there a `docker-compose.yml` file starting with this template:
 
@@ -179,6 +179,8 @@ volumes:
     networks:
       - cadmus-__PRJ__-network
 ```
+
+▶️ 3. add your `env.js` file with proper overrides in the same folder of this `docker-compose.yml` script.
 
 ### Data Persistence
 
