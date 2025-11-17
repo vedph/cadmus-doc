@@ -11,6 +11,7 @@ nav_order: 3
   - [Dump Thesauri Command](#dump-thesauri-command)
   - [Render Items Command](#render-items-command)
   - [Export RDF Command](#export-rdf-command)
+  - [Convert JSON to XML](#convert-json-to-xml)
 
 # Migration Tool
 
@@ -23,30 +24,30 @@ The migration tool provides a multi-platform CLI tool to use data migration func
 Syntax:
 
 ```sh
-./cadmus-mig dump <DatabaseName> [-i] [--no-part-date] [--no-deleted] [--no-parts] [-o OutputDirectory] [--max-file-items N] [--indented] [-w PartTypeKey] [-b PartTypeKey] [-u UserId] [-n MinModified] [-m MaxModified] [-t Title] [--description Description] [-f FacetId] [-g GroupId] [-l Flags] [--flag-matching AllSet|AnySet|AllClear|AnyClear] [-p PageNumber] [-s PageSize]
+./cadmus-mig dump DATABASE_NAME -i --no-part-date --no-deleted --no-parts -o OUTPUT_DIRECTORY --max-file-items N --indented -w PartTypeKey -b PART_TYPE_KEY -u USER_ID -n MIN_MODIFIED -m MAX_MODIFIED -t TITLE --description DESCRIPTION -f FACET_ID -g GROUP_ID -l FLAGS --flag-matching MATCHING -p PageNumber -s PageSize
 ```
 
-- `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
+- `DATABASE_NAME`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
 - `-i`: incremental dump, including only items/parts changed in the timeframe.
 - `--no-part-date`: do not consider parts' date when filtering items by time-based parameters.
 - `--no-deleted`: do not include deleted items.
 - `--no-parts`: do not include parts in exported items.
-- `-o OutputDirectory`: the output directory. If not specified, a desktop folder with the current date will be used. If the folder does not exist, it will be created.
+- `-o OUTPUT_DIRECTORY`: the output directory. If not specified, a desktop folder with the current date will be used. If the folder does not exist, it will be created.
 - `--max-file-items N`: The maximum number of items to export per file. If not specified (0), all items will be exported in a single file.
 - `--indented`: indent JSON output.
-- `-w PartTypeKey`: the keys of the part types to include in the export with form `typeId[:roleId]`. Can be used multiple times, one per part type. If not specified, all part types are included.
-- `-b PartTypeKey`: the keys of the part types to exclude in the export with form `typeId[:roleId]`. Can be used multiple times, one per part type. If not specified, no part types are excluded.
-- `-u UserId`: the user ID to filter items by. If not specified, items by all users are included.
-- `-n MinModified`: the minimum modified date and time filter.
-- `-m MaxModified`: the maximum modified date and time filter.
-- `-t Title`: the item's title filter (any portion of it).
-- `--description Description`: the item's description filter (any portion of it).
-- `-f FacetId`: the item's facet ID.
-- `-g GroupId`: the item's group ID.
-- `-l Flags`: the item's flags. This is a numeric value representing a bitset where each bit is a flag.
+- `-w PART_TYPE_KEY`: the keys of the part types to include in the export with form `typeId[:roleId]`. Can be used multiple times, one per part type. If not specified, all part types are included.
+- `-b PART_TYPE_KEY`: the keys of the part types to exclude in the export with form `typeId[:roleId]`. Can be used multiple times, one per part type. If not specified, no part types are excluded.
+- `-u USER_ID`: the user ID to filter items by. If not specified, items by all users are included.
+- `-n MIN_MODIFIED`: the minimum modified date and time filter.
+- `-m MAX_MODIFIED`: the maximum modified date and time filter.
+- `-t TITLE`: the item's title filter (any portion of it).
+- `--description DESCRIPTION`: the item's description filter (any portion of it).
+- `-f FACET_ID`: the item's facet ID.
+- `-g GROUP_ID`: the item's group ID.
+- `-l FLAGS`: the item's flags. This is a numeric value representing a bitset where each bit is a flag.
 - `--flag-matching AllSet|AnySet|AllClear|AnyClear`: the item's flags matching mode.
-- `-p PageNumber`: the page number (1-N), when you want just a page of results.
-- `-s PageSize`: the page size. By default this is 0, i.e. there is no paging.
+- `-p PAGE_NUMBER`: the page number (1-N), when you want just a page of results.
+- `-s PAGE_SIZE`: the page size. By default this is 0, i.e. there is no paging.
 
 Example:
 
@@ -61,11 +62,11 @@ Example:
 Syntax:
 
 ```sh
-./cadmus-mig dump-thesauri <DatabaseName> [-o OutputPath] [--indented]
+./cadmus-mig dump-thesauri DATABASE_NAME -o OUTPUT_PATH --indented
 ```
 
-- `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
-- `-o OutputPath`: the output JSON file path.
+- `DATABASE_NAME`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
+- `-o OUTPUT_PATH`: the output JSON file path.
 - `--indented`: indent JSON output.
 
 ## Render Items Command
@@ -75,15 +76,15 @@ Syntax:
 Syntax:
 
 ```sh
-./cadmus-mig render <DatabaseName> <ConfigPath> [-p PluginTag] [-r PluginTag] [-c ComposerKey] [-m MaxItemsCount]
+./cadmus-mig render DATABASE_NAME CONFIG_PATH -p PLUGIN_TAG -r PLUGIN_TAG -c COMPOSER_KEY -m MAX_ITEMS_COUNT
 ```
 
-- `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
-- `ConfigPath`: the path to the rendering pipeline configuration file.
-- `-p PluginTag`: the tag of the factory provider plugin for preview (`ICadmusRenderingFactoryProvider`).
-- `-r PluginTag`: the tag of the Cadmus repository provider plugin (`IRepositoryProvider`).
-- `-c ComposerKey`: the item composer key to use (default is `default`).
-- `-m MaxItemsCount`: the maximum number of items to render (0=all).
+- `DATABASE_NAME`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
+- `CONFIG_PATH`: the path to the rendering pipeline configuration file.
+- `-p PLUGIN_TAG`: the tag of the factory provider plugin for preview (`ICadmusRenderingFactoryProvider`).
+- `-r PLUGIN_TAG`: the tag of the Cadmus repository provider plugin (`IRepositoryProvider`).
+- `-c COMPOSER_KEY`: the item composer key to use (default is `default`).
+- `-m MAX_ITEMS_COUNT`: the maximum number of items to render (0=all).
 
 ## Export RDF Command
 
@@ -92,21 +93,21 @@ Syntax:
 Syntax:
 
 ```sh
-./cadmus-mig export-rdf <DatabaseName> <OutputPath> [-f Format] [--p true|false] [-c true|false] [--base-uri URI] [--batch-size Size] [--r true|false] [--export-referenced-nodes-only true|false] [--node-tag-filter Tags] [--triple-tag-filter Tags] [--encoding Encoding]
+./cadmus-mig export-rdf DATABASE_NAME OUTPUT_PATH -f FORMAT --p true|false -c true|false --base-uri URI --batch-size SIZE --r true|false --export-referenced-nodes-only true|false --node-tag-filter TAGS --triple-tag-filter TAGS --encoding ENCODING
 ```
 
-- `DatabaseName`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
-- `OutputPath`: the output file path.
-- `-f Format`: the format to export (`turtle`, `rdfxml`, `rdfowlxml`, `ntriples`, `jsonld`). Default is `turtle`.
+- `DATABASE_NAME`: the Cadmus database name. The MongoDB connection string template to use is specified in the CLI `appsettings.json` configuration file. In it, `{0}` is the placeholder for the database name.
+- `OUTPUT_PATH`: the output file path.
+- `-f FORMAT`: the format to export (`turtle`, `rdfxml`, `rdfowlxml`, `ntriples`, `jsonld`). Default is `turtle`.
 - `-p` or `--include-prefixes`: include prefix declarations in the output. Default is `true`.
 - `-c` or `--include-comments`: include comments in the output. Default is `true`.
 - `--base-uri URI`: the base URI to use for relative URIs. If null or empty, no base URI is used.
-- `--batch-size Size`: maximum number of triples to process in a single batch. Default is 10000.
+- `--batch-size SIZE`: maximum number of triples to process in a single batch. Default is 10000.
 - `-r` or `--pretty-print`: pretty-print the output (add indentation and line breaks). Default is `true`.
 - `--export-referenced-nodes-only`: export only nodes that are referenced in triples. Default is false (exports all nodes).
 - `--node-tag-filter`: optional filter for node tags. If specified, only nodes with matching tags are exported. Comma-separated.
-- `--triple-tag-filter Tags`: optional filter for triple tags. If specified, only triples with matching tags are exported. Comma-separated.
-- --`encoding Encoding`: the character encoding to use for output files. Default is `UTF-8`.
+- `--triple-tag-filter TAGS`: optional filter for triple tags. If specified, only triples with matching tags are exported. Comma-separated.
+- --`encoding ENCODING`: the character encoding to use for output files. Default is `UTF-8`.
 
 Examples:
 
@@ -269,4 +270,27 @@ x:events/pid/birth crm:p97_from_father x:persons/ser_petracco .
     }
   ]
 }
+```
+
+## Convert JSON to XML
+
+🎯 Convert into XML a JSON file representing an item or part as extracted from a Cadmus database (usually via the [get-object command](https://github.com/vedph/cadmus_tool?tab=readme-ov-file#get-object-command) of the Cadmus CLI tool).
+
+Syntax:
+
+```sh
+./cadmus-mig json-to-xml INPUT_PATH -o OUTPUT_PATH -n -f -z -i
+```
+
+- `INPUT_PATH`: the input JSON file path.
+- `-o OUTPUT_PATH`: the output XML file path. If not specified, it will be equal to the input path with extension `.xml`.
+- `-n`: do not render JSON properties with `null` value.
+- `-f`: do not render JSON properties with `false` value.
+- `-z`: do not render JSON numeric properties with `0` value.
+- `-i`: indent output.
+
+Example:
+
+```sh
+./cadmus-mig json-to-xml c:/users/dfusi/desktop/part.json -nfi
 ```
