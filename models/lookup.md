@@ -13,7 +13,7 @@ nav_order: 4
   - [Implementation Details](#implementation-details)
     - [Developer's Hints](#developers-hints)
     - [Linking Items: Pin-based Links](#linking-items-pin-based-links)
-    - [Linking Entities: Asserted ID Brick](#linking-entities-asserted-id-brick)
+    - [Linking Entities: Bricks](#linking-entities-bricks)
       - [External Targets](#external-targets)
       - [Internal Targets](#internal-targets)
       - [Asserted Composite ID Components](#asserted-composite-id-components)
@@ -201,7 +201,7 @@ For instance, say you have a collection of inscriptions; among other textual lay
 
 In this context, you will be able to edit the formulas as you find them, adding new items or new patterns to the existing ones; and yet link each specific pattern to any portion of any inscription, using a dedicated layer part.
 
-### Linking Entities: Asserted ID Brick
+### Linking Entities: Bricks
 
 Once we have scattered such EIDs in our parts, we might want some mechanism in the UI to quickly lookup them, and to optionally build non-scoped IDs from their values. This can be accomplished with the [asserted ID(s) bricks](https://github.com/vedph/cadmus-bricks-shell/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README.md). These provide a way to include external or internal references to resource identifiers, whatever their type and origin. Among them, the currently used component is the asserted composite ID brick, which allows you to enter both external and internal links.
 
@@ -250,18 +250,100 @@ According to the scenario illustrated above, the basic requirements for building
 
 To this end, the asserted composite ID component provides an internal lookup mechanism based on data pins and metadata conventions. When users want to add an ID referring to some internal entity, either found in a part or corresponding to an item, they just pick the _type_ of desired lookup (when more than a single lookup search definition is present), and type some characters to get the first matching pins including these characters; they can then pick one from the list.
 
->The type of lookup is just the name of any of the `IndexLookupDefinition`'s specified in your project. When there is only one, the brick component is smart enough to use it silently. Otherwise, it will show an additional control in the UI where you can pick the lookup definition you want to use. This allows using different lookup definitions, leveraging different pin names and filtering criteria.
+The type of lookup is just the name of any of the `IndexLookupDefinition`'s specified in your project. When there is only one, the brick component is smart enough to use it silently. Otherwise, it will show an additional control in the UI where you can pick the lookup definition you want to use. This allows using different lookup definitions, leveraging different pin names and filtering criteria.
 
-Once a pin value is picked, the lookup control shows all the relevant data which can be used as components for the ID to build:
+You usually define the lookup definitions in the `app.config.ts` list of providers, like in this example:
 
-- the pin's value itself.
-- the item GUID.
-- the item title.
-- the part GUID.
-- the part type ID.
-- the item's metadata part entries.
+```ts
+import { IndexLookupDefinitions } from '@myrmidon/cadmus-core';
 
-The user can then use buttons to append each of these components to the ID being built, and/or variously edit it. When he's ok with the ID, he can then use it as the reference ID being edited.
+import {
+  HISTORICAL_EVENTS_PART_TYPEID,
+  METADATA_PART_TYPEID,
+} from '@myrmidon/cadmus-part-general-ui';
+
+import { COD_CONTENTS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-contents';
+import { COD_DECORATIONS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-decorations';
+import { COD_EDITS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-edits';
+import { COD_HANDS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-hands';
+import { COD_MATERIAL_DSC_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-material-dsc';
+
+export const INDEX_LOOKUP_DEFINITIONS: IndexLookupDefinitions = {
+  // item's metadata
+  meta_eid: {
+    typeId: METADATA_PART_TYPEID,
+    name: 'eid',
+  },
+  // general parts
+  event_eid: {
+    typeId: HISTORICAL_EVENTS_PART_TYPEID,
+    name: 'eid',
+  },
+  // codicology parts
+  cod_unit_eid: {
+    typeId: COD_MATERIAL_DSC_PART_TYPEID,
+    name: 'unit-eid',
+  },
+  cod_hand_eid: {
+    typeId: COD_HANDS_PART_TYPEID,
+    name: 'eid',
+  },
+  cod_decoration_eid: {
+    typeId: COD_DECORATIONS_PART_TYPEID,
+    name: 'eid',
+  },
+  cod_artist_eid: {
+    typeId: COD_DECORATIONS_PART_TYPEID,
+    name: 'artist-id',
+  },
+  cod_content_eid: {
+    typeId: COD_CONTENTS_PART_TYPEID,
+    name: 'eid',
+  },
+  cod_edit_eid: {
+    typeId: COD_EDITS_PART_TYPEID,
+    name: 'eid',
+  },
+};
+
+// ...
+
+// index lookup definitions
+{
+  provide: 'indexLookupDefinitions',
+  useValue: INDEX_LOOKUP_DEFINITIONS,
+},
+```
+
+As you can see, this configuration ultimately just links a pin name and a part type ID. When selecting target by this part type, you just have to type some characters belonging to the value of that pin in all the parts of that type.
+
+Once a pin value is picked, the lookup control shows all the relevant data which can be used as **components for the ID** to build, like:
+
+- pin name
+- pin value
+- item GUID
+- item title
+- part GUID
+- part type ID
+- item's EID when set
+
+The user can then use buttons to append each of these components to the ID being built, and/or variously edit it. When he's ok with the ID, he can then use it as the reference ID being edited. By default, an ID is automatically built on pick, by concatenating `P` (=part) + the part's GUID + `/` + pin value.
+
+There are different **options** to customize the lookup behavior:
+
+- lookup pins by part type or by item instance:
+  - _by part type_: you directly lookup by pin name, in the context of a specific part type. The part type is selected from a dropdown list, which draws its data from the configured `IndexLookupDefinitions`.
+  - _by item instance_: you lookup pins filtered by a specific item (via its assigned EID in its metadata part), and optionally by any of its parts. This is the default mode, as in most cases users have a top-bottom approach and think first of the item they want to target, and then, possibly, to a specific portion of its data (unless they are just happy to target the item as a whole).
+
+>The part type ID and pin name filter (i.e. the _index lookup definitions_) can be set from many sources:
+
+1. directly from the consumer code by setting `lookupDefinitions`;
+2. from injection, when (1) is not used;
+3. from thesaurus `model-types`, when (2) is empty.
+
+- set `pinByTypeMode` to true to let the editor use by-type mode instead of by-item;
+- set `canSwitchMode` to true to allow users switch between by-type and by-item modes;
+- set `canEditTarget` to true to allow users edit the link target GID and label also for internal pins, where they are automatically provided by pin lookup.
 
 ## Linking Recap
 
