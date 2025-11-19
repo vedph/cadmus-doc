@@ -345,6 +345,12 @@ There are different **options** to customize the lookup behavior:
 - set `canSwitchMode` to true to allow users switch between by-type and by-item modes;
 - set `canEditTarget` to true to allow users edit the link target GID and label also for internal pins, where they are automatically provided by pin lookup.
 
+The diagram below summarizes how this component works:
+
+![asserted composite ID](img/asserted-composite-id.png)
+
+From any part of your source item, you link to either an external resource, possibly using one of the configured lookup providers, or to an internal entity. This happens via data pins exposed by the part including (or being) that entity. Lookup definitions here provide preset filters to limit pins lookup to a specified part/pin name pair, when you use the "by type" mode. If using "by item", you typically first pick the item to target, and then the pin of any of its part.
+
 ## Linking Recap
 
 To recap, the main strategies for linking data in Cadmus are:
