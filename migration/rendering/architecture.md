@@ -12,8 +12,8 @@ nav_order: 1
     - [Non-Textual](#non-textual)
     - [Textual](#textual)
       - [Building Trees](#building-trees)
-        - [Collecting Annotated Spans](#collecting-annotated-spans)
-        - [Flattening Spans](#flattening-spans)
+        - [Collecting Annotated Segments](#collecting-annotated-segments)
+        - [Flattening Segments](#flattening-segments)
         - [Building Text Tree](#building-text-tree)
         - [Rendering Text Tree](#rendering-text-tree)
 
@@ -60,6 +60,8 @@ Data are thus processed one item after another. Each item is handled by an **ite
 3. optionally, one or more context suppliers are used to inject from the item additional metadata into the rendering context.
 4. according to the rendering type, textual or non-textual, two different branches are followed. Layered texts in fact require a more complex pipeline, because additional logic is required to flatten multiple layers of structured annotations into some target format, like TEI, HTML, etc.
 
+>⚙️ Technically, the item composer (`IItemComposer`) is a very flexible component as rendition requirements vary a lot across projects. One or more composers are instantiated by a rendering factory (`CadmusRenderingFactory`), which can instantiate and configure context suppliers, text tree filters, text filters, JSON renderers for each part, text part flatteners, text tree renderers, and item composers themselves. All these components are configured in an external JSON document. Then, the logic in each composer can be totally custom and leverage any of these components as required for its purpose; the composer receives a data context including the input item with its parts, and then writes one or more text-based outputs representing its rendition. The standard Cadmus API contains this JSON configuration document in its `preview-profile.json` asset file, but does not include a composer because it is used only to preview parts in the UI; anyway, it can be extended per-project to provide full export functionality based on item composers, whether they write to file system, RAM, etc.
+
 ### Non-Textual
 
 This rendering uses a single part as its source, and renders some of its data using a **JSON renderer** component.
@@ -74,7 +76,7 @@ For instance, some [prebuilt rendering filters](components/renderer-filters) all
 
 As you can see from Figure 1, this pipeline uses:
 
-1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text spans_. Each span is a text linked to zero or more annotations from layers. Text is segmented into spans according to the layer(s) selected for rendering. With no layer, we will have a single span; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once spans are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
+1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text segments_. Each segment is a text linked to zero or more annotations from layers. Text is segmented into segments according to the layer(s) selected for rendering. With no layer, we will have a single segment; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once segments are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
 
 2. zero or more **text tree filters** are applied to the tree to add metadata to its nodes or even reshape the tree as desired. Here we could also have branching, e.g. with binary trees to provide parallel segmentation strategies in TEI rendition.
 
@@ -94,7 +96,7 @@ A --> B
 B --> C
 ```
 
-After the tree is first created from text spans, it always has this linear structure. Later, branching can be introduced by tree filters, which thus transform its shape at will. For instance, this tree starts with the same segments A, B; but then continues on the first branch with C and D; and on the second one with E and F:
+After the tree is first created from text segments, it always has this linear structure. Later, branching can be introduced by tree filters, which thus transform its shape at will. For instance, this tree starts with the same segments A, B; but then continues on the first branch with C and D; and on the second one with E and F:
 
 ```mermaid
 graph LR;
@@ -128,11 +130,11 @@ Let us say that there are 3 annotation layers on top of this base text:
 - **comment** layer part:
   - fragment 0 on `bixit annos` (`1.2-2.1`), about the rarer usage of accusative ("annos") instead of the more common ablative ("annis") in this expression.
 
->💡 Remember that in the Cadmus model a _layer part_ is a collection of specialized annotation models named _fragments_. Each fragment is linked to any specific span of the base text. For instance, in a critical apparatus you might have two variants for the word `illud` chosen in the reconstructed critical text: `illuc` and `illic`. In the apparatus model, this would be a single fragment linked to `illud`, with 2 entries representing variants.
+>💡 Remember that in the Cadmus model a _layer part_ is a collection of specialized annotation models named _fragments_. Each fragment is linked to any specific segment of the base text. For instance, in a critical apparatus you might have two variants for the word `illud` chosen in the reconstructed critical text: `illuc` and `illic`. In the apparatus model, this would be a single fragment linked to `illud`, with 2 entries representing variants.
 
 In this example we are going to render all these layers. We thus need to segment the base text so that we can link to each segment one or more fragments, whatever the layer they come from. Starting from this stage, we have 6 steps to get to our desired rendition, whatever its target format.
 
-##### Collecting Annotated Spans
+##### Collecting Annotated Segments
 
 ▶️ (1) **flatten layers**: use a text part flattener (`ITextPartFlattener`) to get the whole text into a multiline string, plus one range for the fragments in each of the picked layer parts.
 
@@ -145,7 +147,7 @@ que bixit|annos XX
 
 Here `|` stands for a LF character, used as the line delimiter.
 
-The resulting **spans** collected from all the layers are:
+The resulting **segments** collected from all the layers are:
 
 1. 2-2 for `qu[e]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@0`;
 2. 4-4 for `[b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@1`;
@@ -154,25 +156,25 @@ The resulting **spans** collected from all the layers are:
 
 >Links to each layer's fragment are made via these fragment identifiers, built by concatenating the layer part type ID (`it.vedph.token-text-layer`) with its role ID (e.g. `fr.it.vedph.orthography`), separated by a colon, followed by `@` and the index of the fragment in the layer's fragments array. Optionally, these links can be expanded with an additional suffix which starts from any non-digit character after the fragment index. For instance, an apparatus fragment has an array of entries, and when we want to target each of them we add a suffix `.` plus the index of the entry in that array.
 
-Each of the spans has a **model** including:
+Each of the segments has a **model** including:
 
 - the _start_ and _end_ indexes referred to the whole text.
-- _fragment IDs_: the global ID of the corresponding fragment(s). After flattening, each range has just a single fragment ID, because by definition one fragment produces one range. Later, when spans are merged, they may carry more than a single fragment ID. Each fragment ID is built by concatenating the part type ID, followed by `:` and its role ID (which is always defined for a layer part), followed by `_` and the index of the fragment in its layer part.
-- the _text_ corresponding to the range. This is assigned after flattening and merging, for performance reasons (it would be pointless to assign text to all the spans when many of them are going to be merged into new ones in the next step).
+- _fragment IDs_: the global ID of the corresponding fragment(s). After flattening, each range has just a single fragment ID, because by definition one fragment produces one range. Later, when segments are merged, they may carry more than a single fragment ID. Each fragment ID is built by concatenating the part type ID, followed by `:` and its role ID (which is always defined for a layer part), followed by `_` and the index of the fragment in its layer part.
+- the _text_ corresponding to the range. This is assigned after flattening and merging, for performance reasons (it would be pointless to assign text to all the segments when many of them are going to be merged into new ones in the next step).
 
-At this stage we have a string with the text on one side, and a bunch of freely overlapping spans referring to it on the other side. We are just saying that for that text, various portions of it are linked to various annotations, whatever their type, and without caring if the portions overlap.
+At this stage we have a string with the text on one side, and a bunch of freely overlapping segments referring to it on the other side. We are just saying that for that text, various portions of it are linked to various annotations, whatever their type, and without caring if the portions overlap.
 
 We have thus collected all the annotations from their layers into one set; now we must find a way for representing all of them in a linear way, as an annotated text, even if they refer to many different and often overlapping portions of it.
 
-So, the next step is merging these spans into a single linear, contiguous sequence.
+So, the next step is merging these segments into a single linear, contiguous sequence.
 
-##### Flattening Spans
+##### Flattening Segments
 
-▶️ (2) **flatten and merge spans** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous spans, covering the whole text, from start to end. In our example, we are starting from this stage, where each line below the text represents a range with its fragment ID (Figure 2):
+▶️ (2) **flatten and merge segments** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous segments, covering the whole text, from start to end. In our example, we are starting from this stage, where each line below the text represents a range with its fragment ID (Figure 2):
 
 ![flattening](img/flattening.png)
 
-- Figure 2 - Flattening layer spans into merged spans
+- Figure 2 - Flattening layer segments into merged segments
 
 >In this figure we represent the data item (our inscription) as a box containing 5 objects: the green ones are text and text layer parts, each with a specific type and model annotations: orthography, paleography, comment; the base text itself is another object in the box, the one labelled with `T`. The blue object is another part which is not linked to specific portions of the text, just to show that the box might include any type of data, whether it is directly related text or not. For instance, this blue object might be a datation, or a description of the material support, or of its archaeological context, etc.
 
@@ -187,7 +189,7 @@ que bixit|annos XX
 ....CCCCCCCCCCC... fr4
 ```
 
-From here we get these spans (I am numbering the spans to make it easier to refer to them in this documentation):
+From here we get these segments (I am numbering the segments to make it easier to refer to them in this documentation):
 
 1. 0-1 for `qu` = no fragments;
 2. 2-2 for `e` = fr1, fr3;
@@ -208,7 +210,7 @@ que bixit|annos XX
 
 ##### Building Text Tree
 
-▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting from a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged spans. The first range is child of the blank root node; each following range is child of the previous range.
+▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting from a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged segments. The first range is child of the blank root node; each following range is child of the previous range.
 
 Each node has **payload data** with this model:
 
