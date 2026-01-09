@@ -328,6 +328,44 @@ In other terms, the hierarchy is (italic entries are not selectable):
         - t.qual.p.virtue.courage
         - t.qual.p.virtue.courtesy
 
+So, in practice:
+
+- Simple Hierarchy (Non-Selectable Parents): for entries where parent nodes are just containers (not selectable):
+
+```json
+[
+  { "id": "animal", "value": "animal" },
+  { "id": "animal.mammal", "value": "animal: mammals" },
+  { "id": "animal.mammal.dog", "value": "animal: mammals: dogs" },
+  { "id": "animal.mammal.cat", "value": "animal: mammals: cats" }
+]
+```
+
+Here each level gets one entry. Children automatically nest under parents.
+
+- Selectable Parents (using `.-` convention): when you want a parent node to be BOTH a container AND selectable, you need TWO entries:
+
+```json
+[
+  { "id": "if.c7-violenti", "value": "Inferno: VII cerchio - Violenti" },           // ← Container (not selectable)
+  { "id": "if.c7-violenti.-", "value": "Inferno: VII cerchio - Violenti" },         // ← Selectable option
+  { "id": "if.c7-violenti.g1-prossimo", "value": "Inferno: VII cerchio - Violenti: I girone" }
+]
+```
+
+>Note: the container entry (without .-) MUST exist for the algorithm to find the parent!
+
+This is a common mistake ❌:
+
+```json
+[
+  { "id": "if.c7-violenti.-", "value": "..." },              // ← Only the .- version
+  { "id": "if.c7-violenti.g1-prossimo", "value": "..." }     // ← Can't find parent!
+]
+```
+
+This breaks because `if.c7-violenti.g1-prossimo` looks for parent `if.c7-violenti` (not `if.c7-violenti.-`).
+
 ### Aliases
 
 Also, a thesaurus can be just an **alias** targeting another, existing thesaurus. In this case it has no entries, but only a single `targetId` property, with the ID of the thesaurus it refers to.
