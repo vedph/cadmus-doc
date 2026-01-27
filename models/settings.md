@@ -2,7 +2,7 @@
 title: "Models - Settings" 
 layout: default
 parent: Models
-nav_order: 5
+nav_order: 6
 ---
 
 # Editor Settings
@@ -22,4 +22,4 @@ This allows adding specific settings for configurable editors in the UI. Before 
 ⚙️ To use this feature in your frontend UI part or fragment editor:
 
 1. inject the `AppRepository` service.
-2. request the setting object for the editor of the part/fragment type ID and role via `getSettingFor(typeId, roleId?)`. This will return an object with any model, representing all the settings for that specific editor. The repository will cache these settings for future requests, thus avoiding further trips to the server.
+2. request the setting object for the editor of the part/fragment type ID and role via `getSettingFor<T>(typeId, roleId?, reload?)`. This will return an object with any model, representing all the settings for that specific editor. The repository will cache these settings for future requests, thus avoiding further trips to the server.

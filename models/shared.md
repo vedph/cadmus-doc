@@ -73,6 +73,9 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [comment](https://github.com/vedph/cadmus-general/blob/master/docs/fr.comment.md)
   - [pin-links]((https://github.com/vedph/cadmus-general/blob/master/docs/fr.pin-links.md).md)
 
+- [taxonomies subsystem](taxonomies.md):
+  - [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md)
+
 ## Codicology
 
 - parts:
