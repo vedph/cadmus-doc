@@ -31,9 +31,15 @@ In what follows, `__PRJ__` is the placeholder for your Cadmus project's short na
 ng new cadmus-__PRJ__-app
 ```
 
->If you are creating an app for the only purpose of developing component libraries in it, our convention is naming it as `-shell` rather than `-app`.
+> If you are creating an app for the only purpose of developing component libraries in it, our convention is naming it as `-shell` rather than `-app`.
 
-▶️ (2) enter the newly created directory and **add Angular Material** and **Angular localization package**:
+▶️ (2) change the package manager to `pnpm` by replacing the corresponding line in package.json with (update your pnpm version accordingly):
+
+```json
+"packageManager": "pnpm@10.28.1",
+```
+
+▶️ (3) enter the newly created directory and **add Angular Material** and **Angular localization package**:
 
 ```bash
 cd cadmus-__PRJ__-app
@@ -41,7 +47,7 @@ ng add @angular/material
 ng add @angular/localize
 ```
 
->For Angular Material, use a _custom theme_ or pick the theme you prefer, and answer Yes when prompted to _setup global typography_ styles. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
+> For Angular Material, use a _custom theme_ or pick the theme you prefer, and answer Yes when prompted to _setup global typography_ styles. After installing, be sure that there is no prebuilt Angular Material style set in `angular.json`. The localization package instead is a development package which is required by some localization-ready components such as the authentication libraries (`@myrmidon/auth-jwt-*`). You can also just add the NPM package via `npm -i --save-dev @angular/localize`.
 
 💡 The `$localize` function should be defined when running the schematics `ng add @angular/localize`. If you did not run it, or you have legacy code from older CLI apps, it might happen that you are missing some of the changes done by it. In this case, you might get an undefined error at runtime (or build time) for `$localize`, or an error like this:
 
@@ -59,11 +65,9 @@ In this case, ensure that these settings are properly configured:
 2. you must add `@angular/localize/init` to your `polyfills` in `angular.json`, e.g. `"polyfills": ["zone.js", "@angular/localize/init"],` under `projects/NAME/architect/build/options` and `projects/NAME/architect/test/options`. In older code you might rather have a `polyfills.ts` file which is imported in `angular.json`; in this case, add the import there under the app imports.
 3. ensure `main.ts` has the reference _at the very top_:
 
-    ```ts
-    /// <reference types="@angular/localize" />
-    ```
-
->For Angular Material animations you should also add this: `npm i @angular/animations`.
+   ```ts
+   /// <reference types="@angular/localize" />
+   ```
 
 4. in each `tsconfig` file (root `tsconfig.json`, `tsconfig.app.json`, `projects/LIB/tsconfig.lib.json`, `projects/LIB/tsconfig-prod.lib.json`) ensure that under `compilerOptions` you have:
 
@@ -71,9 +75,9 @@ In this case, ensure that these settings are properly configured:
 "types": [ "@angular/localize" ],
 ```
 
->While `tsconfig.lib.prod.json` typically extends from `tsconfig.lib.json`, it's meant for production builds and can override settings. Having the type declaration in both ensures consistent behavior across development and production builds.
+> While `tsconfig.lib.prod.json` typically extends from `tsconfig.lib.json`, it's meant for production builds and can override settings. Having the type declaration in both ensures consistent behavior across development and production builds.
 
-▶️ (3) ensure to apply some [M3 theme](https://material.angular.io/guide/theming) in your app's `styles.scss`:
+▶️ (4) ensure to apply some [M3 theme](https://material.angular.io/guide/theming) in your app's `styles.scss`:
 
 ```scss
 @use "@angular/material" as mat;
@@ -124,23 +128,27 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-.mat-primary, .mat-accent {
+.mat-primary,
+.mat-accent {
   @include mat.all-component-colors($accent-theme);
 }
 
-.mat-error, .mat-warn {
+.mat-error,
+.mat-warn {
   @include mat.all-component-colors($error-theme);
 }
 
-mat-icon.mat-accent, mat-icon.mat-primary {
+mat-icon.mat-accent,
+mat-icon.mat-primary {
   color: var(--mdc-filled-text-field-focus-label-text-color) !important;
 }
-mat-icon.mat-error, mat-icon.mat-warn {
+mat-icon.mat-error,
+mat-icon.mat-warn {
   color: var(--mat-form-field-error-focus-trailing-icon-color) !important;
 }
 ```
 
->This configuration allows to use Cadmus libraries with classes `mat-primary`, `mat-warn` (or `mat-error`), and `mat-accent` without using legacy compatibility mixins. Since Angular 18 the color directive (which automatically changed the target component's theme) has been removed, and you could use compatibility mixins; but these have side effects. In the approach used here, we just create different themes for color variants. In M2 Cadmus I used classes `mat-primary` for emphasized components and `mat-warn` for warn/error components. In M3 I have a default theme, an error theme corresponding to mat-warn, and an accent theme corresponding to mat-primary (and mat-accent). See also my [SO post about M3 theming](https://stackoverflow.com/questions/79230742/proper-angular-material-v3-theming).
+> This configuration allows to use Cadmus libraries with classes `mat-primary`, `mat-warn` (or `mat-error`), and `mat-accent` without using legacy compatibility mixins. Since Angular 18 the color directive (which automatically changed the target component's theme) has been removed, and you could use compatibility mixins; but these have side effects. In the approach used here, we just create different themes for color variants. In M2 Cadmus I used classes `mat-primary` for emphasized components and `mat-warn` for warn/error components. In M3 I have a default theme, an error theme corresponding to mat-warn, and an accent theme corresponding to mat-primary (and mat-accent). See also my [SO post about M3 theming](https://stackoverflow.com/questions/79230742/proper-angular-material-v3-theming).
 
 💡 If you are dealing with an existing app using CSS rather than SCSS:
 
@@ -161,26 +169,35 @@ mat-icon.mat-error, mat-icon.mat-warn {
 ▶️ 1. Install the typical Cadmus packages via NPM:
 
 ```bash
-npm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login --force
+pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core @myrmidon/cadmus-thesaurus-store
 
-npm i @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search --force
-npm i @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core --force
+pnpm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui
 
-npm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui --force
-npm i @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui --force
+pnpm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/cadmus-ui-pg @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers ts-md5 echarts
 
-npm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/cadmus-ui-pg @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers ts-md5 --force
+pnpm i @myrmidon/cadmus-text-ed @myrmidon/cadmus-text-ed-md @myrmidon/cadmus-text-ed-txt
 
-npm i @myrmidon/cadmus-text-ed @myrmidon/cadmus-text-ed-md @myrmidon/cadmus-text-ed-txt --force
-
-npm i @myrmidon/cadmus-refs-decorated-counts @myrmidon/cadmus-ui-note-set @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-mat-physical-state --force
+pnpm i @myrmidon/cadmus-refs-decorated-counts @myrmidon/cadmus-ui-note-set @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-mat-physical-state
 ```
 
-The above packages are fairly typical, but you might well omit those you are not interested in, e.g. general parts or philology parts, or some [bricks](https://github.com/vedph/cadmus-bricks-shell-v3). Some of the legacy third party libraries may require `--force`.
+> 💡 You might also want to append these libraries for **ARM CPU** compatibility (update versions accordingly):
 
-💡 If you want some data statistics in your editor, also do:
+```json
+  "optionalDependencies": {
+    "@rollup/rollup-win32-arm64-msvc": "^4.56.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
+  }
+```
 
-1. `npm i ngx-echarts echarts @myrmidon/cadmus-statistics`
+The above packages are fairly typical, but you might well omit those you are not interested in, e.g. general parts or philology parts, or some [bricks](https://github.com/vedph/cadmus-bricks-shell-v3).
+
+> 💡 If you want some data statistics in your editor, also do:
+
+1. `pnpm i ngx-echarts echarts @myrmidon/cadmus-statistics`
 2. remember to configure echarts adding in `app.config.ts` under `providers`:
 
 ```ts
@@ -196,14 +213,14 @@ import { NgxEchartsModule } from 'ngx-echarts';
 
 ▶️ 2. Typically you will also need **Monaco editor** and **Markdown**:
 
-- [NG essentials](https://github.com/cisstech/nge): `npm i @cisstech/nge monaco-editor --force`.
-- [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `npm i ngx-markdown marked --force`.
+- [NG essentials](https://github.com/cisstech/nge): `pnpm i @cisstech/nge monaco-editor`.
+- [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `pnpm i ngx-markdown marked`.
 
 ⚠️ Note that for such libraries you should also import the providers in `app.config.ts` like:
 
 ```ts
-import { NgeMonacoModule } from '@cisstech/nge/monaco';
-import { NgeMarkdownModule } from '@cisstech/nge/markdown';
+import { NgeMonacoModule } from "@cisstech/nge/monaco";
+import { NgeMarkdownModule } from "@cisstech/nge/markdown";
 
 // ...
 
@@ -213,11 +230,11 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(NgeMonacoModule.forRoot({})),
     importProvidersFrom(NgeMarkdownModule),
     // ...
-  ]
+  ],
 };
 ```
 
->Even though you usually all what you have to do is installing the listed packages, be sure to _follow the directions provided by each library_ when installing it.
+> Even though you usually all what you have to do is installing the listed packages, be sure to _follow the directions provided by each library_ when installing it.
 
 💡 If you are directly or indirectly using legacy libraries like `leaflet`, add this option under `architect/build/options` to avoid a build warning:
 
@@ -246,12 +263,12 @@ This step is essential to let the frontend find the server, while allowing us to
 })(this);
 ```
 
->💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, a MUFI root URI, etc.
+> 💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, a MUFI root URI, etc.
 
 📖 If you are going to use the [external bibliography API](https://github.com/vedph/cadmus_biblioapi), also add its URL here, e.g.:
 
 ```js
-window.__env.biblioApiUrl = 'http://localhost:60058/api/';
+window.__env.biblioApiUrl = "http://localhost:60058/api/";
 ```
 
 In this case typically you will also need to install the bibliography packages:
@@ -263,8 +280,8 @@ npm i @myrmidon/cadmus-biblio-core @myrmidon/cadmus-biblio-api @myrmidon/cadmus-
 Later, in your app's `part-editor-keys.ts`, remember to _setup the route to the bibliography part editor_ like:
 
 ```ts
-import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
-const BIBLIO = 'biblio';
+import { EXT_BIBLIOGRAPHY_PART_TYPEID } from "@myrmidon/cadmus-part-biblio-ui";
+const BIBLIO = "biblio";
 // ...
 
 export const PART_EDITOR_KEYS: PartEditorKeys = {
@@ -275,14 +292,59 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
 };
 ```
 
-⚠️ Since Angular 18 the `public` folder is the place where you should place items to be copied. So, in this case just place the `env.js` file there. No change is required in `angular.json` because it already has a glob catch-all pattern pointing to the `public` folder. Before this version, you typically added `src/env.js` to the `assets` array in `projects/APPNAME/architect/build/options/assets`.
+If you need to keep some settings private, like e.g. Zotero account credentials, add an `env.local.js` file in the same folder with just those options you want to override in `env.js`. For instance, if in your `env.js` you had these settings:
 
-▶️ (2) in `src/index.html` add an import for `env.js` to your `head` element:
+```js
+// ...
+// Zotero
+window.__env.zoteroApiKey = "TODO:YOUR_ZOTERO_KEY";
+window.__env.zoteroUserId = "TODO:YOUR_ZOTERO_USER_ID";
+window.__env.zoteroLibraryId = "TODO:YOUR_ZOTERO_LIBRARY_ID";
+// ...
+```
+
+then in your `env.local.js` you would have (replace placeholders with your real account data):
+
+```js
+// development overrides for env.js
+// DO NOT COMMIT THIS FILE TO THE REPOSITORY
+
+// Zotero
+window.__env.zoteroApiKey = "yourapikey";
+window.__env.zoteroUserId = "youruserid";
+window.__env.zoteroLibraryId = "yourlibraryid";
+```
+
+> ⚠️ In this case, ensure you exclude this `env.local.js` from your repository by adding it to the `.gitignore` file:
+
+```txt
+# Environment files
+env.local.js
+```
+
+▶️ (2) in `src/index.html` add an import for `env.js` to your `head` element, and also add a script to deal with local settings override if using `env.local.js`:
 
 ```html
 <head>
   ...
   <script src="env.js"></script>
+
+<!-- ADD THIS IF YOU USE env.local.js -->
+  <script>
+    // check if a local environment file exists and load it
+    function loadLocalEnv() {
+      var script = document.createElement("script");
+      script.onload = function () {
+        console.log("Loaded local environment overrides.");
+      };
+      script.onerror = function () {
+        console.warn("Local environment file not found, using default values.");
+      };
+      script.src = "env.local.js";
+      document.head.appendChild(script);
+    }
+    loadLocalEnv();
+  </script>
 </head>
 ```
 
@@ -364,22 +426,22 @@ This is optional and depends on your visuals.
 - 📁 `src/app/index-lookup-definitions.ts` with this content:
 
 ```ts
-import { IndexLookupDefinitions } from '@myrmidon/cadmus-core';
+import { IndexLookupDefinitions } from "@myrmidon/cadmus-core";
 
-export const INDEX_LOOKUP_DEFINITIONS : IndexLookupDefinitions = {}
+export const INDEX_LOOKUP_DEFINITIONS: IndexLookupDefinitions = {};
 ```
 
 You can add to the definitions object all the pin-based lookup definitions you will need in your project, e.g.:
 
 ```ts
 // ...
-import { METADATA_PART_TYPEID } from '@myrmidon/cadmus-part-general-ui';
+import { METADATA_PART_TYPEID } from "@myrmidon/cadmus-part-general-ui";
 
 export const INDEX_LOOKUP_DEFINITIONS: IndexLookupDefinitions = {
   // item's metadata
   meta_eid: {
     typeId: METADATA_PART_TYPEID,
-    name: 'eid',
+    name: "eid",
   },
 };
 ```
@@ -398,7 +460,7 @@ export const ITEM_BROWSER_KEYS = {
 
 - 📁 `src/app/part-editor-keys.ts`: this is the only file with a real content, the others being just extension points. You must specify here the connection of each part or fragment ID with its hosting library in constant `PART_EDITOR_KEYS`. This object has a property named after each part/fragment type ID, with a value equal to an object with `part` equal to the library ID, and optionally `fragments` (when the part is a layer part). This property is an object with a property for each fragment type for the layer part, named after the fragment type ID, with a value equal to the library ID.
 
->⚠️ If using external bibliography, remember to [add the route](#3-setup-environment) for its editor.
+> ⚠️ If using external bibliography, remember to [add the route](#3-setup-environment) for its editor.
 
 ▶️ (2) copy these folders (each corresponding to an app's page component) into your app's `src/app` folder from the [reference project](https://github.com/vedph/cadmus-shell-v3):
 
@@ -534,7 +596,7 @@ services:
     networks:
       - cadmus-__PRJ__-network
 
- # PostgreSQL
+  # PostgreSQL
   cadmus-__PRJ__-pgsql:
     image: postgres
     container_name: cadmus-__PRJ__-pgsql
@@ -587,7 +649,7 @@ networks:
     driver: bridge
 ```
 
->⚠️ If using bibliography API, add its service to the compose stack too.
+> ⚠️ If using bibliography API, add its service to the compose stack too.
 
 - 📁 `dockerignore`:
 
