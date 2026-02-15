@@ -316,10 +316,10 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
 // ... etc.
 
-import { deepCopy, NgxToolsValidators } from "@myrmidon/ngx-tools";
+import { NgxToolsValidators } from "@myrmidon/ngx-tools";
 import { DialogService } from "@myrmidon/ngx-mat-tools";
 import { AuthJwtService } from "@myrmidon/auth-jwt-login";
-import { ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
+import { CloseSaveButtonsComponent, ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
 import { EditedObject, ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
 
 import {
@@ -433,7 +433,7 @@ export class __NAME__sPartComponent
 
   public edit__NAME__(entry: __NAME__, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(entry));
+    this.edited.set(structuredClone(entry));
   }
 
   public close__NAME__(): void {
