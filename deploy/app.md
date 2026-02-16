@@ -54,7 +54,7 @@ services:
     networks:
       - cadmus-__PRJ__-network
 
- # PostgreSQL
+  # PostgreSQL
   cadmus-__PRJ__-pgsql:
     image: postgres
     container_name: cadmus-__PRJ__-pgsql
@@ -165,20 +165,20 @@ volumes:
 💡 Should you need an admin UI frontend for MongoDB, you could add other services e.g. from the [mongo-express Docker image](https://hub.docker.com/_/mongo-express):
 
 ```yml
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    restart: unless-stopped
-    ports:
-      - 8082:8081
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=cadmus-__PRJ__-mongo
-      - ME_CONFIG_MONGODB_PORT=27017
-      - ME_CONFIG_BASICAUTH=false
-    depends_on:
-      - cadmus-__PRJ__-mongo
-    networks:
-      - cadmus-__PRJ__-network
+mongo-express:
+  image: mongo-express
+  container_name: mongo-express
+  restart: unless-stopped
+  ports:
+    - 8082:8081
+  environment:
+    - ME_CONFIG_MONGODB_SERVER=cadmus-__PRJ__-mongo
+    - ME_CONFIG_MONGODB_PORT=27017
+    - ME_CONFIG_BASICAUTH=false
+  depends_on:
+    - cadmus-__PRJ__-mongo
+  networks:
+    - cadmus-__PRJ__-network
 ```
 
 ▶️ 3. add your `env.js` file with proper overrides in the same folder of this `docker-compose.yml` script.
@@ -210,13 +210,13 @@ volumes:
 
 💡 The `volumes:` section in a `docker-compose.yml` file is used to define named volumes. _Named volumes_ are a type of Docker volume that can persist data between container lifecycles, and can be more easily referenced and managed. When you specify a volume in this section, Docker Compose will ensure that this volume is created if it does not already exist.
 
->In this example, `mongo-vol` and `pgsql-vol` are the named volumes on the host machine, while `/data/db` and `/var/lib/postgresql/data` are the directories inside the respective containers where volumes are mounted.
+> In this example, `mongo-vol` and `pgsql-vol` are the named volumes on the host machine, while `/data/db` and `/var/lib/postgresql/data` are the directories inside the respective containers where volumes are mounted.
 
 This tells Docker to mount the named volumes at the specified paths within the containers. Any data that the MongoDB or PostgreSQL services write to these paths will be stored in the named volumes, and will persist even if the containers are stopped or deleted (unless you destroy also the volumes like in `docker compose down -v`).
 
 ### Named Volumes and Bind Mounts
 
->💡 This is a note for newcomers. Experienced Docker compose users can safely skip it.
+> 💡 This is a note for newcomers. Experienced Docker compose users can safely skip it.
 
 For databases, named volumes are the default choice rather than bind mounts. A _named volume_ is created and managed by Docker, while a _bind mount_ is a file or directory on the host machine that is mounted into a container.
 
@@ -254,7 +254,7 @@ In this section you will find information about all the relevant API settings. A
 
 As `appsettings.json` is a JSON document, overriding any of its properties means that you must use an expression to point to it. In the ASP.NET convention, used here, you just have to append the name of each property (case insensitive; conventionally, use uppercase for environment variables) starting from the root object. Each name is separated by a double underscore (or by `:` in Windows hosts: see [this post](https://github.com/aspnet/Configuration/issues/469)).
 
->👉 The double underscore is supported by all platforms, and is automatically converted into a colon. Paths are case insensitive.
+> 👉 The double underscore is supported by all platforms, and is automatically converted into a colon. Paths are case insensitive.
 
 For instance, say your configuration document has a `ConnectionStrings` object like this:
 
@@ -321,8 +321,8 @@ Cadmus API implement [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CO
 ▶️ 1. Replace the `localhost` origin (`ALLOWEDORIGINS__0`) with the URL of your host, like:
 
 ```yml
-  environment:
-    - ALLOWEDORIGINS__0=https://myproject.somewhere.edu
+environment:
+  - ALLOWEDORIGINS__0=https://myproject.somewhere.edu
 ```
 
 ### JWT Key
@@ -330,11 +330,11 @@ Cadmus API implement [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CO
 ▶️ 1. Change `Jwt:SecureKey`. The `jwt` object in the configuration contains the configuration for the authentication JWT token. Among its properties, the relevant one is `SecureKey`, which contains a seed for generating the token. This must be a string whose length _must_ be a multiple of 8. Use some long and complex string here; it should at least be 48 characters long; the longer the better. For instance:
 
 ```yml
-  environment:
-    - JWT__SECUREKEY=Rh+m(dkh_Rn6DhOD-wKcd;>P=]Q*T}J/MPbnfenDKOL[1y4I_1Oy1JAU./V98Zex
+environment:
+  - JWT__SECUREKEY=Rh+m(dkh_Rn6DhOD-wKcd;>P=]Q*T}J/MPbnfenDKOL[1y4I_1Oy1JAU./V98Zex
 ```
 
->⚠️ Be sure to make this key long enough (48+ characters), or the ASP.NET service will throw an error at startup.
+> ⚠️ Be sure to make this key long enough (48+ characters), or the ASP.NET service will throw an error at startup.
 
 Other, less relevant settings in the `JWT` section are:
 
@@ -366,11 +366,11 @@ In Cadmus API settings, each stock user object has its username (which must be u
 You must at least replace the default stock user _password_. You can change all the other settings at will, but be sure to at least change the password, because the one provided in the image is the same mock password used for developing, and thus published in the code repository. So, as for any other security related settings, you must change this sensitive data. For instance:
 
 ```yml
-  environment:
-    - STOCKUSERS__0__PASSWORD=2R$M&o*4ej4@
+environment:
+  - STOCKUSERS__0__PASSWORD=2R$M&o*4ej4@
 ```
 
->💡 If you want to preload a set of users, create them directly in `appsettings.json`, like in the above example. For security reasons, just ensure that their usernames and passwords are fake. Then, override their usernames and passwords with the real ones via environment variables in your host. This way, you can create fully structured user accounts in JSON, and just provide the sensitive data from environment variables.
+> 💡 If you want to preload a set of users, create them directly in `appsettings.json`, like in the above example. For security reasons, just ensure that their usernames and passwords are fake. Then, override their usernames and passwords with the real ones via environment variables in your host. This way, you can create fully structured user accounts in JSON, and just provide the sensitive data from environment variables.
 
 In descending order of assigned authorizations, **roles** are:
 
@@ -379,7 +379,7 @@ In descending order of assigned authorizations, **roles** are:
 3. `operator`
 4. `visitor`
 
->⚠️ Please ensure that you are complying with all the requirements setup in Cadmus for a password, or you will get errors at startup. The password must include at least 8 characters, uppercase and lowercase letters, digits, and symbols like dash, stop, parentheses, etc.
+> ⚠️ Please ensure that you are complying with all the requirements setup in Cadmus for a password, or you will get errors at startup. The password must include at least 8 characters, uppercase and lowercase letters, digits, and symbols like dash, stop, parentheses, etc.
 
 ### Rate Limiting
 
@@ -415,7 +415,7 @@ Anyway, no personal data is directly found in the log, as it just stores user na
 
 If you enable logging, all sensitive operations on data are logged with user names and their IP address. In most cases the log is cyclic, so that it won't grow indefinitely (usually it's limited to 10 MB).
 
->Data history never gets pruned, as it's part of the data themselves and can be used to recover from errors or other accidents, and track the evolution of data being entered.
+> Data history never gets pruned, as it's part of the data themselves and can be used to recover from errors or other accidents, and track the evolution of data being entered.
 
 There are usually 4 types of log targets:
 
@@ -468,7 +468,7 @@ The database-related settings essentially refer to connection strings. In `appse
 }
 ```
 
->💥 Please remember that the containerized API layer requiring the database service connects to it within a Docker network. This means that the server name is just the name of the container, and that the port is the default port for its database service. Even when you remap the database service port, e.g. to avoid a clash with the same service (PostgreSQL at 5432) on the host, nonetheless the containerized API will continue to connect to the default port 5432.
+> 💥 Please remember that the containerized API layer requiring the database service connects to it within a Docker network. This means that the server name is just the name of the container, and that the port is the default port for its database service. Even when you remap the database service port, e.g. to avoid a clash with the same service (PostgreSQL at 5432) on the host, nonetheless the containerized API will continue to connect to the default port 5432.
 
 - `ConnectionStrings` This object contains the connection string template to the MongoDB database (`Default`), and the authentication and index databases (`Auth`, `Index`). You must ensure that the strings use the database service as named in the Docker stack (or, if you prefer, any other external database service, in this case removing it from the bottom of the Docker stack). Typically, they are as follows:
 
@@ -479,7 +479,7 @@ environment:
   - CONNECTIONSTRINGS__INDEX=Server=cadmus-PRJ-pgsql;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
 ```
 
->💡 Note that here the hostnames (like `cadmus-PRJ-mongo` or `cadmus-PRJ-pgsql`) are just the names of the database containerized services in the Docker compose script. In development we just use `localhost`.
+> 💡 Note that here the hostnames (like `cadmus-PRJ-mongo` or `cadmus-PRJ-pgsql`) are just the names of the database containerized services in the Docker compose script. In development we just use `localhost`.
 
 - `DatabaseNames` (`DATABASENAMES`): the names of the authentication and data databases. These are not found in the connection string templates, where there is a placeholder `{0}` representing them, as the program needs to know both the full connection string and the database name alone.
   - `Auth` (`DATABASENAMES__AUTH`): user accounts database. Usually `cadmus-PRJ-auth`.
@@ -611,13 +611,13 @@ All the messaging services share these options:
 
 Other options are specific for each service. Other mailing services can be used (e.g. SendGrid, MailJet, etc.); this requires just swapping the default service with another in the API startup code.
 
->💡 The messaging section is separated from the mailer section because building a text message is a process potentially shared among different messaging systems (email, SMS, etc.). Messages are built according to a set of HTML templates in the API layer (in folder `wwwroot/messages` of its source code).
+> 💡 The messaging section is separated from the mailer section because building a text message is a process potentially shared among different messaging systems (email, SMS, etc.). Messages are built according to a set of HTML templates in the API layer (in folder `wwwroot/messages` of its source code).
 
 ## 4. Configure Frontend App
 
 When hosting on a server, the web application needs to know the address of the API service, which is no longer found at `localhost`. To avoid having to recompile the Angular app when changing this address, the app has an uncompiled `env.json` file including the base URIs accessed by it. So, you can just change the URIs inside this file and you are ready to go.
 
->💡 Also remember that your web app too will be relocated on a server, so it will no longer be running at `localhost`. This means that you should ensure to include its new location under the [allowed CORS origins](#allowedorigins) of the API layer.
+> 💡 Also remember that your web app too will be relocated on a server, so it will no longer be running at `localhost`. This means that you should ensure to include its new location under the [allowed CORS origins](#allowedorigins) of the API layer.
 
 This is the default content of `env.js` (local port and version numbers of course vary):
 
@@ -653,7 +653,7 @@ In this example:
 - your _host_ machine has a patched `env.js` file in its local file system, in directory `/opt/dockers/cadmus-__PRJ__/web`
 - this file gets bound to the container's `env.js` file in its NGINX `/usr/share/nginx/html` directory.
 
->Alternatively, you might create an ad-hoc Docker image for production, but this would be more cumbersome. You might even "hack" the Docker image on the host by directly changing the file's content in the container, but manually changing a Docker image is not a good practice.
+> Alternatively, you might create an ad-hoc Docker image for production, but this would be more cumbersome. You might even "hack" the Docker image on the host by directly changing the file's content in the container, but manually changing a Docker image is not a good practice.
 
 ## Updating Services
 
@@ -662,12 +662,16 @@ To update any service from the stack, the typical procedure is:
 1. update the version in the `docker-compose.yml` script.
 2. pull the version specified in the script for the specified container:
 
-    ```sh
-    docker compose pull CONTAINERNAME
-    ```
+   ```sh
+   docker compose pull CONTAINERNAME
+   ```
+
+> You can also use just `docker compose pull` and only images whose tags have changed will be pulled.
 
 3. recreate the service whose image has been pulled:
 
-    ```sh
-    docker compose up -d CONTAINERNAME
-    ```
+   ```sh
+   docker compose up -d CONTAINERNAME
+   ```
+
+> If you update multiple containers at once, just append their names after `-d`: e.g. `docker compose up -d cadmus-gve-app cadmus-gve-api`.
