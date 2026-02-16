@@ -61,6 +61,7 @@ will import a single settings object with ID `it.vedph.taxo-store-nodes`, whose 
 
 ```json
 {
+  "_id": "it.vedph.taxo-store-nodes",
   "treeId": "animals"
 }
 ```
