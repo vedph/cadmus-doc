@@ -72,16 +72,19 @@ mongodump --port=27017 --db cadmus-PRJ-log --archive="${TODAY_BACKUP_DIR}/cadmus
 echo "Dumping PostgreSQL databases..."
 # Note: Using '-h 127.0.0.1' requires your DB services to be configured with '127.0.0.1:PORT:PORT' in docker-compose.yml
 
+# export the PostgreSQL password so child processes (pg_dump) can see it
+export PGPASSWORD='postgres'
+
 # Dump cadmus-PRJ (main data)
-pg_dump --username=postgres -h 127.0.0.1 cadmus-PRJ | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-pgsql.gz"
+pg_dump -h 127.0.0.1 -U postgres -d cadmus-PRJ -w | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-pgsql.gz"
 
 # Dump cadmus-PRJ-auth (accounts)
-pg_dump --username=postgres -h 127.0.0.1 cadmus-PRJ-auth | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-auth-pgsql.gz"
+pg_dump -h 127.0.0.1 -U postgres -d cadmus-PRJ-auth -w | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-auth-pgsql.gz"
 
 echo "Backup completed successfully in ${TODAY_BACKUP_DIR}!"
 ```
 
-⚠️ Note that for PostgreSQL you should set the password in the home folder of your user (get it via `echo $HOME`) in a file named `.pgpass` with this content:
+⚠️ Note that usually for PostgreSQL you should set the password in the home folder of your user (get it via `echo $HOME`) in a file named `.pgpass` with this content:
 
 ```txt
 127.0.0.1:5432:*:postgres:YOURPASSWORDHERE
@@ -92,6 +95,8 @@ Be sure to set its permissions:
 ```sh
 chmod 0600 /root/.pgpass
 ```
+
+Anyway, this often does not work because when put it in a script the PGPASSWORD variable gets "lost" if not handled correctly. So, the approach to set the password explicitly is more effective.
 
 💡 If you want to download files, just connect to your VM (using your account credentials) via SCP (use your VM IP and port 22). You can either use GUI like WinSCP or command line tools.
 
