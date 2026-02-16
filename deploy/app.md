@@ -25,6 +25,7 @@ nav_order: 2
       - [External Databases](#external-databases)
     - [Other Services](#other-services)
   - [4. Configure Frontend App](#4-configure-frontend-app)
+  - [Updating Services](#updating-services)
 
 Essentially, to host Cadmus app on a server you should just customize the default _Docker compose script_, which is designed for hosting the system on a local machine. This usually resolves to changing some URIs, and replacing mock security data.
 
@@ -653,3 +654,20 @@ In this example:
 - this file gets bound to the container's `env.js` file in its NGINX `/usr/share/nginx/html` directory.
 
 >Alternatively, you might create an ad-hoc Docker image for production, but this would be more cumbersome. You might even "hack" the Docker image on the host by directly changing the file's content in the container, but manually changing a Docker image is not a good practice.
+
+## Updating Services
+
+To update any service from the stack, the typical procedure is:
+
+1. update the version in the `docker-compose.yml` script.
+2. pull the version specified in the script for the specified container:
+
+    ```sh
+    docker compose pull CONTAINERNAME
+    ```
+
+3. recreate the service whose image has been pulled:
+
+    ```sh
+    docker compose up -d CONTAINERNAME
+    ```
