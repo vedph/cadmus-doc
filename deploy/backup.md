@@ -245,6 +245,8 @@ You could launch all these scripts sequentially:
 
 >⚠️ Ensure all scripts are executable: `chmod +x /home/crontab-scripts/*.sh`.
 
+---
+
 ## Host Setup
 
 The host would require the database client tools and FTP utility. Should you need to install them, you can follow the procedures outlined here.
@@ -309,7 +311,7 @@ sudo apt update
 (4) Install the client package (change client version accordingly):
 
 ```sh
-sudo apt install -y postgresql-client-17
+sudo apt install -y postgresql-client-18
 ```
 
 To open the client shell:
