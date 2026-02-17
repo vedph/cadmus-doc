@@ -675,3 +675,5 @@ To update any service from the stack, the typical procedure is:
    ```
 
 > If you update multiple containers at once, just append their names after `-d`: e.g. `docker compose up -d cadmus-gve-app cadmus-gve-api`.
+
+💡 To remove dangling images you can use `docker image prune -a` which removes all the images not referenced by any container (whether it is running or not).
