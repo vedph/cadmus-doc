@@ -17,6 +17,7 @@ nav_order: 4
     - [MongoDB Client](#mongodb-client)
     - [PostgreSQL Client](#postgresql-client)
     - [LFTP Tool](#lftp-tool)
+  - [Data Restore](#data-restore)
 
 To backup your Cadmus data, you must:
 
@@ -30,7 +31,7 @@ To backup your Cadmus data, you must:
 
 If you expose the database services from your Docker containers, as it is usually the case, you just have to use the corresponding database tools to dump databases. Just be sure to use the right port, as often ports are remapped when several services run in the same host machine.
 
->Note that usually in Docker omitting `ports` for database services altogether is the safest option. Anyway, exposing the database ports to the loopback address (127.0.0.1) on your host machine is better than exposing them to all interfaces (`- 27017:27017`). Since only the API containers need to access the databases, we could remove the `ports` section entirely from the database services. The API services will still be able to connect using the service name and internal port (e.g. `cadmus-ndp-mongo:27017`) because they share the same Docker network. This is the most secure configuration as the databases are completely isolated from the host machine's external network interfaces. Anyway, as we need to access the DB locally for backup, it is acceptable to use the loopback address.
+>Note that usually in Docker omitting `ports` for database services altogether is the safest option. Anyway, exposing the database ports to the loopback address (127.0.0.1) on your host machine is better than exposing them to all interfaces (`- 27017:27017`). Since only the API containers need to access the databases, we could remove the `ports` section entirely from the database services. The API services will still be able to connect using the service name and internal port (e.g. `cadmus-PRJ-mongo:27017`) because they share the same Docker network. This is the most secure configuration as the databases are completely isolated from the host machine's external network interfaces. Anyway, as we need to access the DB locally for backup, it is acceptable to use the loopback address.
 
 ## Linux
 
@@ -326,4 +327,30 @@ Install the `lftp` tool:
 
 ```sh
 sudo apt install -y lftp
+```
+
+## Data Restore
+
+To restore databases, assuming that you used the above backup procedure:
+
+```sh
+# (1) MONGO
+# restore and replace main data
+mongorestore --port=27017 --archive=cadmus-PRJ-mongo.gz --gzip --drop
+# restore and replace logs (not required)
+mongorestore --port=27017 --archive=cadmus-PRJ-log-mongo.gz --gzip --drop
+
+# (2) POSTGRES
+export PGPASSWORD='postgres'
+# 1. terminate active connections (sometimes needed if an app is holding the DB open)
+psql -h 127.0.0.1 -U postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'cadmus-PRJ';"
+# 2. drop and Recreate the databases
+psql -h 127.0.0.1 -U postgres -c "DROP DATABASE \"cadmus-PRJ\";"
+psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE \"cadmus-PRJ\";"
+psql -h 127.0.0.1 -U postgres -c "DROP DATABASE \"cadmus-PRJ-auth\";"
+psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE \"cadmus-PRJ-auth\";"
+# 3. perform the restore
+gunzip -c cadmus-PRJ-pgsql.gz | psql -h 127.0.0.1 -U postgres -d cadmus-PRJ
+gunzip -c cadmus-PRJ-auth-pgsql.gz | psql -h 127.0.0.1 -U postgres -d cadmus-PRJ-auth
+unset PGPASSWORD
 ```
