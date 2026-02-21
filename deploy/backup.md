@@ -254,40 +254,37 @@ The host would require the database client tools and FTP utility. Should you nee
 
 ### MongoDB Client
 
-(1) Import the MongoDB Public Key (⚠️ change the key and version as required for all these commands!):
+This procedure is for Ubuntu 24 ("noble"):
+
+```sh
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+   --dearmor --yes
+
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+
+sudo apt-get update
+
+# this installs the shell and the backup/restore tools only
+sudo apt-get install -y mongodb-mongosh mongodb-database-tools
+```
+
+>💡 To restore a whole MongoDB database, use a command like: `mongorestore --drop --archive="cadmus-PRJ-mongo.gz" --gzip --db cadmus-PRJ`. To restore a single collection, e.g. the facets, in an easy way, export the `facets` collection via a tool like Studio3T: you will get a folder named after the database, including a couple of `.gz` files for the `facets` collection. Upload this folder to the VM (e.g. via SCP) and run a command like this from the PARENT folder of the folder containing the uploaded folder: `mongorestore --drop --nsInclude "cadmus-PRJ.facets" --gzip ./xfer`. So, if the folder was uploaded to `/opt/xfer`, you must run this command from `/opt`.
+
+Old procedure (for versions before 24, change version numbers as required):
 
 ```sh
 wget -qO - https://www.mongodb.org/static/pgp/server-8.0.asc | sudo apt-key add -
-```
-
-(2) Add MongoDB repository to the list:
-
-```sh
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
-```
-
-(3) Update the package list:
-
-```sh
 sudo apt update
-```
-
-(4) Install the MongoDB Database Tools (which includes mongodump):
-
-```sh
 sudo apt install -y mongodb-database-tools
-```
 
->Note that this does not include `mongosh`. If you also need the shell, follow this procedure (change version numbers as required):
-
-```sh
+# for mongosh
 curl -fsSL https://pgp.mongodb.com/server-8.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg
 echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 sudo apt update
 sudo apt install -y mongodb-mongosh
 ```
-
->💡 To restore a whole MongoDB database, use a command like: `mongorestore --drop --archive="cadmus-PRJ-mongo.gz" --gzip --db cadmus-PRJ`. To restore a single collection, e.g. the facets, in an easy way, export the `facets` collection via a tool like Studio3T: you will get a folder named after the database, including a couple of `.gz` files for the `facets` collection. Upload this folder to the VM (e.g. via SCP) and run a command like this from the PARENT folder of the folder containing the uploaded folder: `mongorestore --drop --nsInclude "cadmus-PRJ.facets" --gzip ./xfer`. So, if the folder was uploaded to `/opt/xfer`, you must run this command from `/opt`.
 
 ### PostgreSQL Client
 
