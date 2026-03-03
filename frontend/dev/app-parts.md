@@ -855,8 +855,8 @@ export class __NAME__PartFeatureComponent
 ```html
 <cadmus-current-item-bar />
 <cadmus-__NAME__-part
-  [identity]="identity"
-  [data]="$any(data)"
+  [identity]="identity()"
+  [data]="$any(data())"
   (dataChange)="save($event!.value!)"
   (editorClose)="close()"
   (dirtyChange)="onDirtyChange($event)"
