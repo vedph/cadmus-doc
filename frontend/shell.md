@@ -72,7 +72,7 @@ graph LR;
   cadmus-part-general-pg --> cadmus-core
   cadmus-part-general-pg --> cadmus-state
   cadmus-part-general-pg --> cadmus-ui
-  cadmus-part-general-pg --> cadmus-ui-pg
+  cadmus-part-general-pg --> cadmus-item-editor
   cadmus-part-general-pg --> cadmus-part-general-ui
   cadmus-part-general-ui --> ngx-tools
   cadmus-part-general-ui --> ngx-mat-tools
@@ -89,7 +89,7 @@ graph LR;
   cadmus-part-philology-pg --> cadmus-core
   cadmus-part-philology-pg --> cadmus-state
   cadmus-part-philology-pg --> cadmus-ui
-  cadmus-part-philology-pg --> cadmus-ui-pg
+  cadmus-part-philology-pg --> cadmus-item-editor
   cadmus-part-philology-pg --> cadmus-part-philology-ui
   cadmus-part-philology-ui --> ngx-tools
   cadmus-part-philology-ui --> ngx-mat-tools
@@ -123,9 +123,9 @@ graph LR;
   cadmus-ui --> ngx-tools
   cadmus-ui --> cadmus-refs-lookup
   cadmus-ui --> cadmus-core
-  cadmus-ui-pg --> cadmus-core
-  cadmus-ui-pg --> cadmus-api
-  cadmus-ui-pg --> cadmus-state
-  cadmus-ui-pg --> cadmus-ui
-  cadmus-ui-pg --> cadmus-item-editor
+  cadmus-item-editor --> cadmus-core
+  cadmus-item-editor --> cadmus-api
+  cadmus-item-editor --> cadmus-state
+  cadmus-item-editor --> cadmus-ui
+  cadmus-item-editor --> cadmus-item-editor
 ```

@@ -31,6 +31,6 @@ graph LR;
   cadmus-part-biblio-ui --> cadmus-biblio-core
   cadmus-part-biblio-pg --> cadmus-core
   cadmus-part-biblio-pg --> cadmus-state
-  cadmus-part-biblio-pg --> cadmus-ui-pg
+  cadmus-part-biblio-pg --> cadmus-item-editor
   cadmus-part-biblio-pg --> cadmus-part-biblio-ui
 ```

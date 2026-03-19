@@ -20,7 +20,7 @@ graph LR;
   cadmus-part-codicology-bindings --> cadmus-refs-historical-date
   cadmus-part-codicology-bindings --> cadmus-state
   cadmus-part-codicology-bindings --> cadmus-ui
-  cadmus-part-codicology-bindings --> cadmus-ui-pg
+  cadmus-part-codicology-bindings --> cadmus-item-editor
   cadmus-part-codicology-contents --> ngx-tools
   cadmus-part-codicology-contents --> ngx-mat-tools
   cadmus-part-codicology-contents --> cadmus-cod-location
@@ -28,7 +28,7 @@ graph LR;
   cadmus-part-codicology-contents --> cadmus-ui-flag-set
   cadmus-part-codicology-contents --> cadmus-state
   cadmus-part-codicology-contents --> cadmus-ui
-  cadmus-part-codicology-contents --> cadmus-ui-pg
+  cadmus-part-codicology-contents --> cadmus-item-editor
   cadmus-part-codicology-decorations --> ngx-tools
   cadmus-part-codicology-decorations --> ngx-mat-tools
   cadmus-part-codicology-decorations --> cadmus-refs-assertion
@@ -41,7 +41,7 @@ graph LR;
   cadmus-part-codicology-decorations --> cadmus-ui-flag-set
   cadmus-part-codicology-decorations --> cadmus-state
   cadmus-part-codicology-decorations --> cadmus-ui
-  cadmus-part-codicology-decorations --> cadmus-ui-pg
+  cadmus-part-codicology-decorations --> cadmus-item-editor
   cadmus-part-codicology-decorations --> cadmus-codicology-ui
   cadmus-part-codicology-edits --> ngx-tools
   cadmus-part-codicology-edits --> cadmus-cod-location
@@ -51,7 +51,7 @@ graph LR;
   cadmus-part-codicology-edits --> cadmus-ui-flag-set
   cadmus-part-codicology-edits --> cadmus-state
   cadmus-part-codicology-edits --> cadmus-ui
-  cadmus-part-codicology-edits --> cadmus-ui-pg
+  cadmus-part-codicology-edits --> cadmus-item-editor
   cadmus-part-codicology-hands --> ngx-tools
   cadmus-part-codicology-hands --> cadmus-cod-location
   cadmus-part-codicology-hands --> cadmus-mat-physical-size
@@ -63,7 +63,7 @@ graph LR;
   cadmus-part-codicology-hands --> cadmus-ui-note-set
   cadmus-part-codicology-hands --> cadmus-state
   cadmus-part-codicology-hands --> cadmus-ui
-  cadmus-part-codicology-hands --> cadmus-ui-pg
+  cadmus-part-codicology-hands --> cadmus-item-editor
   cadmus-part-codicology-hands --> cadmus-codicology-ui
   cadmus-part-codicology-layouts --> ngx-tools
   cadmus-part-codicology-layouts --> cadmus-cod-location
@@ -73,7 +73,7 @@ graph LR;
   cadmus-part-codicology-layouts --> cadmus-refs-historical-date
   cadmus-part-codicology-layouts --> cadmus-state
   cadmus-part-codicology-layouts --> cadmus-ui
-  cadmus-part-codicology-layouts --> cadmus-ui-pg
+  cadmus-part-codicology-layouts --> cadmus-item-editor
   cadmus-part-codicology-layouts --> cadmus-codicology-ui
   cadmus-part-codicology-material-dsc --> ngx-tools
   cadmus-part-codicology-material-dsc --> cadmus-cod-location
@@ -81,11 +81,11 @@ graph LR;
   cadmus-part-codicology-material-dsc --> cadmus-refs-historical-date
   cadmus-part-codicology-material-dsc --> cadmus-state
   cadmus-part-codicology-material-dsc --> cadmus-ui
-  cadmus-part-codicology-material-dsc --> cadmus-ui-pg
+  cadmus-part-codicology-material-dsc --> cadmus-item-editor
   cadmus-part-codicology-pg --> cadmus-core
   cadmus-part-codicology-pg --> cadmus-state
   cadmus-part-codicology-pg --> cadmus-ui
-  cadmus-part-codicology-pg --> cadmus-ui-pg
+  cadmus-part-codicology-pg --> cadmus-item-editor
   cadmus-part-codicology-pg --> cadmus-part-codicology-bindings
   cadmus-part-codicology-pg --> cadmus-part-codicology-contents
   cadmus-part-codicology-pg --> cadmus-part-codicology-decorations
@@ -106,11 +106,11 @@ graph LR;
   cadmus-part-codicology-sheet-labels --> cadmus-refs-lookup
   cadmus-part-codicology-sheet-labels --> cadmus-state
   cadmus-part-codicology-sheet-labels --> cadmus-ui
-  cadmus-part-codicology-sheet-labels --> cadmus-ui-pg
+  cadmus-part-codicology-sheet-labels --> cadmus-item-editor
   cadmus-part-codicology-sheet-labels --> cadmus-codicology-ui
   cadmus-part-codicology-shelfmarks --> cadmus-state
   cadmus-part-codicology-shelfmarks --> cadmus-ui
-  cadmus-part-codicology-shelfmarks --> cadmus-ui-pg
+  cadmus-part-codicology-shelfmarks --> cadmus-item-editor
   cadmus-part-codicology-watermarks --> cadmus-cod-location
   cadmus-part-codicology-watermarks --> cadmus-mat-physical-size
   cadmus-part-codicology-watermarks --> cadmus-refs-asserted-chronotope
@@ -118,5 +118,5 @@ graph LR;
   cadmus-part-codicology-watermarks --> cadmus-refs-historical-date
   cadmus-part-codicology-watermarks --> cadmus-state
   cadmus-part-codicology-watermarks --> cadmus-ui
-  cadmus-part-codicology-watermarks --> cadmus-ui-pg
+  cadmus-part-codicology-watermarks --> cadmus-item-editor
 ```
