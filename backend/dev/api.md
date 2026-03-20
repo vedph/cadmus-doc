@@ -19,7 +19,7 @@ nav_order: 6
 
 The [reference API backend project](https://github.com/vedph/cadmus-api) is the model for this section.
 
-▶️ (1) create a new ASP.NET Core web API project (no authentication) named `Cadmus<PRJ>Api`: select `None` for `Authentication type`, ensure that `Enable Docker` and `Use HTTPS` is disabled (we'll provide our own Docker files), ensure that `Use controllers`, `Enable OpenAPI support`, and `Do not use top-level statements` are checked.
+▶️ (1) create a new ASP.NET Core web API project (no authentication) named `Cadmus<PRJ>Api`: select `None` for `Authentication type`, ensure that `Enable container support` and `Use HTTPS` is disabled (we'll provide our own Docker files), ensure that `Use controllers`, `Enable OpenAPI support`, and `Do not use top-level statements` are checked.
 
 >Remember to disable HTTPS. In most API configurations HTTPS is managed by a reverse proxy, and this option is not required here in development.
 
@@ -137,7 +137,7 @@ foreach ($pkg in $packages) {
 
 ▶️ (1) Add these settings to `appsettings.json` (replace `__PRJ__` with your project's name). Feel free to customize them as required.
 
->Please notice that all the sensitive data like users and passwords are there only for illustration purposes, and they will be overwritten by environment variables set in the [host server](../deploy).
+>⚠️ Please notice that all the sensitive data like users and passwords are there only for illustration purposes, and they will be overwritten by environment variables set in the [host server](../deploy).
 
 ```json
 {
@@ -489,7 +489,7 @@ public static class Program
 }
 ```
 
-If you are not going to use a project-specific services library, add your app services in a new `Services` folder:
+If you are not going to use a project-specific services library, **add your app services** in a new `Services` folder:
 
 - `AppRepositoryProvider.cs`: parts
 - `AppPartSeederFactoryProvider.cs`: part seeders
@@ -664,21 +664,19 @@ This is the core customization for the whole project. Usually, the profile file 
 
 ## 5. Setup Docker
 
-▶️ (1) In the project's root (where the `.sln` file is located), add a `Dockerfile` to build the Docker image (replace `__PRJ__` with your project's name):
+▶️ (1) In the project's root (where the `.slnx` file is located), add a `Dockerfile` to build the Docker image (replace `__PRJ__` with your project's name):
 
 ```yml
 # Stage 1: base
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 443
 
 # Stage 2: build
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY ["Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj", "Cadmus__PRJ__Api/"]
-# copy local packages to avoid using a NuGet custom feed, then restore
-# COPY ./local-packages /src/local-packages
 RUN dotnet restore "Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj" -s https://api.nuget.org/v3/index.json --verbosity n
 # copy the content of the API project
 COPY . .
