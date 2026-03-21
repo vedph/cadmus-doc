@@ -45,7 +45,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## General Parts
 
-- [models.json](https://github.com/vedph/cadmus-general/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-general/blob/master/docs/models.json)
 
 - parts:
   - [asserted historical dates](https://github.com/vedph/cadmus-general/blob/master/docs/asserted-historical-dates.md)
@@ -82,7 +82,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Codicology Parts
 
-- [models.json](https://github.com/vedph/cadmus-codicology/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-codicology/blob/master/docs/models.json)
 
 - parts:
   - [bindings](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-bindings.md)
@@ -100,7 +100,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Epigraphy Parts
 
-- [models.json](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/models.json)
 
 - parts:
   - [scripts](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-scripts.md)
@@ -114,7 +114,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Geography Parts
 
-- [models.json](https://github.com/vedph/cadmus-geo/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-geo/blob/master/docs/models.json)
 
 - parts:
   - [asserted locations](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-locations.md)
@@ -122,7 +122,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Iconography Parts
 
-- [models.json](https://github.com/vedph/cadmus-iconography/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-iconography/blob/master/docs/models.json)
 
 - parts:
   - [iconography instructions](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-instructions.md)
@@ -134,7 +134,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Lexicography Parts
 
-- [models.json](https://github.com/vedph/cadmus-lexicography/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-lexicography/blob/master/docs/models.json)
 
 - parts:
   - [lemma](https://github.com/vedph/cadmus-lexicography/blob/master/docs/lemma-part.md)
@@ -144,8 +144,12 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Philology Parts
 
+- ⚙️ [models.json](https://github.com/vedph/cadmus-philology/blob/master/docs/models.json)
+
 - fragments:
   - [apparatus](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md)
   - [orthography](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.orthography.md)
-  - [quotations](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.quotations.md)
-  - [witnesses](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.witnesses.md)
+  - †[quotations](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.quotations.md)
+  - †[witnesses](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.witnesses.md)
+
+>`†` marks obsoleted parts.
