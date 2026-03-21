@@ -9,6 +9,8 @@ nav_order: 1
 
 This list contains the general-purpose models used by many Cadmus-based projects. The models specific to a project are described in the corresponding repository.
 
+>The `models.json` files listed here contain the definitions of the models found in each group of parts. These can be used to enable facet editing within the Cadmus editor, by adding a `models` key under the backend profile's `settings` property. They provide the facet editor with the list of the available parts/fragments (which is determined by the modules included in the API backend of each project), their thesauri IDs, and their base-text role.
+
 ## Bricks
 
 Bricks are reusable UI components mostly used in part or fragment editors. Many of them are related to specific models in the backend, while others are just UI widgets which make it easier to build specific UI functionality. You can play with bricks at the bricks demo website:
@@ -41,7 +43,9 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 - [physical size](https://github.com/vedph/cadmus-bricks/blob/master/docs/physical-size.md)
 - [physical state](https://github.com/vedph/cadmus-bricks/blob/master/docs/physical-state.md)
 
-## General
+## General Parts
+
+- [models.json](https://github.com/vedph/cadmus-general/blob/master/docs/models.json)
 
 - parts:
   - [asserted historical dates](https://github.com/vedph/cadmus-general/blob/master/docs/asserted-historical-dates.md)
@@ -76,7 +80,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 - [taxonomies subsystem](taxonomies.md):
   - [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md)
 
-## Codicology
+## Codicology Parts
 
 - parts:
   - [bindings](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-bindings.md)
@@ -92,7 +96,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 >This project is connected to the [codicological layout view](https://github.com/vedph/cod-layout-view) web component library, which contains services and models representing manuscript layout formulas, and is a generalization inspired by Cadmus codicology layout formulas.
 
-## Epigraphy
+## Epigraphy Parts
 
 - parts:
   - [scripts](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-scripts.md)
@@ -104,24 +108,24 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 - fragments:
   - [ligatures](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/fr.epi-ligatures.md)
 
-## Geography
+## Geography Parts
 
 - parts:
   - [asserted locations](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-locations.md)
   - [asserted toponyms](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-toponyms.md)
 
-## Iconography
+## Iconography Parts
 
 - parts:
   - [iconography instructions](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-instructions.md)
   - [iconography part](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-iconography.md)
 
-## Imaging
+## Imaging Parts
 
 - parts:
   - [W3C gallery image annotations](https://github.com/vedph/cadmus-img/blob/master/docs/w3c-gallery-image-annotations.md)
 
-## Lexicography
+## Lexicography Parts
 
 - parts:
   - [lemma](https://github.com/vedph/cadmus-lexicography/blob/master/docs/lemma-part.md)
@@ -129,7 +133,7 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
   - [word senses](https://github.com/vedph/cadmus-lexicography/blob/master/docs/word-senses-part.md)
   - [word collocations](https://github.com/vedph/cadmus-lexicography/blob/master/docs/word-collocations-part.md)
 
-## Philology
+## Philology Parts
 
 - fragments:
   - [apparatus](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md)
