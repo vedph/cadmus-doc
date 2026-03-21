@@ -134,6 +134,8 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Lexicography Parts
 
+- [models.json](https://github.com/vedph/cadmus-lexicography/blob/master/docs/models.json)
+
 - parts:
   - [lemma](https://github.com/vedph/cadmus-lexicography/blob/master/docs/lemma-part.md)
   - [word forms](https://github.com/vedph/cadmus-lexicography/blob/master/docs/word-forms-part.md)
