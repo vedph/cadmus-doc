@@ -114,15 +114,18 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Geography Parts
 
+- [models.json](https://github.com/vedph/cadmus-geo/blob/master/docs/models.json)
+
 - parts:
   - [asserted locations](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-locations.md)
   - [asserted toponyms](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-toponyms.md)
 
 ## Iconography Parts
 
+- [models.json](https://github.com/vedph/cadmus-iconography/blob/master/docs/models.json)
+
 - parts:
   - [iconography instructions](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-instructions.md)
-  - [iconography part](https://github.com/vedph/cadmus-iconography/blob/master/docs/ico-iconography.md)
 
 ## Imaging Parts
 
