@@ -18,6 +18,7 @@ nav_order: 7
   - [10. Add Preview Styles](#10-add-preview-styles)
   - [11. Add Docker Support](#11-add-docker-support)
   - [12. Add Readme](#12-add-readme)
+  - [13. Add Branding](#13-add-branding)
 
 # Creating Frontend App
 
@@ -674,4 +675,83 @@ Finally you can use a README template like this:
 1. `npm run build-lib`
 2. update version in `env.js` and `ng build`
 3. `docker build . -t vedph2020/cadmus-__PRJ__-app:0.0.1 -t vedph2020/cadmus-__PRJ__-app:latest` (replace with the current version).
+```
+
+## 13. Add Branding
+
+Sometimes you host multiple instances of the same editor, e.g. in a staging vs. production environment. In this case, you can conditionally change the toolbar color as follows.
+
+(1) in `env.js` add a `branding` variable and set it to the desired value:
+
+```js
+(function (window) {
+  window.__env = window.__env || {};
+  // ... etc.
+
+  // UI branding: staging, dev, production (default)
+  window.__env.branding = "production";
+```
+
+(2) in `styles.scss` add:
+
+```scss
+.env-branded-toolbar {
+  // Use a variable that we will set via [style.--app-env-color]
+  background-color: var(--app-env-color, var(--mat-sys-primary)) !important;
+
+  // Ensure the text color contrasts correctly.
+  // If the background is a 'sys' color, the 'on-sys' color is its natural pair.
+  color: var(--app-env-on-color, var(--mat-sys-on-primary)) !important;
+
+  // Apply the same logic to internal component tokens (as you did in your original code)
+  --mat-toolbar-container-text-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+  --mat-icon-button-icon-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+  --mat-button-text-label-text-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+}
+```
+
+(3) in `app.ts` change your code to provide branding:
+
+```ts
+// this assumes you inject private _env: EnvService in ctor:
+export class App {
+  // ...
+  public readonly branding = computed(() => {
+    switch (this._env.get('branding')) {
+      case 'staging':
+        return {
+          bg: 'var(--mat-sys-tertiary)',
+          text: 'var(--mat-sys-on-tertiary)',
+        };
+      case 'dev':
+        return {
+          bg: 'var(--mat-sys-error)',
+          text: 'var(--mat-sys-on-error)',
+        };
+      default: // Production
+        return {
+          bg: 'var(--mat-sys-primary)',
+          text: 'var(--mat-sys-on-primary)',
+        };
+    }
+  });
+```
+
+(4) in `app.html` change the class of the `mat-toolbar`:
+
+```html
+  <mat-toolbar
+    class="env-branded-toolbar"
+    [style.--app-env-color]="branding().bg"
+    [style.--app-env-on-color]="branding().text"
+  >
 ```
