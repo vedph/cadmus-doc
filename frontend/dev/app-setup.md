@@ -24,6 +24,8 @@ nav_order: 7
 
 In what follows, `__PRJ__` is the placeholder for your Cadmus project's short name.
 
+---
+
 ## 1. Create Angular App
 
 ▶️ (1) create a **new Angular app**: use SCSS rather than CSS, and don't enable SSR (as per default option):
@@ -250,12 +252,14 @@ mat-icon.mat-accent {
 }
 ```
 
+---
+
 ## 2. Install Packages
 
 ▶️ 1. Install the typical Cadmus packages via NPM:
 
 ```bash
-pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core @myrmidon/cadmus-thesaurus-store
+pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core @myrmidon/cadmus-thesaurus-store @myrmidon/cadmus-profile-editor @myrmidon/cadmus-profile-import
 
 pnpm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui
 
@@ -270,7 +274,7 @@ pnpm i @myrmidon/cadmus-refs-decorated-counts @myrmidon/cadmus-ui-note-set @myrm
 
 ```json
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.56.0"
+    "@rollup/rollup-win32-arm64-msvc": "^4.60.1"
   },
   "pnpm": {
     "overrides": {
@@ -326,9 +330,14 @@ export const appConfig: ApplicationConfig = {
 
 ```json
 "allowedCommonJsDependencies": [
-  "leaflet"
+  "dagre",
+  "webcola",
+  "ngraph.graph",
+  "ngraph.forcelayout"
 ]
 ```
+
+---
 
 ## 3. Setup Environment
 
@@ -346,6 +355,8 @@ This step is essential to let the frontend find the server, while allowing us to
   window.__env.version = "0.0.1";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
+  // UI branding: staging, dev, production (default)
+  window.__env.branding = "production";
 })(this);
 ```
 
@@ -505,6 +516,8 @@ This is optional and depends on your visuals.
 
 ▶️ (2) also, if using [lookup sets](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-refs-lookup/README.md#lookup-set), typically you will also need an icon for each lookup source, e.g. VIAF, GeoNames, etc. You can find some of these icons in the image folder of the [Cadmus shell app](https://github.com/vedph/cadmus-shell-v3/tree/master/src/assets/img).
 
+---
+
 ## 6. Add Cadmus Infrastructure
 
 ▶️ (1) add some extension points, optionally adding new entries for your new parts (see [dynamic lookup](https://github.com/vedph/cadmus_doc/blob/master/core/dynamic-lookup)):
@@ -568,6 +581,8 @@ export const ITEM_BROWSER_KEYS = {
 
 Of course you will then need to add links to this route in your app.
 
+---
+
 ## 7. Implement App Component
 
 The default app component must be updated with a code like that found in the [Cadmus shell](https://github.com/vedph/cadmus-shell-v3/tree/master/src/app):
@@ -576,15 +591,21 @@ The default app component must be updated with a code like that found in the [Ca
 - [app.component.html](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.component.html)
 - [app.component.scss](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.component.scss)
 
+---
+
 ## 8. Configure Routes
 
 Setup your routes in [app.routes.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.routes.ts). As you can see from that code, most routes target a single standalone component (via `loadComponent`), while some of them target a module (via `loadChildren`). Targeting modules happens when they work as the entry point for sub-routes, like e.g. for the general or philologic parts module.
 
 Starting from that template, add all the routes you need, and remove those you don't need.
 
+---
+
 ## 9. Configure App
 
 Finally, add to [app.config.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.config.ts) the required services. You can start from this template, and optionally add more providers if required.
+
+---
 
 ## 10. Add Preview Styles
 
@@ -596,6 +617,8 @@ If using preview:
 ```scss
 @import "preview-styles.css";
 ```
+
+---
 
 ## 11. Add Docker Support
 
@@ -745,6 +768,8 @@ node_modules
 src
 ```
 
+---
+
 ## 12. Add Readme
 
 Finally you can use a README template like this:
@@ -761,6 +786,8 @@ Finally you can use a README template like this:
 2. update version in `env.js` and `ng build`
 3. `docker build . -t vedph2020/cadmus-__PRJ__-app:0.0.1 -t vedph2020/cadmus-__PRJ__-app:latest` (replace with the current version).
 ```
+
+---
 
 ## 13. Add Branding
 
