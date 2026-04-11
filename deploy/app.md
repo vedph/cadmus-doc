@@ -88,6 +88,8 @@ services:
       - CONNECTIONSTRINGS__AUTH=Server=cadmus__PRJ__pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - CONNECTIONSTRINGS__BIBLIO=Server=cadmus__PRJ__pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - SEED__DELAY=50
+      # TODO: set to 0 for no mock data
+      - SEED__ITEMCOUNT=100
       - SERILOG__CONNECTIONSTRING=mongodb://cadmus__PRJ__mongo:27017/{0}-log
       # TODO: change the default user password (same as API below)
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
@@ -246,7 +248,7 @@ In this section you will find information about all the relevant API settings. A
 
 ▶️ 3. change the default user password ([StockUsers](#stockusers)).
 
-▶️ 4. change the base API URL for the [frontend app](#4-frontend-app-settings).
+▶️ 4. change the base API URL for the [frontend app](#4-configure-frontend-app).
 
 ### Settings and Environment Variables
 
