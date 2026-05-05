@@ -1,5 +1,5 @@
 ---
-title: "Graph - JMES Path" 
+title: "Graph - JMES Path"
 layout: default
 parent: "Graph - Mappings"
 nav_order: 1
@@ -7,10 +7,25 @@ nav_order: 1
 
 # JMES Path
 
-- [tutorial](https://jmespath.org/tutorial.html)
-- [examples](https://jmespath.org/examples.html)
+- [JMES Path](#jmes-path)
+  - [Basic Expressions](#basic-expressions)
+  - [Lists](#lists)
+  - [Projections](#projections)
+    - [List Projections](#list-projections)
+    - [Object Projections](#object-projections)
+    - [Flatten Projections](#flatten-projections)
+    - [Slice Projections](#slice-projections)
+    - [Filter Projections](#filter-projections)
+    - [Pipe Expressions](#pipe-expressions)
+  - [Multiselect](#multiselect)
+    - [Multiselect List](#multiselect-list)
+    - [Multiselect Hash](#multiselect-hash)
+  - [Functions](#functions)
 
 This is just a cheatsheet derived from the excellent JMES tutorial, which also provides interactive examples.
+
+- [tutorial](https://jmespath.org/tutorial.html)
+- [examples](https://jmespath.org/examples.html)
 
 ## Basic Expressions
 
@@ -20,11 +35,12 @@ This is just a cheatsheet derived from the excellent JMES tutorial, which also p
 **Examples:**
 
 ```json
-// Data: {"name": "John", "age": 30}
-name        // → "John"
-age         // → 30
-address     // → null
+{ "name": "John", "age": 30 }
 ```
+
+- `name` → "John"
+- `age` → 30
+- `address` → null
 
 ## Lists
 
@@ -34,13 +50,14 @@ address     // → null
 **Examples:**
 
 ```json
-// Data: ["a", "b", "c", "d", "e"]
-[0]         // → "a"
-[-1]        // → "e"
-[1:3]       // → ["b", "c"]
-[:2]        // → ["a", "b"]
-[::2]       // → ["a", "c", "e"]
+["a", "b", "c", "d", "e"]
 ```
+
+- `[0]` → "a"
+- `[-1]` → "e"
+- `[1:3]` → ["b", "c"]
+- `[:2]` → ["a", "b"]
+- `[::2]` → ["a", "c", "e"]
 
 ## Projections
 
@@ -62,10 +79,14 @@ There are 5 kinds of projections:
 - **Example:**
 
 ```json
-// Data: [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}]
-[*].name    // → ["John", "Jane"]
-[*].age     // → [30, 25]
+[
+  { "name": "John", "age": 30 },
+  { "name": "Jane", "age": 25 }
+]
 ```
+
+- `[*].name` → ["John", "Jane"]
+- `[*].age` → [30, 25]
 
 ### Object Projections
 
@@ -74,9 +95,17 @@ There are 5 kinds of projections:
 - **Example:**
 
 ```json
-// Data: {"user1": {"name": "John"}, "user2": {"name": "Jane"}}
-*.name      // → ["John", "Jane"]
+{
+  "user1": {
+    "name": "John"
+  },
+  "user2": {
+    "name": "Jane"
+  }
+}
 ```
+
+- `*.name` → ["John", "Jane"]
 
 ### Flatten Projections
 
@@ -85,9 +114,13 @@ There are 5 kinds of projections:
 - **Example:**
 
 ```json
-// Data: [["a", "b"], ["c", "d"]]
-[]          // → ["a", "b", "c", "d"]
+[
+  ["a", "b"],
+  ["c", "d"]
+]
 ```
+
+- `[]` → ["a", "b", "c", "d"]
 
 ### Slice Projections
 
@@ -96,9 +129,10 @@ There are 5 kinds of projections:
 - **Example:**
 
 ```json
-// Data: [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}]
-[1:3].id    // → [2, 3]
+[{ "id": 1 }, { "id": 2 }, { "id": 3 }, { "id": 4 }]
 ```
+
+- `[1:3].id` → [2, 3]
 
 ### Filter Projections
 
@@ -107,20 +141,25 @@ There are 5 kinds of projections:
 - **Example:**
 
 ```json
-// Data: [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}]
-[?age > `27`].name              // → ["John"]
-[?name == 'Jane'].age           // → [25]
+[
+  { "name": "John", "age": 30 },
+  { "name": "Jane", "age": 25 }
+]
 ```
+
+- `[?age > ``27``].name` → ["John"]
+- `[?name == 'Jane'].age` → [25]
 
 ### Pipe Expressions
 
 Stop a projection with a pipe to apply further operations:
 
 ```json
-// Data: [{"name": "John"}, {"name": "Jane"}]
-[*].name | [0]                  // → "John"
-[*].name | length(@)            // → 2
+[{ "name": "John" }, { "name": "Jane" }]
 ```
+
+- `[*].name | [0]` → "John"
+- `[*].name | length(@)` → 2
 
 ## Multiselect
 
@@ -132,9 +171,10 @@ Multiselect allows you to create elements that don't exist in a JSON document. A
 - **Example:**
 
 ```json
-// Data: [{"name": "John", "age": 30, "city": "NYC"}]
-[*].[name, age]                 // → [["John", 30]]
+[{ "name": "John", "age": 30, "city": "NYC" }]
 ```
+
+- `[*].[name, age]` → [["John", 30]]
 
 ### Multiselect Hash
 
@@ -142,9 +182,10 @@ Multiselect allows you to create elements that don't exist in a JSON document. A
 - **Example:**
 
 ```json
-// Data: [{"name": "John", "age": 30, "city": "NYC"}]
-[*].{person: name, years: age}  // → [{"person": "John", "years": 30}]
+[{ "name": "John", "age": 30, "city": "NYC" }]
 ```
+
+- `[*].{person: name, years: age}` → [{"person": "John", "years": 30}]
 
 ## Functions
 
@@ -173,12 +214,13 @@ A number of [functions](https://jmespath.org/specification.html#builtin-function
 **Examples:**
 
 ```json
-// Data: [{"name": "John", "scores": [85, 90, 78]}, {"name": "Jane", "scores": [92, 88, 95]}]
-[*].scores | [0]                    // → [85, 92]
-[*].{name: name, avg: avg(scores)}  // → [{"name": "John", "avg": 84.33}, {"name": "Jane", "avg": 91.67}]
-[?contains(name, 'J')].name         // → ["John", "Jane"]
-[?length(scores) > `2`].name        // → ["John", "Jane"]
+[{"name": "John", "scores": [85, 90, 78]}, {"name": "Jane", "scores": [92, 88, 95]}]
 ```
+
+- `[*].scores | [0]` → [85, 92]
+- `[*].{name: name, avg: avg(scores)}` → [{"name": "John", "avg": 84.33}, {"name": "Jane", "avg": 91.67}]
+- `[?contains(name, 'J')].name` → ["John", "Jane"]
+- `[?length(scores) > ``2``].name` → ["John", "Jane"]
 
 **Filter with Functions:**
 

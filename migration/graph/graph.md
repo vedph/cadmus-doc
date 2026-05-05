@@ -30,7 +30,7 @@ Using a [metaphor](../../index.md#overview), the basic Cadmus architecture inclu
 
 So, in a sense our objects are _monadic_. Yet, we often need to represent relationships among them. While properties considered intrinsic or relevant to such objects are part of their model, relations with other objects are usually confined to the realm of _incidental_ events.
 
-To quote a famous example used in [CIDOC-CRM](https://cidoc-crm.org/), consider the event of Caesar's murder by Brutus and others. In an event-centric ontology like CIDOC-CRM, we have 3 segments on the timeline of history, each corresponding to the lifespan of an entity:
+A famous example used in [CIDOC-CRM](https://cidoc-crm.org/) considers the event of Caesar's murder by Brutus and others. In an event-centric ontology like CIDOC-CRM, we have 3 segments on the timeline of history, each corresponding to the lifespan of an entity:
 
 - one for Caesar;
 - one for Brutus;
@@ -42,7 +42,7 @@ Now, of course this event is something which is not _intrinsically_ part of the 
 
 Should we have a database of persons, or of archaeological artefacts, we could not make the sword a property of the person object, or vice-versa. These are not features considered intrinsic to either a person or an object in general terms (unless we are specifically collecting cases of murder). Adding such an optional property just to make room for that information somewhere would pollute the model of each object.
 
->Of course, in Cadmus you can still add a lot of links to internal or external resources. Where it makes sense, or even when your model needs a section linking to other data, you can freely add them. The graph is used when you are going to build a full network of relationships, far beyond a bunch of links from a resource to another one.
+>Of course, in Cadmus you can still add a lot of links to internal or external resources. Where it makes sense, or even when your model needs a section linking to other data, you can freely add them. The graph is used when you are going to build a full network of relationships, far beyond a bunch of links from a resource to another one; or when you want to export RDF data.
 
 So, where should we place things like events or other types of less or more incidental relationships among various objects? Clearly, outside each of these types. Given that Cadmus is designed also for emitting RDF-like modeled data, thus allowing users to publish for the semantic web, it's obvious that such relations can easily be represented as edges connecting the nodes of a graph.
 
