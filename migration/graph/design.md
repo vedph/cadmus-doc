@@ -7,6 +7,11 @@ nav_order: 7
 
 # Designing for Graph
 
+- [Designing for Graph](#designing-for-graph)
+  - [(1) Ontologies](#1-ontologies)
+  - [(2) Define Mappings](#2-define-mappings)
+  - [(3) Nodes List](#3-nodes-list)
+
 The typical steps for designing a graph for a Cadmus projects are:
 
 1. define the ontologies you want to target.
