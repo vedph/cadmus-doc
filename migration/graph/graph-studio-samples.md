@@ -25,7 +25,7 @@ Let us consider a couple of example mappings for [Graph Studio](graph-studio). S
 In mapping these data to the graph, for each work we want:
 
 - a node representing the _work_.
-- a number of nodes and triples representing _events_ involving that work.
+- nodes and triples representing _events_ involving that work.
 
 Let us now consider the mappings for this output.
 
