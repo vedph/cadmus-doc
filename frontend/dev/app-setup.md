@@ -303,38 +303,29 @@ import { NgxEchartsModule } from 'ngx-echarts';
 
 ▶️ 2. Typically you will also need **Monaco editor** and **Markdown**:
 
-- [NG essentials](https://github.com/cisstech/nge): `pnpm i @cisstech/nge monaco-editor`.
+- `pnpm i @jean-merelis/ngx-monaco-editor`
 - [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `pnpm i ngx-markdown marked`.
 
 ⚠️ Note that for such libraries you should also import the providers in `app.config.ts` like:
 
 ```ts
-import { NgeMonacoModule } from "@cisstech/nge/monaco";
-import { NgeMarkdownModule } from "@cisstech/nge/markdown";
+ import {
+   DefaultMonacoLoader,
+   NGX_MONACO_LOADER_PROVIDER,
+ } from '@jean-merelis/ngx-monaco-editor';
 
 // ...
 
 export const appConfig: ApplicationConfig = {
   providers: [
     // ...
-    importProvidersFrom(NgeMonacoModule.forRoot({})),
-    importProvidersFrom(NgeMarkdownModule),
+    {
+      provide: NGX_MONACO_LOADER_PROVIDER,
+      useFactory: () => new DefaultMonacoLoader({ paths: { vs: '/vs' } }),
+    },
     // ...
   ],
 };
-```
-
-> Even though you usually all what you have to do is installing the listed packages, be sure to _follow the directions provided by each library_ when installing it.
-
-💡 If you are directly or indirectly using legacy libraries like `leaflet`, add this option under `architect/build/options` to avoid a build warning:
-
-```json
-"allowedCommonJsDependencies": [
-  "dagre",
-  "webcola",
-  "ngraph.graph",
-  "ngraph.forcelayout"
-]
 ```
 
 ---
