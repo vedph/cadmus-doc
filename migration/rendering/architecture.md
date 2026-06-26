@@ -17,16 +17,19 @@ nav_order: 1
         - [Building Text Tree](#building-text-tree)
         - [Rendering Text Tree](#rendering-text-tree)
 
-The easiest form of data export in Cadmus is based on rendering data, for both exporting data into files and providing a frontend interface with "previews", i.e. views which summarize structured data for human readers. For instance, in the former case you can export stand-off TEI documents from text items with layers; in the latter case, you can view a compact and human-friendly data summary inside the editor itself.
+The easiest form of data export in Cadmus is based on **rendering data**, for:
 
-So, export may be done at different levels of granularity:
+- exporting data into files, e.g. stand-off TEI documents from text items with layers.
+- providing a frontend interface with "previews", i.e. views which summarize structured data for human readers within the editor itself.
 
-- you can export all the items or a subset of them;
-- you can export a subset of parts of each item;
-- you can export a single text part, with all its related layer parts, or a subset of them;
-- you can export a single part.
+This export has different levels of **granularity**:
 
-The export process is driven by a JSON-based configuration, which assembles and configures its components. In most cases, it relies on a set of transformations.
+- all the _items_, or a subset of them;
+- a subset of _parts_ of each item;
+- a single _text part_, with all its related _layer parts_, or a subset of them;
+- a single _part_.
+
+The export process is driven by a JSON-based configuration, which assembles and configures its components. In most cases, it relies on a set of **transformations**.
 
 As Cadmus data is based on objects (items, parts, and fragments), each of them can be serialized with an object notation, like JSON. This is what effectively happens when these objects are stored in the Cadmus database (which relies on MongoDB, even though via an intermediate layer which allows you to change the underlying store engine).
 
@@ -34,8 +37,7 @@ This means that any object, and thus any data, can be represented as a JSON docu
 
 In this context, producing output essentially means **transforming JSON** documents. This may be done with a mix of different technologies, chosen according to data structure and export purposes:
 
-- as for the _architecture_, you can use builtin components, which are either generic components with a high level of customization, allowing you to get your output by just providing a configuration file; or specialized components, which, though still configurable, have a more specific logic (like the component used to generate a TEI apparatus). In most cases you can just combine generic and specialized builtin components to generate your desired output. Anyway, it is always possible to build your own components and use them as plugins.
-
+- as for the _architecture_, you can use builtin components, which are either generic components with a high level of customization, allowing you to get your output by just providing a configuration file; or specialized components, which, though still configurable, have a more specific logic (like the component used to generate a TEI apparatus). In most cases you can combine generic and specialized builtin components to generate your desired output. It is always possible to build your own components and use them as plugins.
 - as for _transformation technologies_, given that we start with JSON and we usually end with a text-based format, you can mix a number of approaches, using what best fits your scenario:
   - [JMESPath](https://jmespath.org/tutorial.html), a powerful selection and transformation language for JSON.
   - [XSLT](https://developer.mozilla.org/en-US/docs/Web/XSLT), by using a [component](components/json-renderers#xslt-json-renderer) which automatically [converts JSON](json-rendering) into an XML dialect.
@@ -49,18 +51,18 @@ The data flow and the main components of the Cadmus export architecture are summ
 
 - _Figure 1: Cadmus export architecture_
 
-It all starts from the Cadmus **database**, including items with their parts. Some of these parts may represent text (with a text part) or layered text (with a text part and any number of text layer parts). Many other parts may well represent non-textual data (e.g. the codicological description of a manuscript).
+It all starts from the Cadmus **database**, including items with their parts. Some of these parts may represent text (including a base text part) or layered text (including a base text part and any number of text layer parts). Many other parts may well represent non-textual data (e.g. the codicological description of a manuscript).
 
 When exporting into files, usually the entry point is represented by an **item ID collector**, which collects the IDs of all the matching items in their order. This is used to filter and order the items for export; currently, we just have a single [builtin collector](components/collectors).
 
-Data are thus processed one item after another. Each item is handled by an **item composer**, which orchestrates all the components used in the rendering pipelines. Additionally, a simple data model, the rendering context, is shared across most of the components. The general flow is thus:
+Data is thus processed one item after another. Each item is handled by an **item composer**, which orchestrates all the components used in the rendering pipelines. Additionally, a simple data model, the rendering context, is shared across most of the components. The general flow is thus:
 
 1. the item collector provides item IDs filtered and sorted as required.
 2. for each ID, the corresponding item is loaded.
 3. optionally, one or more context suppliers are used to inject from the item additional metadata into the rendering context.
-4. according to the rendering type, textual or non-textual, two different branches are followed. Layered texts in fact require a more complex pipeline, because additional logic is required to flatten multiple layers of structured annotations into some target format, like TEI, HTML, etc.
+4. according to the rendering type, textual or non-textual, two different branches are followed. Layered texts require a more complex pipeline, because additional logic is required to flatten multiple layers of structured annotations into some target format, like TEI, HTML, etc.
 
->⚙️ Technically, the item composer (`IItemComposer`) is a very flexible component as rendition requirements vary a lot across projects. One or more composers are instantiated by a rendering factory (`CadmusRenderingFactory`), which can instantiate and configure context suppliers, text tree filters, text filters, JSON renderers for each part, text part flatteners, text tree renderers, and item composers themselves. All these components are configured in an external JSON document. Then, the logic in each composer can be totally custom and leverage any of these components as required for its purpose; the composer receives a data context including the input item with its parts, and then writes one or more text-based outputs representing its rendition. The standard Cadmus API contains this JSON configuration document in its `preview-profile.json` asset file, but does not include a composer because it is used only to preview parts in the UI; anyway, it can be extended per-project to provide full export functionality based on item composers, whether they write to file system, RAM, etc.
+>⚙️ Technically, the item composer (`IItemComposer`) is a very flexible component as rendition requirements vary a lot across projects. One or more composers are created by a rendering factory (`CadmusRenderingFactory`), which can instantiate and configure context suppliers, text tree filters, text filters, JSON renderers for each part, text part flatteners, text tree renderers, and item composers themselves. All these components are configured in an external JSON document. Then, the logic in each composer can be totally custom; the composer receives a data context including the input item with its parts, and then writes one or more text-based outputs representing its rendition. The standard Cadmus API contains this JSON configuration document in its `preview-profile.json` asset file, but it does not include a composer because it is used only to preview parts in the UI; anyway, it can be extended per-project to provide full export functionality based on item composers, whether they write to file system, RAM, etc.
 
 ### Non-Textual
 
