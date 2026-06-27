@@ -138,7 +138,7 @@ In this example we are going to render all these layers. We thus need to segment
 
 ##### Collecting Annotated Segments
 
-▶️ (1) **flatten layers**: use a text part flattener (`ITextPartFlattener`) to get the whole text into a multiline string, plus one range for the fragments in each of the picked layer parts.
+▶️ (1) **flatten text with fragments from layers**: use a text part flattener (`ITextPartFlattener`) to get the whole text into a multiline string, plus one range for the fragments in each of the picked layer parts.
 
 The resulting text is (I add a ruler with index numbers at its bottom for better readability):
 
@@ -151,10 +151,10 @@ Here `|` stands for a LF character, used as the line delimiter.
 
 The resulting **segments** collected from all the layers are:
 
-1. 2-2 for `qu[e]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@0`;
-2. 4-4 for `[b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@1`;
-3. 2-4 for `qu[e b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.apparatus@0`;
-4. 4-14 for `[bixit|annos]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.comment@0`.
+1. indexes 2-2 for `qu[e]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@0`;
+2. indexes 4-4 for `[b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@1`;
+3. indexes 2-4 for `qu[e b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.apparatus@0`;
+4. indexes 4-14 for `[bixit|annos]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.comment@0`.
 
 >Links to each layer's fragment are made via these fragment identifiers, built by concatenating the layer part type ID (`it.vedph.token-text-layer`) with its role ID (e.g. `fr.it.vedph.orthography`), separated by a colon, followed by `@` and the index of the fragment in the layer's fragments array.
 
@@ -208,6 +208,8 @@ que bixit|annos XX
 112345555555555666 ranges
 ```
 
+Each range is linked to 0 or more fragments.
+
 ▶️ (3) **assign text values** to each merged range (via `ItemComposer`). This is trivial as it just means getting substrings from the whole text, as delimited by each range. As anticipated above, we defer this processing to this stage to avoid useless processing in previous stages.
 
 ##### Building Text Tree
@@ -257,4 +259,4 @@ Note that here the `ixit/annos` node has been split into two nodes, `ixit` and `
 
 ##### Rendering Text Tree
 
-▶️ (6) **render the text tree** (via an `ITextTreeRenderer`). A text tree renderer traverses the tree and renders it into some specific format. This can be anything, from something as simple as plain text (by just concatenating text from each node) to HTML, TEI, etc.
+▶️ (6) **render the text tree** (via an `ITextTreeRenderer`). A text tree renderer traverses the tree and renders it into a specific format. This can be anything: plain text (by just concatenating text from each node), HTML, TEI, etc.
