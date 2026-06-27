@@ -78,7 +78,7 @@ For instance, some [prebuilt rendering filters](components/renderer-filters) all
 
 As you can see from Figure 1, this pipeline uses:
 
-1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text segments_. Each segment is a text linked to zero or more annotations from layers. Text is segmented into segments according to the layer(s) selected for rendering. With no layer, we will have a single segment; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once segments are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
+1. a **text part flattener** (`ITextPartFlattener`), used to flatten a layered text (i.e. one text part, plus any number of text layer parts) into a set of _text segments_. Each segment is a text linked to zero or more annotations from layers. Text is split into segments according to the annotation layer(s) selected for rendering. With no layer, we will have a single segment; with 1 layer only, the segmentation will reflect the distribution of its annotations; with multiple layers, the segmentation is the result of flattening the segments from annotations from all the layers. Once segments are defined, they get projected into a linear tree, where each segment is the child node of the node representing the previous segment.
 
 2. zero or more **text tree filters** are applied to the tree to add metadata to its nodes or even reshape the tree as desired. Here we could also have branching, e.g. with binary trees to provide parallel segmentation strategies in TEI rendition.
 
@@ -154,9 +154,9 @@ The resulting **segments** collected from all the layers are:
 1. 2-2 for `qu[e]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@0`;
 2. 4-4 for `[b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.orthography@1`;
 3. 2-4 for `qu[e b]ixit`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.apparatus@0`;
-4. 4-14 for `bixit|annos`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.comment@0`.
+4. 4-14 for `[bixit|annos]`: fragment ID=`it.vedph.token-text-layer:fr.it.vedph.comment@0`.
 
->Links to each layer's fragment are made via these fragment identifiers, built by concatenating the layer part type ID (`it.vedph.token-text-layer`) with its role ID (e.g. `fr.it.vedph.orthography`), separated by a colon, followed by `@` and the index of the fragment in the layer's fragments array. Optionally, these links can be expanded with an additional suffix which starts from any non-digit character after the fragment index. For instance, an apparatus fragment has an array of entries, and when we want to target each of them we add a suffix `.` plus the index of the entry in that array.
+>Links to each layer's fragment are made via these fragment identifiers, built by concatenating the layer part type ID (`it.vedph.token-text-layer`) with its role ID (e.g. `fr.it.vedph.orthography`), separated by a colon, followed by `@` and the index of the fragment in the layer's fragments array.
 
 Each of the segments has a **model** including:
 
@@ -172,13 +172,13 @@ So, the next step is merging these segments into a single linear, contiguous seq
 
 ##### Flattening Segments
 
-▶️ (2) **flatten and merge segments** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous segments, covering the whole text, from start to end. In our example, we are starting from this stage, where each line below the text represents a range with its fragment ID (Figure 2):
+▶️ (2) **flatten and merge segments** (via `FragmentTextRange.MergeRanges`) into a sequence of non-overlapping, contiguous segments, covering the whole text, from start to end. In our example, we are starting with this stage, where each line below the text represents a range with its fragment ID (Figure 2):
 
 ![flattening](img/flattening.png)
 
 - Figure 2 - Flattening layer segments into merged segments
 
->In this figure we represent the data item (our inscription) as a box containing 5 objects: the green ones are text and text layer parts, each with a specific type and model annotations: orthography, paleography, comment; the base text itself is another object in the box, the one labelled with `T`. The blue object is another part which is not linked to specific portions of the text, just to show that the box might include any type of data, whether it is directly related text or not. For instance, this blue object might be a datation, or a description of the material support, or of its archaeological context, etc.
+In Figure 2 we represent the data item (our inscription) as a box containing 5 objects: the green ones are text and text layer parts, each with a specific type and model annotations: orthography, paleography, comment. The base text itself is another object in the box, the one labelled with `T`. The blue object is another part which is not linked to specific portions of the text, just to show that the box might include any type of data, whether it is directly related text or not. For instance, this blue object might be a datation, or a description of the material support, or of its archaeological context, etc.
 
 More schematically, these are our layers:
 
@@ -194,25 +194,25 @@ que bixit|annos XX
 From here we get these segments (I am numbering the segments to make it easier to refer to them in this documentation):
 
 1. 0-1 for `qu` = no fragments;
-2. 2-2 for `e` = fr1, fr3;
-3. 3-3 for space = fr3;
-4. 4-4 for `b` = fr2, fr3, fr4;
-5. 5-14 for `ixit|annos` = fr4;
+2. 2-2 for `e` = fr1 (O), fr3 (P);
+3. 3-3 for space = fr3 (P);
+4. 4-4 for `b` = fr2 (O), fr3 (P), fr4 (C);
+5. 5-14 for `ixit|annos` = fr4 (C);
 6. 15-17 for space + `XX` = no fragments.
 
 Here we have the text with indexes above, and range numbers below:
 
 ```txt
-012345678901234567
+012345678901234567 indexes
 que bixit|annos XX
-112345555555555666
+112345555555555666 ranges
 ```
 
 ▶️ (3) **assign text values** to each merged range (via `ItemComposer`). This is trivial as it just means getting substrings from the whole text, as delimited by each range. As anticipated above, we defer this processing to this stage to avoid useless processing in previous stages.
 
 ##### Building Text Tree
 
-▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting from a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged segments. The first range is child of the blank root node; each following range is child of the previous range.
+▶️ (4) **build a text tree**: this tree is built (via `ItemComposer`) starting with a blank root node, from which a single branch stems, with descendant nodes corresponding to the merged segments. The first range is child of the blank root node; each following range is child of the previous range.
 
 Each node has **payload data** with this model:
 
@@ -235,11 +235,11 @@ root --> 1[qu]
 5 --> 6[_XX]
 ```
 
->The tree structure may seem an overcomplication when dealing with a single linear branch, but it is really useful when rendering more complex data. For instance, we might be able to transform a linear tree into a binary branching tree, and adopt a parallel segmentation strategy, like in [this example](./samples/tei-simple-ps.md).
+>The tree structure may seem an overcomplication when dealing with a single linear branch, but it is useful when rendering more complex data. For instance, we might be able to transform a linear tree into a binary branching tree, and adopt a parallel segmentation strategy, like in [this example](./samples/tei-simple-ps.md).
 
 Note that here a node contains text with a LF character, which is used to mark the end of the original line. Typically this is adjusted in the next step so that such nodes are split.
 
-▶️ (5) **apply text tree filters**: optionally, apply filters to the tree nodes. Each of the filters takes the input of the previous one and generates a new tree. Among these filters, you will almost always use the _block linear tree text filter_, which splits nodes wherever they include newlines. This ensures that each node has at most 1 newline, and that it appears at the end of its text. This is required to ensure that text blocks will be correctly rendered. For our example, the result of this filter is:
+▶️ (5) **apply text tree filters**: optionally, apply filters to the tree nodes. Each of the filters takes the input of the previous one and generates a new tree. Among these filters, you will almost always use the _block linear tree text filter_, which splits nodes wherever they include newlines (=at text blocks). This ensures that each node has at most 1 newline, and that it always appears at the end of its text. This is required to ensure that text blocks will be correctly rendered. For our example, the result of this filter is:
 
 ```mermaid
 graph LR;
