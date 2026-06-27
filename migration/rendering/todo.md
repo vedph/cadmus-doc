@@ -8,9 +8,9 @@
 
 The components used to export Cadmus data into some markup language (typically XML) are grouped under `Cadmus.Export.ML` assembly. These rely on the general purpose export components, and add logic targeted to build a full-fledged output for third parties (e.g. TEI).
 
-In general, the simplest approach to building TEI from Cadmus objects is via some form of stand-off notation (see e.g. [E. Spadini, M. Turska, XML-TEI Stand-off Markup: One Step Beyond, Digital Philology 2019 225-239](https://serval.unil.ch/resource/serval:BIB_F671BA825955.P001/REF.pdf)). In fact, stand-off practically is the unique solution to solve serious overlap issues in TEI, typically arising when a lot of different structures are to be encoded in the same text.
+In general, the simplest approach to building TEI from Cadmus objects is via some form of stand-off notation (see e.g. [E. Spadini, M. Turska, XML-TEI Stand-off Markup: One Step Beyond, Digital Philology 2019 225-239](https://serval.unil.ch/resource/serval:BIB_F671BA825955.P001/REF.pdf)). In fact, stand-off practically is the only solution to solve serious overlap issues in TEI, typically arising when a lot of different structures are to be encoded in the same text.
 
-In stand-off, annotations are no more embedded in the text, but rather stand side by side to it, and refer to it in various ways. The simplest and probably most popular linking method is just wrapping each portion of text to be annotated with an identifier. For instance, you can just wrap each word in the text in a `seg` element with some `xml:id`, and then refer to it from annotations.
+In stand-off, annotations are no more embedded in the text, but rather stand side by side to it, and refer to it in various ways. The simplest and probably most popular linking method is just wrapping each portion of text to be annotated with an identifier. For instance, you can wrap each word in the text in a `seg` element with an `xml:id`, and then refer to it from annotations.
 
 Thus, stand-off implies that you have separated "layers" for:
 
