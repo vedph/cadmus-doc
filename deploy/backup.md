@@ -21,7 +21,7 @@ nav_order: 4
 
 To backup your Cadmus data, you must:
 
-- backup the **Mongo** databases (data), conventionally named as follows:
+- backup the **Mongo** database (data), conventionally named as follows:
   - `cadmus-PRJ`
 - backup 2 or 3 **PostgreSQL** database(s) (indexes, user accounts, and optionally graph). Conventionally they are named as follows:
   - `cadmus-PRJ` (the index anyway can be rebuilt from data if required)
