@@ -8,22 +8,21 @@ nav_order: 4
 # Data Backup
 
 - [Data Backup](#data-backup)
-  - [Linux](#linux)
-    - [Backup](#backup)
-    - [Cleanup](#cleanup)
-    - [Transfer](#transfer)
-    - [Crontab](#crontab)
+  - [Backup](#backup)
+  - [Restore](#restore)
+  - [Cleanup](#cleanup)
+  - [Transfer - LFTP](#transfer---lftp)
+  - [Transfer - GDrive](#transfer---gdrive)
+  - [Crontab](#crontab)
   - [Host Setup](#host-setup)
     - [MongoDB Client](#mongodb-client)
     - [PostgreSQL Client](#postgresql-client)
     - [LFTP Tool](#lftp-tool)
-  - [Data Restore](#data-restore)
 
 To backup your Cadmus data, you must:
 
-- backup 1 or 2 **Mongo** databases (data and logs). You can leave out logs if you are not interested in keeping audit records. Conventionally they are named as follows:
+- backup the **Mongo** databases (data), conventionally named as follows:
   - `cadmus-PRJ`
-  - `cadmus-PRJ-log`
 - backup 2 or 3 **PostgreSQL** database(s) (indexes, user accounts, and optionally graph). Conventionally they are named as follows:
   - `cadmus-PRJ` (the index anyway can be rebuilt from data if required)
   - `cadmus-PRJ-auth`
@@ -33,11 +32,11 @@ If you expose the database services from your Docker containers, as it is usuall
 
 >Note that usually in Docker omitting `ports` for database services altogether is the safest option. Anyway, exposing the database ports to the loopback address (127.0.0.1) on your host machine is better than exposing them to all interfaces (`- 27017:27017`). Since only the API containers need to access the databases, we could remove the `ports` section entirely from the database services. The API services will still be able to connect using the service name and internal port (e.g. `cadmus-PRJ-mongo:27017`) because they share the same Docker network. This is the most secure configuration as the databases are completely isolated from the host machine's external network interfaces. Anyway, as we need to access the DB locally for backup, it is acceptable to use the loopback address.
 
-## Linux
+In Linux, which is the most typical host, you can just have a `.sh` batch file saving your data somewhere, and then launch it periodically with [crontab](https://crontab.guru).
 
-In Linux, which is the most typical host, you can just have a `.sh` batch file saving your data somewhere, and then launch it periodically with [crontab](https://crontab.guru). Here is an example, which saves all the databases into separate, compressed files, with their date.
+## Backup
 
-### Backup
+👉 In this script replace `PRJ` with your project name.
 
 ```sh
 #!/bin/bash
@@ -76,13 +75,14 @@ echo "Dumping PostgreSQL databases..."
 # export the PostgreSQL password so child processes (pg_dump) can see it
 export PGPASSWORD='postgres'
 
-# Dump cadmus-PRJ (main data)
+# use the -w flag to ensure it fails rather than hangs if something goes wrong
 pg_dump -h 127.0.0.1 -U postgres -d cadmus-PRJ -w | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-pgsql.gz"
-
-# Dump cadmus-PRJ-auth (accounts)
 pg_dump -h 127.0.0.1 -U postgres -d cadmus-PRJ-auth -w | gzip > "${TODAY_BACKUP_DIR}/cadmus-PRJ-auth-pgsql.gz"
 
-echo "Backup completed successfully in ${TODAY_BACKUP_DIR}!"
+# security best practice: unset it after the dump is done
+unset PGPASSWORD
+
+echo "Backup completed successfully in ${TODAY_BACKUP_DIR}"
 ```
 
 ⚠️ Note that usually for PostgreSQL you should set the password in the home folder of your user (get it via `echo $HOME`) in a file named `.pgpass` with this content:
@@ -101,7 +101,58 @@ Anyway, this often does not work because when put it in a script the PGPASSWORD 
 
 💡 If you want to download files, just connect to your VM (using your account credentials) via SCP (use your VM IP and port 22). You can either use GUI like WinSCP or command line tools.
 
-### Cleanup
+## Restore
+
+👉 In this script replace `PRJ` with your project name.
+
+```sh
+#!/bin/bash
+# Restore script for Cadmus databases.
+# Usage: ./restore.sh YYYYMMDD
+
+set -e
+
+# --- Configuration & Validation ---
+BASE_BACKUP_DIR="./backup"
+TARGET_DATE=$1
+
+if [ -z "$TARGET_DATE" ]; then
+    echo "ERROR: Please provide a date folder name (YYYYMMDD) as an argument."
+    echo "Usage: $0 YYYYMMDD"
+    exit 1
+fi
+
+TODAY_BACKUP_DIR="${BASE_BACKUP_DIR}/${TARGET_DATE}"
+
+if [ ! -d "$TODAY_BACKUP_DIR" ]; then
+    echo "ERROR: Backup directory ${TODAY_BACKUP_DIR} does not exist."
+    exit 1
+fi
+
+echo "===================================================="
+echo " Starting Cadmus Database Restore from: ${TARGET_DATE}"
+echo "===================================================="
+
+# --- MongoDB Restore ---
+echo "--> Restoring MongoDB databases via docker exec..."
+
+# Added --drop to clear seeded collections before writing backup data
+if [ -f "${TODAY_BACKUP_DIR}/cadmus-PRJ-mongo.gz" ]; then
+    echo "Restoring cadmus-PRJ..."
+    docker exec -i cadmus-PRJ-mongo mongorestore --drop --archive --gzip < "${TODAY_BACKUP_DIR}/cadmus-PRJ-mongo.gz"
+else
+    echo "WARNING: ${TODAY_BACKUP_DIR}/cadmus-PRJ-mongo.gz not found. Skipping."
+fi
+
+if [ -f "${TODAY_BACKUP_DIR}/cadmus-PRJ-log-mongo.gz" ]; then
+    echo "Restoring cadmus-PRJ-log..."
+    docker exec -i cadmus-PRJ-mongo mongorestore --drop --archive --gzip < "${TODAY_BACKUP_DIR}/cadmus-PRJ-log-mongo.gz"
+else
+    echo "WARNING: ${TODAY_BACKUP_DIR}/cadmus-PRJ-log-mongo.gz not found. Skipping."
+fi
+```
+
+## Cleanup
 
 This script can be periodically run to cleanup the backup folder from oldest dumps.
 
@@ -110,16 +161,20 @@ This script can be periodically run to cleanup the backup folder from oldest dum
 # Script to delete old local backups
 
 # --- Configuration ---
-# Set the base directory where your backup folders are located
+# Match this exactly with your backup script location (use absolute paths if run via cron)
 BASE_BACKUP_DIR="./backup"
 # Number of latest backup folders to KEEP (e.g., 7 days)
 KEEP_DAYS=7
 
 echo "Starting cleanup: retaining the last ${KEEP_DAYS} backup folders in ${BASE_BACKUP_DIR}"
 
-# Find all directories in BASE_BACKUP_DIR, sort them by name (which is the date),
-# skip the latest 'KEEP_DAYS' directories, and delete the rest.
-# The date format (YYYYMMDD) ensures alphabetical sorting is chronological.
+# Ensure directory exists before searching
+if [ ! -d "${BASE_BACKUP_DIR}" ]; then
+    echo "Error: Directory ${BASE_BACKUP_DIR} does not exist."
+    exit 1
+fi
+
+# Find all daily directories, sort chronologically reverse, skip the first X, and delete
 find "${BASE_BACKUP_DIR}" -mindepth 1 -maxdepth 1 -type d | sort -r | tail -n +$((KEEP_DAYS + 1)) | while read dir_to_delete; do
     echo "Deleting old backup folder: ${dir_to_delete}"
     rm -rf "${dir_to_delete}"
@@ -128,9 +183,9 @@ done
 echo "Cleanup completed."
 ```
 
-### Transfer
+## Transfer - LFTP
 
-Of course, you can then **transfer** your files somewhere else, e.g. (this script is placed in `backup` folder):
+Of course, you can then **transfer** your files somewhere else, e.g. (this script is placed in `backup` folder). This script just uses some FTP account.
 
 ```sh
 #!/bin/bash
@@ -140,39 +195,44 @@ Of course, you can then **transfer** your files somewhere else, e.g. (this scrip
 BASE_BACKUP_DIR="./backup"
 DATE_DIR_NAME=`date +%Y%m%d`
 ARCHIVE_NAME="cadmus-backup-${DATE_DIR_NAME}.tar.gz"
+FULL_ARCHIVE_PATH="${BASE_BACKUP_DIR}/${ARCHIVE_NAME}"
 
-# NOTE: For security, use SFTP if your server supports it:
-# Change 'ftp://' to 'sftp://'
 FTP_HOST="ftp.myserver.net"
 FTP_USER="user"
-FTP_PASS="password" # Replace with a real password or read from a secure source
+FTP_PASS="password"
+
+# Verify source folder exists
+if [ ! -d "${BASE_BACKUP_DIR}/${DATE_DIR_NAME}" ]; then
+    echo "ERROR: Today's backup directory (${BASE_BACKUP_DIR}/${DATE_DIR_NAME}) not found!"
+    exit 1
+fi
 
 # --- Archiving ---
 echo "Creating single archive for upload: ${ARCHIVE_NAME}"
-
-# Create a tarball of the daily folder
-tar -czf "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}" -C "${BASE_BACKUP_DIR}" "${DATE_DIR_NAME}"
+tar -czf "${FULL_ARCHIVE_PATH}" -C "${BASE_BACKUP_DIR}" "${DATE_DIR_NAME}"
 
 # --- Upload ---
 echo "Starting upload using lftp..."
 
-# Use lftp to connect, set prompt off, put the file, and quit
-lftp -e "set cmd:prompt ''; put ${ARCHIVE_NAME}; bye" -u "${FTP_USER}","${FTP_PASS}" "${FTP_HOST}"
+# Fixed: Pass the explicit local path to the 'put' command
+lftp -e "set cmd:prompt ''; put ${FULL_ARCHIVE_PATH}; bye" -u "${FTP_USER}","${FTP_PASS}" "${FTP_HOST}"
 
 # Check the exit status of lftp
 if [ $? -eq 0 ]; then
     echo "Upload completed successfully!"
-    # Clean up the single archive file after upload (keep the original folder)
-    echo "Removing local archive file: ${ARCHIVE_NAME}"
-    rm "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}"
+    echo "Removing local archive file: ${FULL_ARCHIVE_PATH}"
+    rm "${FULL_ARCHIVE_PATH}"
 else
-    echo "ERROR: Upload failed! Keeping archive for inspection."
+    echo "ERROR: Upload failed! Keeping archive for inspection at ${FULL_ARCHIVE_PATH}"
+    exit 1
 fi
 
 echo "Transfer process finished."
 ```
 
-This script just uses some FTP account. Another popular option is using **GDrive** as your backup target. To this end, you could use a script like this:
+## Transfer - GDrive
+
+Another popular option is using **GDrive** as your backup target. To this end, you could use a script like this:
 
 ```sh
 #!/bin/bash
@@ -182,22 +242,31 @@ This script just uses some FTP account. Another popular option is using **GDrive
 BASE_BACKUP_DIR="./backup"
 DATE_DIR_NAME=$(date +%Y%m%d)
 ARCHIVE_NAME="cadmus-backup-${DATE_DIR_NAME}.tar.gz"
+FULL_ARCHIVE_PATH="${BASE_BACKUP_DIR}/${ARCHIVE_NAME}"
+
 RCLONE_REMOTE="gdrive"           # Name of your rclone remote
 RCLONE_DESTINATION="backups"     # Folder in Google Drive
 
+# Verify source folder exists
+if [ ! -d "${BASE_BACKUP_DIR}/${DATE_DIR_NAME}" ]; then
+    echo "ERROR: Today's backup directory (${BASE_BACKUP_DIR}/${DATE_DIR_NAME}) not found!"
+    exit 1
+fi
+
 # --- Archiving ---
 echo "Creating archive: ${ARCHIVE_NAME}"
-tar -czf "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}" -C "${BASE_BACKUP_DIR}" "${DATE_DIR_NAME}"
+tar -czf "${FULL_ARCHIVE_PATH}" -C "${BASE_BACKUP_DIR}" "${DATE_DIR_NAME}"
 
 # --- Upload ---
 echo "Uploading to Google Drive via rclone..."
-rclone copy "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}" "${RCLONE_REMOTE}:${RCLONE_DESTINATION}" --progress
+rclone copy "${FULL_ARCHIVE_PATH}" "${RCLONE_REMOTE}:${RCLONE_DESTINATION}" --progress
 
 if [ $? -eq 0 ]; then
     echo "Upload successful. Cleaning up local archive..."
-    rm "${BASE_BACKUP_DIR}/${ARCHIVE_NAME}"
+    rm "${FULL_ARCHIVE_PATH}"
 else
-    echo "ERROR: Upload failed. Archive retained for inspection."
+    echo "ERROR: Upload failed. Archive retained for inspection at ${FULL_ARCHIVE_PATH}"
+    exit 1
 fi
 
 echo "Backup process complete."
@@ -234,7 +303,7 @@ To **configure rclone** with your GDrive account you need a headless setup via i
 scp ~/.config/rclone/rclone.conf user@your-vm:/home/user/.config/rclone/rclone.conf
 ```
 
-### Crontab
+## Crontab
 
 You could launch all these scripts sequentially:
 
@@ -324,30 +393,4 @@ Install the `lftp` tool:
 
 ```sh
 sudo apt install -y lftp
-```
-
-## Data Restore
-
-To restore databases, assuming that you used the above backup procedure:
-
-```sh
-# (1) MONGO
-# restore and replace main data
-mongorestore --port=27017 --archive=cadmus-PRJ-mongo.gz --gzip --drop
-# restore and replace logs (not required)
-mongorestore --port=27017 --archive=cadmus-PRJ-log-mongo.gz --gzip --drop
-
-# (2) POSTGRES
-export PGPASSWORD='postgres'
-# 1. terminate active connections (sometimes needed if an app is holding the DB open)
-psql -h 127.0.0.1 -U postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'cadmus-PRJ';"
-# 2. drop and Recreate the databases
-psql -h 127.0.0.1 -U postgres -c "DROP DATABASE \"cadmus-PRJ\";"
-psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE \"cadmus-PRJ\";"
-psql -h 127.0.0.1 -U postgres -c "DROP DATABASE \"cadmus-PRJ-auth\";"
-psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE \"cadmus-PRJ-auth\";"
-# 3. perform the restore
-gunzip -c cadmus-PRJ-pgsql.gz | psql -h 127.0.0.1 -U postgres -d cadmus-PRJ
-gunzip -c cadmus-PRJ-auth-pgsql.gz | psql -h 127.0.0.1 -U postgres -d cadmus-PRJ-auth
-unset PGPASSWORD
 ```
