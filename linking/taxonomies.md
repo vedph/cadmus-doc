@@ -1,6 +1,11 @@
 # Taxonomy Trees
 
-- 🌐  [taxonomies store](https://github.com/vedph/taxo-store)
+- 🌐 [taxonomies store](https://github.com/vedph/taxo-store)
+- ⚙️ [development](../develop/taxostore.md)
+
+- [Taxonomy Trees](#taxonomy-trees)
+  - [Store](#store)
+  - [Data Source](#data-source)
 
 Thesauri provide relatively short and stable taxonomies; they can be changed, either by editing or by importing them, but this usually does not happen often, and editing a thesaurus requires more access privileges.
 
@@ -36,7 +41,7 @@ The taxonomies subsystem provides:
 - full backend logic to manage taxonomies.
 - API endpoints ready to be integrated in your API.
 - [frontend components](https://github.com/vedph/taxo-store-shell) to integrate in your frontend. Cadmus provides a part editor based on these components.
-- a Cadmus part, [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md), provides a ready to use part which allows user to pick nodes from any specific tree, while also editing it. This part lets you pick any number of node IDs from a single tree. The tree is specified as the part's role ID, and lookup and editing parameters can be customized via backend settings for each combination of part type ID and part role ID.
+- TODO UPDATE a Cadmus part, [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md), provides a ready to use part which allows user to pick nodes from any specific tree, while also editing it. This part lets you pick any number of node IDs from a single tree. The tree is specified as the part's role ID, and lookup and editing parameters can be customized via backend settings for each combination of part type ID and part role ID.
 
 ## Data Source
 
