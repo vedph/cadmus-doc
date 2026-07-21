@@ -45,37 +45,37 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## General Parts
 
-- ⚙️ [models.json](https://github.com/vedph/cadmus-general/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/models.json)
 
 - parts:
-  - [asserted historical dates](https://github.com/vedph/cadmus-general/blob/master/docs/asserted-historical-dates.md)
-  - [bibliography](https://github.com/vedph/cadmus-general/blob/master/docs/bibliography.md)
-  - [categories](https://github.com/vedph/cadmus-general/blob/master/docs/categories.md)
-  - [chronotopes](https://github.com/vedph/cadmus-general/blob/master/docs/chronotopes.md)
-  - [comment](https://github.com/vedph/cadmus-general/blob/master/docs/comment.md)
-  - [decorated counts](https://github.com/vedph/cadmus-general/blob/master/docs/decorated-counts.md)
-  - [district location](https://github.com/vedph/cadmus-general/blob/master/docs/district-location.md)
-  - [document references](https://github.com/vedph/cadmus-general/blob/master/docs/doc-references.md)
-  - [external bibliography](https://github.com/vedph/cadmus-general/blob/master/docs/ext-bibliography.md)
-  - [external IDs](https://github.com/vedph/cadmus-general/blob/master/docs/external-ids.md)
-  - [flags](https://github.com/vedph/cadmus-general/blob/master/docs/flags.md)
-  - [historical date](https://github.com/vedph/cadmus-general/blob/master/docs/historical-date.md)
-  - [historical events](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md)
-  - [index keywords](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)
-  - [metadata](https://github.com/vedph/cadmus-general/blob/master/docs/metadata.md)
-  - [names](https://github.com/vedph/cadmus-general/blob/master/docs/names.md)
-  - [note](https://github.com/vedph/cadmus-general/blob/master/docs/note.md)
-  - [physical measurements](https://github.com/vedph/cadmus-general/blob/master/docs/physical-measurements.md)
-  - [physical states](https://github.com/vedph/cadmus-general/blob/master/docs/physical-states.md)
-  - [pin-links](https://github.com/vedph/cadmus-general/blob/master/docs/pin-links.md)
-  - [tiled text](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text.md)
-  - [tiled text layer](https://github.com/vedph/cadmus-general/blob/master/docs/tiled-text-layer.md)
-  - [token text](https://github.com/vedph/cadmus-general/blob/master/docs/token-text.md)
-  - [token text layer](https://github.com/vedph/cadmus-general/blob/master/docs/token-text-layer.md)
+  - [asserted historical dates](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/asserted-historical-dates.md)
+  - [bibliography](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/bibliography.md)
+  - [categories](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/categories.md)
+  - [chronotopes](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/chronotopes.md)
+  - [comment](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/comment.md)
+  - [decorated counts](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/decorated-counts.md)
+  - [district location](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/district-location.md)
+  - [document references](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/doc-references.md)
+  - [external bibliography](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/ext-bibliography.md)
+  - [external IDs](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/external-ids.md)
+  - [flags](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/flags.md)
+  - [historical date](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/historical-date.md)
+  - [historical events](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/historical-events.md)
+  - [index keywords](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/index-keywords.md)
+  - [metadata](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/metadata.md)
+  - [names](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/names.md)
+  - [note](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/note.md)
+  - [physical measurements](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/physical-measurements.md)
+  - [physical states](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/physical-states.md)
+  - [pin-links](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/pin-links.md)
+  - [tiled text](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/tiled-text.md)
+  - [tiled text layer](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/tiled-text-layer.md)
+  - [token text](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/token-text.md)
+  - [token text layer](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/token-text-layer.md)
 - fragments:
-  - [chronology](https://github.com/vedph/cadmus-general/blob/master/docs/fr.chronology.md)
-  - [comment](https://github.com/vedph/cadmus-general/blob/master/docs/fr.comment.md)
-  - [pin-links]((https://github.com/vedph/cadmus-general/blob/master/docs/fr.pin-links.md).md)
+  - [chronology](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/fr.chronology.md)
+  - [comment](https://github.com/vedph/cadmus-core/tree/master/docs/models/general/fr.comment.md)
+  - [pin-links]((https://github.com/vedph/cadmus-core/tree/master/docs/models/general/fr.pin-links.md).md)
 
 - [taxonomies subsystem](taxonomies.md):
   - [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md)
@@ -144,12 +144,12 @@ Bricks are reusable UI components mostly used in part or fragment editors. Many 
 
 ## Philology Parts
 
-- ⚙️ [models.json](https://github.com/vedph/cadmus-philology/blob/master/docs/models.json)
+- ⚙️ [models.json](https://github.com/vedph/cadmus-core/blob/master/docs/models/philology/models.json)
 
 - fragments:
-  - [apparatus](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md)
-  - [orthography](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.orthography.md)
-  - †[quotations](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.quotations.md)
-  - †[witnesses](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.witnesses.md)
+  - [apparatus](https://github.com/vedph/cadmus-core/blob/master/docs/models/philology/fr.apparatus.md)
+  - [orthography](https://github.com/vedph/cadmus-core/blob/master/docs/models/philology/fr.orthography.md)
+  - †[quotations](https://github.com/vedph/cadmus-core/blob/master/docs/models/philology/fr.quotations.md)
+  - †[witnesses](https://github.com/vedph/cadmus-core/blob/master/docs/models/philology/fr.witnesses.md)
 
 >`†` marks obsoleted parts.
