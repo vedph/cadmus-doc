@@ -7,41 +7,38 @@ nav_order: 8
 # Cadmus Tool
 
 - [Cadmus Tool](#cadmus-tool)
-  - [Commands](#commands)
-    - [Database](#database)
-      - [Create Database Command](#create-database-command)
-      - [Index Database Command](#index-database-command)
-      - [Seed Database Command](#seed-database-command)
-      - [Seed Users Command](#seed-users-command)
-      - [Graph One Command](#graph-one-command)
-      - [Graph Many Command](#graph-many-command)
-      - [Update Graph Classes Command](#update-graph-classes-command)
-      - [Build SQL Command](#build-sql-command)
-      - [Run Mongo Command](#run-mongo-command)
-    - [Accounts](#accounts)
-      - [Add User Command](#add-user-command)
-      - [Add User Roles Command](#add-user-roles-command)
-      - [Delete User Command](#delete-user-command)
-      - [Delete User Roles Command](#delete-user-roles-command)
-      - [List Users Command](#list-users-command)
-      - [Update User Command](#update-user-command)
-    - [Export](#export)
-      - [Get Object Command](#get-object-command)
-      - [Graph Dereference Mappings](#graph-dereference-mappings)
-    - [Import](#import)
-      - [Graph Import Command](#graph-import-command)
-      - [Thesaurus Import Command](#thesaurus-import-command)
-        - [File Format](#file-format)
+  - [Database](#database)
+    - [Create Database Command](#create-database-command)
+    - [Index Database Command](#index-database-command)
+    - [Seed Database Command](#seed-database-command)
+    - [Seed Users Command](#seed-users-command)
+    - [Graph One Command](#graph-one-command)
+    - [Graph Many Command](#graph-many-command)
+    - [Update Graph Classes Command](#update-graph-classes-command)
+    - [Build SQL Command](#build-sql-command)
+    - [Run Mongo Command](#run-mongo-command)
+  - [Accounts](#accounts)
+    - [Add User Command](#add-user-command)
+    - [Add User Roles Command](#add-user-roles-command)
+    - [Delete User Command](#delete-user-command)
+    - [Delete User Roles Command](#delete-user-roles-command)
+    - [List Users Command](#list-users-command)
+    - [Update User Command](#update-user-command)
+  - [Export](#export)
+    - [Get Object Command](#get-object-command)
+    - [Graph Dereference Mappings](#graph-dereference-mappings)
+  - [Import](#import)
+    - [Graph Import Command](#graph-import-command)
+    - [Thesaurus Import Command](#thesaurus-import-command)
+      - [File Format](#file-format)
   - [Plugin Architecture](#plugin-architecture)
     - [Setup](#setup)
 
 The main Cadmus configuration and utility command-line tool is `cadmus-tool`.
 
-## Commands
+## Database
 
-### Database
-
-#### Create Database Command
+### Create Database Command
 
 🎯 Create an index or graph database with its own schema.
 
@@ -56,7 +53,7 @@ The main Cadmus configuration and utility command-line tool is `cadmus-tool`.
 ./cadmus-tool create-db graph cadmus-itinera-graph
 ```
 
-#### Index Database Command
+### Index Database Command
 
 🎯 Index the specified Cadmus database. If the index database does not exist, it will be created; if it exists, it will be cleared if requested.
 
@@ -75,7 +72,7 @@ This requires a plugin with providers for the repository factory and the parts s
 ./cadmus-tool index cadmus-itinera ./plugins/Cadmus.Itinera.Services/seed-profile.json -g repository-provider.itinera
 ```
 
-#### Seed Database Command
+### Seed Database Command
 
 🎯 Create a new Cadmus MongoDB database (if the specified database does not already exists), and seed it with a specified number of random items.
 
@@ -93,7 +90,7 @@ This requires a plugin with providers for the repository factory and the parts s
 ./cadmus-tool seed cadmus-itinera ./plugins/Cadmus.Itinera.Services/seed-profile.json -g repository-provider.itinera -s seeder-factory-provider.itinera -c 10 -h
 ```
 
-#### Seed Users Command
+### Seed Users Command
 
 🎯 Seed user accounts into a Cadmus auth database from a JSON file.
 
@@ -132,7 +129,7 @@ The seed file is like this:
 ]
 ```
 
-#### Graph One Command
+### Graph One Command
 
 🎯 Map a single item/part into the graph database.
 
@@ -151,7 +148,7 @@ The seed file is like this:
 ./cadmus-tool graph-one cadmus-itinera 4a0ce97e-84d1-417d-9fb0-a91d9dfc4da7 -g repository-provider.itinera -px
 ```
 
-#### Graph Many Command
+### Graph Many Command
 
 🎯 Map all the items into the target graph. This is used to rebuild the graph database from Cadmus data.
 
@@ -167,7 +164,7 @@ The seed file is like this:
 ./cadmus-tool graph-many cadmus-itinera repository-provider.itinera
 ```
 
-#### Update Graph Classes Command
+### Update Graph Classes Command
 
 🎯 Update the index of nodes classes in the index database. This is a potentially long task, depending on the number of nodes and the depth of class hierarchies.
 
@@ -181,7 +178,7 @@ The seed file is like this:
 ./cadmus-tool graph-cls cadmus-itinera ./plugins/Cadmus.Itinera.Services/seed-profile.json
 ```
 
-#### Build SQL Command
+### Build SQL Command
 
 🎯 Build SQL code for querying the Cadmus index database, just once or interactively.
 
@@ -199,7 +196,7 @@ The seed file is like this:
 ./cadmus-tool build-sql -q "[dsc*=even]"
 ```
 
-#### Run Mongo Command
+### Run Mongo Command
 
 🎯 Run Mongo a script targeting the specified database.
 
@@ -232,9 +229,9 @@ Supported commands:
    - `db.collection` - directly access a collection with dot notation.
    - `db.getCollection("name")` - access a collection by name.
 
-### Accounts
+## Accounts
 
-#### Add User Command
+### Add User Command
 
 🎯 Add a user account.
 
@@ -242,7 +239,7 @@ Supported commands:
 ./cadmus-tool add-user NAME PASSWORD EMAIL FIRST_NAME LAST_NAME
 ```
 
-#### Add User Roles Command
+### Add User Roles Command
 
 🎯 Add role(s) to a user account.
 
@@ -250,7 +247,7 @@ Supported commands:
 ./cadmus-tool add-user-roles NAME ROLE1 ROLEn
 ```
 
-#### Delete User Command
+### Delete User Command
 
 🎯 Delete a user account.
 
@@ -258,7 +255,7 @@ Supported commands:
 ./cadmus-tool delete-user USER_NAME [-y]
 ```
 
-#### Delete User Roles Command
+### Delete User Roles Command
 
 🎯 Delete role(s) from a user account.
 
@@ -266,7 +263,7 @@ Supported commands:
 ./cadmus-tool delete-user-roles
 ```
 
-#### List Users Command
+### List Users Command
 
 🎯 List user accounts.
 
@@ -274,7 +271,7 @@ Supported commands:
 ./cadmus-tool list-users
 ```
 
-#### Update User Command
+### Update User Command
 
 🎯 Update a user account.
 
@@ -282,9 +279,9 @@ Supported commands:
 ./cadmus-tool update-user
 ```
 
-### Export
+## Export
 
-#### Get Object Command
+### Get Object Command
 
 🎯 Get the JSON code representing an item or a part's content, optionally converted in XML.
 
@@ -301,7 +298,7 @@ Supported commands:
 ./cadmus-tool get-obj cadmus 8e5d5b5d-4b27-4d00-9038-f611a8e199b9 c:/users/dfusi/desktop -g repository-provider.itinera -p -x
 ```
 
-#### Graph Dereference Mappings
+### Graph Dereference Mappings
 
 🎯 Dereference mappings in a JSON mappings file by outputting a fully dereferenced list of mappings into another file. This can then be imported via [graph-import](#graph-import-command).
 
@@ -383,9 +380,9 @@ Supported commands:
 ./cadmus-tool graph-deref c:/users/dfusi/desktop/mappings.json c:/users/dfusi/desktop/mappings-d.json
 ```
 
-### Import
+## Import
 
-#### Graph Import Command
+### Graph Import Command
 
 🎯 Import preset nodes, triples, node mappings, or thesauri class nodes into graph (the JSON document references must be [dereferenced](#graph-dereference-mappings) first!).
 
@@ -471,7 +468,7 @@ All data files are JSON documents, having as their root element an **array** of 
 ]
 ```
 
-#### Thesaurus Import Command
+### Thesaurus Import Command
 
 🎯 Import one or more thesauri from one or more file(s) into a Cadmus database. Files can be JSON, CSV, XLS, XLSX and are selected according to their extension. Any unknown extension is treated as a JSON source.
 
@@ -494,7 +491,7 @@ All data files are JSON documents, having as their root element an **array** of 
 ./cadmus-tool thes-import c:/users/dfusi/desktop/thesauri/*.json cadmus-itinera -d
 ```
 
-##### File Format
+#### File Format
 
 - **JSON**: a single thesaurus as an _object_, or a list of thesauri as an _array of objects_. Each object is encoded like in this sample:
 
