@@ -24,7 +24,7 @@ One of the key concepts in Cadmus is **reuse**, which is obtained via modularity
 
 Using a metaphor, imagine a set of 📦 _boxes_ (named _items_), each representing a data record, whatever its type. Every box has a small 🏷️ _label_ (=an essential set of metadata), and may contain any number of 🚗 _objects_ (named _parts_; the name comes from the fact that they are the parts of a macro-model, built by aggregation). The boxes with these objects are stored on shelves, i.e. the database infrastructure.
 
->In turn, the objects contained in boxes are often built by assembling smaller pieces, known as _bricks_. For instance, the same wheels used in many different types of toy cars could be bricks. Bricks are small, frequently-reused sub-models, with their corresponding UI. For instance, a datation model can be reused in any object model including a datation; so we have a reusable brick model for it, and a corresponding brick UI component, which can be integrated in the object's editor UI. You can play with some stock bricks [here](https://cadmus-bricks-v3.fusi-soft.com).
+>In turn, the objects contained in boxes are often built by assembling smaller pieces, known as _bricks_. For instance, the same wheels used in many different types of toy cars could be bricks. Bricks are small, frequently-reused sub-models, with their corresponding UI. For instance, a datation model can be reused in any object model including a datation; so we have a reusable brick model for it, and a corresponding brick UI component, which can be integrated in the object's editor UI. You can play with some stock bricks at <https://cadmus-bricks-v3.fusi-soft.com>.
 
 Optionally, you also have a set of 🖼️ _stickers_ you can attach to any of these objects; these are the [thesauri](models/thesauri), i.e. predefined (yet editable) taxonomies used in your data. For instance, think of an object representing a set of keywords to attach to your item; for each of these keywords, you might want to use a language identifier; and in its UI, the language might be selected from a dropdown list. This list of languages would thus be a thesaurus, having an entry for each language, with an ID (maybe an [ISO639](https://www.iso.org/iso-639-language-codes.html) language code) and a human-friendly label.
 
@@ -60,28 +60,18 @@ In the end, this tool will allow you to build your own data with your own models
 
 🌐 The main Cadmus repositories are:
 
-- backend:
-  - [core](https://github.com/vedph/cadmus_core)
-  - [general models](https://github.com/vedph/cadmus-general)
-  - [philological models](https://github.com/vedph/cadmus-philology)
+- **backend**:
+  - [core and CLI tool](https://github.com/vedph/cadmus-core)
   - [codicological models](https://github.com/vedph/cadmus-codicology)
   - [geographic models](https://github.com/vedph/cadmus-geo)
   - [epigraphic models](https://github.com/vedph/cadmus-epigraphy)
-  - [API layer](https://github.com/vedph/cadmus-api)
   - [bibliographic subsystem](https://github.com/vedph/cadmus_biblioapi) for an independent bibliographic database in a RDBMS
-  - [data migration subsystem](https://github.com/vedph/cadmus-migration-v2) for data import/export and editor preview, with sample [UI preview templates](https://github.com/vedph/cadmus-previews)
-  - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) with its [backend API](https://github.com/vedph/cadmus-graph-studio-api): 👉 [graph studio demo](https://cadmus-graph-studio.fusi-soft.com/)
-  - [CLI tool](https://github.com/vedph/cadmus_tool): a command line, multiple-platforms tool with many utility functions
-- frontend:
+  - sample [UI preview templates](https://github.com/vedph/cadmus-previews)
+  - [data graph UI tools](https://github.com/vedph/cadmus-graph-studio-app) 👉 [graph studio demo](https://cadmus-graph-studio.fusi-soft.com/)
+- **frontend**:
   - [UI infrastructure](https://github.com/vedph/cadmus-shell-v3)
   - [UI widgets ("bricks")](https://github.com/vedph/cadmus-bricks-shell-v3): 👉 [online demo](http://cadmus-bricks-v3.fusi-soft.com/)
   - [Angular extensions for Annotorious](https://github.com/vedph/ngx-annotorious): used for visual annotations
-- documentation: <https://github.com/vedph/cadmus-doc> which feeds this site at <https://vedph.github.io/cadmus-doc>
+- **documentation**: <https://github.com/vedph/cadmus-doc> which feeds this site at <https://vedph.github.io/cadmus-doc>
 
-Additionally, each project has its own repositories. Typically, a project has:
-
-- a _core repository_ for its specific models.
-- an _API repository_ for the thin wrapper around the shared API infrastructure. This also contains the configuration file which defines items facets and thesauri.
-- an _app repository_ for the frontend web app. According to the project's complexity, this is just a thin wrapper around the shared UI infrastructure, or can add editors for specific models.
-
-You will find all the Cadmus projects created by myself at the [VeDPH GitHub](https://github.com/vedph).
+Additionally, each project has its own repositories. You will find all the Cadmus projects created by myself at the [VeDPH GitHub](https://github.com/vedph).

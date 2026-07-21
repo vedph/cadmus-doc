@@ -60,9 +60,9 @@ The **import** methods provided in the Cadmus editor may adopt 3 different behav
 
 ### Editing in Cadmus CLI
 
-TODO
+If you are not using the UI, you can use the Cadmus [command line tool](../tools/cadmus-tool.md#thesaurus-import-command) for more fine-grained imports, or also generic MongoDB commands, should you need to directly patch the database.
 
-⚙️ If you are not using the UI, you can use the Cadmus [command line tool](https://github.com/vedph/cadmus_tool?tab=readme-ov-file#thesaurus-import-command) for more fine-grained imports, or also generic MongoDB commands, should you need to directly patch the database. You can also use the Cadmus [data migration command line tool](https://github.com/vedph/cadmus-migration-v3) for bulk thesauri export. To manually patch the database (for advanced users!):
+>You can also use the Cadmus [data migration command line tool](../tools/cadmus-mig.md#dump-thesauri-command) for bulk thesauri export.
 
 ### Editing Manually
 
