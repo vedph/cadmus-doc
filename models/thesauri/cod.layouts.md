@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Layouts"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 25
----
-
 # Thesauri - Codicology - Layouts
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-layouts.md)

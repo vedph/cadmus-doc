@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Decorations"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 22
----
-
 # Thesauri - Codicology - Decorations
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-decorations.md)

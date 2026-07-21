@@ -1,10 +1,3 @@
----
-title: "Models - Dynamic Lookup" 
-layout: default
-parent: Models
-nav_order: 4
----
-
 # Dynamic Lookup
 
 - [Dynamic Lookup](#dynamic-lookup)

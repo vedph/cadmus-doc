@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Edits"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 23
----
-
 # Thesauri - Codicology - Edits
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-edits.md)

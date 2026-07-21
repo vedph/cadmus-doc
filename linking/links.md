@@ -1,3 +1,10 @@
+---
+title: "Links" 
+layout: default
+parent: "Linking Data"
+nav_order: 3
+---
+
 # Links
 
 An essential part of data linking in Cadmus is represented by linking its data to external or internal resources.

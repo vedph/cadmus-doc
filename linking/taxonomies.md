@@ -1,3 +1,10 @@
+---
+title: "Taxonomy Trees" 
+layout: default
+parent: "Linking Data"
+nav_order: 2
+---
+
 # Taxonomy Trees
 
 - 🌐 [taxonomies store](https://github.com/vedph/taxo-store)

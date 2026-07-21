@@ -1,10 +1,3 @@
----
-title: "Models - Taxonomies" 
-layout: default
-parent: Models
-nav_order: 5
----
-
 # Taxonomies
 
 In most cases, taxonomies in Cadmus are relatively static and small data, defined via [thesauri](thesauri.md). Some projects anyway have more specialized requirements for specific taxonomies which could not be optimally satisfied by thesauri alone.

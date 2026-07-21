@@ -1,10 +1,3 @@
----
-title: "Thesauri Examples"
-layout: default
-parent: Models
-nav_order: 3
----
-
 # Thesauri Examples
 
 Here you can find example thesauri for each general model. Parts marked by 🔖 may have [role-dependent thesauri](../thesauri#role-dependent-thesauri): a role-dependent thesaurus ID has the role suffixed to its ID after a `_` and before the `@` language identifier.

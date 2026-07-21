@@ -1,10 +1,3 @@
----
-title: "Thesauri - Pin Links"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 18
----
-
 # Thesauri - Pin Links
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/pin-links.md)

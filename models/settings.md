@@ -2,7 +2,7 @@
 title: "Models - Settings"
 layout: default
 parent: Models
-nav_order: 6
+nav_order: 2
 ---
 
 # Editor Settings

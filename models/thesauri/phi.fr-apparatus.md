@@ -1,10 +1,3 @@
----
-title: "Thesauri - PHI Apparatus Fragment"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 41
----
-
 # Thesauri - Philology - Apparatus Fragment
 
 - 🌐 [part](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md)

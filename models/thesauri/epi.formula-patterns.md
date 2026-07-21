@@ -1,10 +1,3 @@
----
-title: "Thesauri - EPI Formula Patterns"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 34
----
-
 # Thesauri - Epigraphy - Formula Patterns
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-formula-patterns.md)

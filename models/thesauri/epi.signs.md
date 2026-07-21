@@ -1,10 +1,3 @@
----
-title: "Thesauri - EPI Signs"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 31
----
-
 # Thesauri - Epigraphy - Signs
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-signs.md)

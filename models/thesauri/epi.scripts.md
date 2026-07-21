@@ -1,10 +1,3 @@
----
-title: "Thesauri - EPI Scripts"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 30
----
-
 # Thesauri - Epigraphy - Scripts
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-scripts.md)

@@ -1,10 +1,3 @@
----
-title: "Thesauri - EPI Support"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 31
----
-
 # Thesauri - Epigraphy - Support
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-support.md)

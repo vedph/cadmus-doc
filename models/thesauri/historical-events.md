@@ -1,10 +1,3 @@
----
-title: "Thesauri - Historical Events"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 11
----
-
 # Thesauri - Historical Events
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md) (role-dependent)

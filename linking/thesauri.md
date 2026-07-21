@@ -1,3 +1,10 @@
+---
+title: "Thesauri" 
+layout: default
+parent: "Linking Data"
+nav_order: 1
+---
+
 # Thesauri
 
 - [Thesauri](#thesauri)

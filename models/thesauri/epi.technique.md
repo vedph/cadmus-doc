@@ -1,10 +1,3 @@
----
-title: "Thesauri - EPI Support Technique"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 33
----
-
 # Thesauri - Epigraphy - Technique
 
 - 🌐 [part](https://github.com/vedph/cadmus-epigraphy/blob/master/docs/epi-technique.md)

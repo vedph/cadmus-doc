@@ -1,10 +1,3 @@
----
-title: "Thesauri - Physical States"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 17
----
-
 # Thesauri - Physical States
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/physical-states.md)

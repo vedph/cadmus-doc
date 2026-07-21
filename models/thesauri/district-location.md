@@ -1,10 +1,3 @@
----
-title: "Thesauri - District Location"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 7
----
-
 # Thesauri - District Location
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/district-location.md)

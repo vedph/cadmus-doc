@@ -1,10 +1,3 @@
----
-title: "Thesauri - Names"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 14
----
-
 # Thesauri - Names
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/names.md)

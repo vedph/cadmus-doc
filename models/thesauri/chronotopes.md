@@ -1,10 +1,3 @@
----
-title: "Thesauri - Chronotopes"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 4
----
-
 # Thesauri - Chronotopes
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/chronotopes.md)

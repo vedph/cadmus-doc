@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Hands"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 24
----
-
 # Thesauri - Codicology - Hands
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-hands.md)

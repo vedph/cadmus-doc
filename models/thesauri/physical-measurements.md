@@ -1,10 +1,3 @@
----
-title: "Thesauri - Physical Measurements"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 16
----
-
 # Thesauri - Physical Measurements
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/physical-measurements.md)

@@ -1,10 +1,3 @@
----
-title: "Thesauri - Index Keywords"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 12
----
-
 # Thesauri - Index Keywords
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)

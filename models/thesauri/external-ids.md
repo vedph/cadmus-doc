@@ -1,10 +1,3 @@
----
-title: "Thesauri - External IDs"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 9
----
-
 # Thesauri - External IDs
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/external-ids.md)

@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Bindings"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 20
----
-
 # Thesauri - Codicology - Bindings
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-bindings.md)

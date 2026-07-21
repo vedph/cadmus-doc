@@ -1,10 +1,3 @@
----
-title: "Thesauri - Document References"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 8
----
-
 # Thesauri - Document References
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/chronotopes.md)

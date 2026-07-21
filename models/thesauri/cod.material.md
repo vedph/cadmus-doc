@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Material"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 26
----
-
 # Thesauri - Codicology - Material
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-material.md)

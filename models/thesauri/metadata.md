@@ -1,10 +1,3 @@
----
-title: "Thesauri - Metadata"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 13
----
-
 # Thesauri - Metadata
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/index-keywords.md)

@@ -1,3 +1,9 @@
+---
+title: "Linking Data" 
+layout: default
+nav_order: 3
+---
+
 # Linking Data
 
 Linking data is an essential task to create networks of objects. In Cadmus, links refer to these main areas:

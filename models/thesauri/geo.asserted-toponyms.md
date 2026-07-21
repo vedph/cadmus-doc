@@ -1,10 +1,3 @@
----
-title: "Thesauri - GEO Asserted Toponyms"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 37
----
-
 # Thesauri - Geography - Asserted Toponyms
 
 - 🌐 [part](https://github.com/vedph/cadmus-geo/blob/master/docs/asserted-toponyms.md)

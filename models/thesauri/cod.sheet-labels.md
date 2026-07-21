@@ -1,10 +1,3 @@
----
-title: "Thesauri - COD Sheet Labels"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 27
----
-
 # Thesauri - Codicology - Sheet Labels
 
 - 🌐 [part](https://github.com/vedph/cadmus-codicology/blob/master/docs/cod-sheet-labels.md)

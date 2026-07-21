@@ -1,10 +1,3 @@
----
-title: "Thesauri - Comment"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 5
----
-
 # Thesauri - Comment
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/comment.md)

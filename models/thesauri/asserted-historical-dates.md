@@ -1,10 +1,3 @@
----
-title: "Thesauri - Asserted Historical Dates"
-layout: default
-parent: "Thesauri Examples"
-nav_order: 1
----
-
 # Thesauri - Asserted Historical Dates
 
 - 🌐 [part](https://github.com/vedph/cadmus-general/blob/master/docs/asserted-historical-dates.md)
