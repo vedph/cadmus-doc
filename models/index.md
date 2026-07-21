@@ -22,13 +22,15 @@ Items are the top-level objects in a Cadmus database. You can think of them as b
 
 Items have a fixed set of **metadata** (the label attached to the box):
 
-- id: a GUID uniquely and globally identifying the item.
+- id: a GUID uniquely and globally identifying the item. This is assigned automatically.
 - title: a human-friendly title for the item.
 - description: a short description of the item.
 - sort key: a string used to sort items in the editor. This is calculated according to item's metadata.
 - facet: the item's facet ID. A facet tells which parts can be put inside an item, with all their metadata. So you can think of the facet as the "type" of an item; even if this is open and dynamic, because at any time we can add new part definitions to the facet to extend it.
 - group ID: an arbitrary string used to virtually group all the items sharing that string value. For instance, you might have a set of epigrams belonging to a notebook called H5, and assign H5 as the group ID to each item representing an epigram.
-- flags: editorial flags attached to the item. These are defined per-project up to a maximum of 32, and represent editorial states like draft, completed, revised, published, etc.
+- flags: editorial flags attached to the item. These are defined per-project up to a maximum of 32, and represent editorial states which can be toggled on or off, like draft, completed, revised, published, etc.
+
+>To provide more additional, generic metadata to an item (e.g. for author names, revisor names, etc.) you can add it the metadata part, whose model is just a list of name/value pairs. Item's metadata instead are fixed and essential metadata linked to each item, whatever its content.
 
 ## Parts
 
