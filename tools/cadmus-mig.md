@@ -1,9 +1,7 @@
 ---
 title: "Migration Tool" 
 layout: default
-parent: Migration
-nav_order: 3
-
+nav_order: 9
 ---
 
 - [Migration Tool](#migration-tool)

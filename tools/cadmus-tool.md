@@ -1,3 +1,9 @@
+---
+title: "Cadmus Tool" 
+layout: default
+nav_order: 8
+---
+
 # Cadmus Tool
 
 - [Cadmus Tool](#cadmus-tool)
