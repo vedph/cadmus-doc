@@ -20,7 +20,6 @@ nav_order: 1
     - [Aliases](#aliases)
     - [Models Thesaurus](#models-thesaurus)
   - [Importing Thesauri](#importing-thesauri)
-  - [TODO](#todo)
 
 Thesauri represent taxonomies of any type you might be using in editing by **picking a value from a closed set**. For instance, in describing a text you might have a set of ink colors to pick from.
 
@@ -248,6 +247,8 @@ As for **value naming conventions**:
 - use English for the primary (default fallback) language, or just the language you prefer for the editor. Of course, once you publish data you might provide as many thesauri as you want for all the languages you want to support; every localized label will refer to the same ID.
 - try avoiding a long text, because this is designed to fit in some UI control which would otherwise be cut or take too much space in the UI.
 - try avoiding very specialized characters which might be missing from commonly used fonts in the web.
+
+>You may also want to take a mixed approach where useful. For instance, say you want a list of epigraphic categories to be later mapped to the LOD identifiers defined by [EAGLE](https://www.eagle-network.eu/voc/typeins.html). Such identifiers are full URIs like `https://www.eagle-network.eu/voc/typeins/lod/76` representing a `tabula defixionis`; so, if we want shorter identifiers but still be able to map to this taxonomy, we might strip off the constant prefix and just use some shorter, human-friendly ID followed by the numeric ID, which is the only variable part of these URIs. Just like in RDF we use prefixes to shorten URIs, we will thus build IDs like `defixio-76`. Later, rebuilding the full URI by replacing the short prefix `defixio` with the full URI portion `https://www.eagle-network.eu/voc/typeins/lod/` will be trivial processing. This way, we have short and readable IDs, which is the recommended practice for Cadmus, without losing the connection to an existing third-party ontology.
 
 ### Hierarchical Thesauri
 
@@ -515,13 +516,3 @@ For all these options you can check `dry run` to test the import without writing
 3. select the import mode (default is _replace_). It is also recommended to check the `dry run` before truly importing data, so you can prevent errors during import. Once you have run a test with `dry run`, just uncheck it and repeat the import.
 4. select the file you want to import.
 5. click the _upload_ button.
-
-## TODO
-
-- [Cadmus command line tool](https://github.com/vedph/cadmus_tool): this tool has functions to variously import thesauri into an existing database with different modes (replacing, patching, or synching), and from different formats (JSON, CSV, XLSX, XLS).
-- [Cadmus migration command line tool](https://github.com/vedph/cadmus-migration-v3): this tool has a function to export all the thesauri at once. You can still use the Cadmus UI itself to export a single thesaurus: in most Cadmus editors, there is an admin area where you can import or export thesauri via the UI.
-
-
- Here we are using ISO 639 for language codes (using standards is always recommended when available); but IDs are totally arbitrary.
-
->You may also want to take a mixed approach where useful. For instance, say you want a list of epigraphic categories to be later mapped to the LOD identifiers defined by [EAGLE](https://www.eagle-network.eu/voc/typeins.html). Such identifiers are full URIs like `https://www.eagle-network.eu/voc/typeins/lod/76` representing a `tabula defixionis`; so, if we want shorter identifiers but still be able to map to this taxonomy, we might strip off the constant prefix and just use some shorter, human-friendly ID followed by the numeric ID, which is the only variable part of these URIs. Just like in RDF we use prefixes to shorten URIs, we will thus build IDs like `defixio-76`. Later, rebuilding the full URI by replacing the short prefix `defixio` with the full URI portion `https://www.eagle-network.eu/voc/typeins/lod/` will be trivial processing. This way, we have short and readable IDs, which is the recommended practice for Cadmus, without losing the connection to an existing third-party ontology.
