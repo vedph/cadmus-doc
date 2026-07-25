@@ -1,4 +1,4 @@
-# Importing from Excel
+# Importing Excel Data
 
 This procedure is an example of importing items from a spreadsheet into a Cadmus database via the Proteus conversion framework.
 

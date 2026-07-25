@@ -2,7 +2,7 @@
 title: "Adding Backend Part Seeders"
 parent: "Creating Backend Core"
 layout: default
-nav_order: 2
+nav_order: 4
 ---
 
 - [Adding Backend Part Seeders](#adding-backend-part-seeders)

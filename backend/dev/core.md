@@ -2,7 +2,7 @@
 title: "Creating Backend Core"
 parent: "Cadmus Backend"
 layout: default
-nav_order: 6
+nav_order: 2
 ---
 
 - [Creating Backend Core](#creating-backend-core)

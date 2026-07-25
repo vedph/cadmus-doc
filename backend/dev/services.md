@@ -2,7 +2,7 @@
 title: "Adding Backend Services"
 parent: "Creating Backend Core"
 layout: default
-nav_order: 5
+nav_order: 7
 ---
 
 - [Adding Backend Services](#adding-backend-services)
