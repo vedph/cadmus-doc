@@ -77,3 +77,45 @@ To use any of the profiles for dumping or importing data, run your tool like:
 ```sh
 ./your-tool-name import YOUR_PROFILE_PATH
 ```
+
+### Log File
+
+Whenever you run the tool, it creates a plain text file in its executable folder, named after the Cadmus project plus suffix `-log` and the current date. You should first inspect it and consider any error or warnings found in it.
+
+The log file contains one line per log message, with `[ERR]`=error, `[WRN]`=warning, `[INF]`=information (just an informative line), e.g.:
+
+```txt
+2026-07-27 09:35:12.925 +02:00 [INF] Reading set #1
+2026-07-27 09:35:12.962 +02:00 [INF] -- ROW: 2
+2026-07-27 09:35:12.993 +02:00 [ERR] Unknown value for col-material: "lead" at region 32:34=col-material
+...
+```
+
+Whenever you find an error, it is either an error in the source data (the spreadsheet being imported) or a design or implementation bug in the corresponding parser. You need to fix it and re-run the importer until all errors are cleared.
+
+### Excel Dump
+
+The Excel dump shows the list of decoded entries (Figure 1).
+
+![Excel dump](../img/excel-dump.png)
+
+- _Figure 1 - Excel dump_
+
+- each entry is a row, and each set is introduced by a yellow header.
+- the type column says the type of the entry: text, property or command.
+- the text column shows the value of the text when the entry has this type.
+- in a similar way, property name and value show the name and value of a property entry, and command shows the command.
+- the rightmost column contains the list of all the regions which include the entry.
+
+In Figure 1 the first two columns of the first row of an example import file appear, from top to bottom:
+
+- a command for the sheet start;
+- a command for the row start (with its row number);
+- a command for the column start (with its ordinal number and name);
+- a text with the cell's content;
+- a command for the column end;
+- a command for the start of another column, its text, and its corresponding close command.
+
+In the yellow rightmost column each row lists all regions including it.
+
+The dump continues showing all cells from all rows in the input spreadsheet.
