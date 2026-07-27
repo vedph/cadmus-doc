@@ -9,6 +9,8 @@ nav_order: 9
 
 Procedure for [importing Excel data](../../migration/import/import-xlsx.md). In this document, `__PRJ__` is the name of your project.
 
+- [example: TES import tool](https://github.com/vedph/cadmus-tes/tree/master/tes-tool)
+
 ## Setup Solution
 
 In your backend solution, **add 2 projects**:
@@ -92,9 +94,113 @@ public sealed class Col__TAG__EntryRegionParser :
             entryIndex + 1)!;
         string? value = ImportHelper.FilterValue(txt.Value, false);
 
-        // TODO
+        // TODO implement your parsing logic for value here
+        // unless it is empty or null, targeting the current
+        // item -- you can add or reuse an existing part of any
+        // given type with ctx.EnsurePartForCurrentItem<T>
+        // (pass it the role ID string if required)
 
         return entryIndex + 3;
     }   
 }
+```
+
+## Profiles
+
+Add the Proteus dump and import profiles to your tool assets as content files. This allows having them distributed with the tool so you can use them as the input for the import process.
+
+These files typically are (replace `__PRJ__` with your project name):
+
+- 📁 `Dump-xlsx.json` used to dump each parsed row into Excel files to inspect the decoded entries with their regions:
+
+```json
+{
+  "context": {
+    "id": "it.vedph.entry-set-context.cadmus"
+  },
+  "entryReader": {
+    "id": "entry-reader.xlsx",
+    "options": {
+      "inputFile": "{{HOMEDRIVE}}{{HOMEPATH}}\\Desktop\\__PRJ__\\__PRJ__.xlsx",
+      "hasHeaderRow": true,
+      "columnNameFiltering": true,
+      "eofCheckColumn": 1
+    }
+  },
+  "entrySetBoundaryDetector": {
+    "id": "entry-set-detector.cmd",
+    "options": {
+      "type": 2,
+      "name": "row-end"
+    }
+  },
+  "entryRegionDetectors": [
+    {
+      "id": "region-detector.explicit",
+      "options": {
+        "unpairedCommandNames": [
+          "sheet",
+          "row",
+          "col"
+        ],
+        "tagSuffixArgName": "n",
+        "tagSuffixSeparator": "-"
+      }
+    },
+    {
+      "id": "region-detector.unmapped",
+      "options": {
+        "unmappedRegionTag": "x"
+      }
+    }
+  ],
+  "entryRegionParsers": [
+    {
+      "id": "entry-region-parser.__PRJ__.row"
+    },
+    {
+      "id": "entry-region-parser.__PRJ__.col-YOUR_COLUMN_NAME"
+    },
+    /* ... etc */
+  ],
+  "entrySetContextPatchers": [
+    {
+      "id": "it.vedph.entry-set-context-patcher.cadmus"
+    }
+  ],
+  "entrySetExporters": [
+    {
+      "id": "entry-set-exporter.excel-dump",
+      "options": {
+        "maxEntriesPerDumpFile": 10000,
+        "outputDirectory": "{{HOMEDRIVE}}{{HOMEPATH}}\\Desktop\\__PRJ__\\__PRJ__-dump"
+      }
+    }
+  ]
+}
+```
+
+- 📁 `Dump-md.json` used to dump each parsed row into Markdown files with the details of the item built from each row with its parts: this is equal to the above profile, and only the exporter module changes as follows:
+
+```json
+"entrySetExporters": [
+  {
+    "id": "it.vedph.entry-set-exporter.cadmus.md-dump",
+    "options": {
+    "outputDirectory": "{{HOMEDRIVE}}{{HOMEPATH}}\\Desktop\\__PRJ__\\__PRJ__-dump\\",
+    "noEntries": true,
+    "jsonParts": true
+    }
+  }
+]
+```
+
+- 📁 `Import.json` used to effectively import data into the target MongoDB database. As above, only the exporter changes:
+
+```json
+"entrySetExporters": [
+  {
+    "id": "it.vedph.entry-set-exporter.cadmus.mongo"
+  }
+]
 ```

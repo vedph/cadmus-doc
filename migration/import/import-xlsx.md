@@ -2,15 +2,17 @@
 
 This procedure is an example of importing items from a spreadsheet into a Cadmus database via the Proteus conversion framework.
 
+- [example: TES import tool](https://github.com/vedph/cadmus-tes/tree/master/tes-tool)
+
 ## Leveraging Proteus
 
-In short, Proteus adapts any input source to a list of so-called decoded entries. A **decoded entry** is the smallest meaningful unit of input for conversion. There are three types:
+In short, Proteus adapts any input source to a list of so-called decoded entries. A **decoded entry** is _the smallest meaningful unit of input for conversion_. There are three types of decoded entries:
 
-- `T` (text entry) — raw text fragments
-- `P` (property entry) — simple style properties (bold, italic, color, etc.)
-- `C` (command entry) — structural or metatextual commands with arguments
+- `T` (text entry) — raw text fragments.
+- `P` (property entry) — simple style properties (bold, italic, color, etc.).
+- `C` (command entry) — structural or metatextual commands with arguments.
 
-Example of a decoded paragraph with world in bold:
+The following list is a set of decoded entries from a text paragraph with the word "world" in bold:
 
 ```txt
 C block(open=1)
@@ -22,13 +24,15 @@ T !
 C block(open=0)
 ```
 
-In this case, assuming that each record to import is a row in the source spreadsheet, each row is decoded into a set of entries:
+Here a command starts the block, followed by normal text; then bold opens, followed by bold text; and it closes after it, followed by normal text again. Finally, the block is closed.
+
+In the case of a spreadsheet import, we assume that each record to import is a row in the source spreadsheet. Each row is decoded into a set of entries:
 
 1. for each sheet: `C sheet-start(index=INDEX, n=NAME)` ... `C sheet-end()`.
 2. for each row:  `row-start(y=N)` ... `C row-end()`.
 3. for each column in each row: `C col-start(x=N, n=COLUMN_NAME)`, `T ...`, `C col-end()` where the text entry contains the cell's value.
 
-For instance:
+For instance, these entries represent the first 3 cells of the first row of the first sheet in a source spreadsheet:
 
 ```txt
 C sheet-start(index=0, n=Foglio1)
@@ -48,14 +52,28 @@ T 48x75
 C col-end()
 ```
 
-This list of entries represents the first 3 cells of the first row of the first sheet in a source spreadsheet. So, the idea is to parse one row at a time, and within it one cell at a time; for each cell type, a specific logic can be used.
+So, the idea is to parse one row at a time, and within it one cell at a time; for each cell type, a specific logic can be used.
 
-A stock Proteus region detector is then used to define a region for each sheet, row, and column. Column region names start with col- followed by the column's label (where spaces are converted to `_` and text is lowercased).
+Proteus typically leverages a conversion pipeline which gets such entries as its input. Among its component, a core family of components is typically represented by **region detectors**. The task of these components is to detect semantically defined regions within the list of decoded entries.
+
+In the case of the spreadsheet, a simple stock Proteus _region detector_ is used to define a region for each sheet, row, and column. Column region names start with `col-` followed by the column's label (where spaces are converted to `_` and text is lowercased).
+
+So, if you want to process a cell labelled "Origin latitude" in your spreadsheet you just handle the region named `col-origin_latitude` via a corresponding region parser. The Proteus import infrastructure will use all the region parses you configure in the import profile, calling them in the order in which columns are read (from left to right: A, B, C, etc.).
+
+Thus the import logic is a collection of very simple region parser modules. Each knows exactly how to parse the received cell, and what to do with its parsed data: typically it adds a part to the item being built, and fills some of its properties with parsed data.
 
 This allows for a highly modular approach, where you just create a region parser for each region (=column) you want to import. Typically, each parser builds a part and adds it to the item corresponding to the current row; or just adds more metadata to the item; or build some temporary structure to be progressively completed while combining multiple cells together.
 
-In the end, the item built can be exported both for dumping and for import purposes, using e.g. these exporters:
+In the end, the item built can be exported both for dumping and for import purposes, using e.g. these **exporters** from their respective profiles:
 
-- an Excel dump exporter, to see all the decoded entries with their regions.
-- a Markdown dump exporter, to see all the items with their parts.
-- a MongoDB exporter, to store the items in a target Cadmus database.
+- an _Excel dump exporter_, to see all the decoded entries with their regions.
+- a _Markdown dump exporter_, to see all the items with their parts.
+- a _MongoDB exporter_, to store the items in a target Cadmus database.
+
+## Using Tool
+
+To use any of the profiles for dumping or importing data, run your tool like:
+
+```sh
+./your-tool-name import YOUR_PROFILE_PATH
+```
