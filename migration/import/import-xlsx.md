@@ -1,3 +1,10 @@
+---
+title: "Importing Excel" 
+layout: default
+parent: Migration
+nav_order: 5
+---
+
 # Importing Excel Data
 
 This procedure is an example of importing items from a spreadsheet into a Cadmus database via the Proteus conversion framework.
