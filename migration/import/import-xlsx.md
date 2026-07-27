@@ -119,3 +119,9 @@ In Figure 1 the first two columns of the first row of an example import file app
 In the yellow rightmost column each row lists all regions including it.
 
 The dump continues showing all cells from all rows in the input spreadsheet.
+
+>Note that in the default conversion approach there is no attempt to further parse the content of each cell into regions, because usually this is not required, a cell being considered as a simple unit of data. So, in this approach you can assume that each column region has exactly 3 entries: two command entries wrapping a single text entry.
+
+### Markdown Dump
+
+The Markdown dump focuses on the results of parsing the input rows and columns.
