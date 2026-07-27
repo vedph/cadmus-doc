@@ -124,4 +124,12 @@ The dump continues showing all cells from all rows in the input spreadsheet.
 
 ### Markdown Dump
 
-The Markdown dump focuses on the results of parsing the input rows and columns.
+The Markdown dump focuses on the results of parsing the input rows and columns. The Proteus pipeline works on sets of decoded entries, one set at a time. In our scenario, a set is a row, corresponding to an item.
+
+For each set, the dump shows:
+
+- the set ordinal number.
+- under `Data`, the temporary set of cached metadata in the conversion context. These can be used by parsers to do their work.
+- under `Items`, the list of items in the set. In our scenario there is exactly 1 item per set. For each item:
+  - item's metadata.
+  - list of items parts, each with its content dumped as JSON code.
