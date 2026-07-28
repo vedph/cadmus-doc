@@ -115,7 +115,7 @@ Examples:
 
 ### Entry ID (EID)
 
-The "entry" ID is just a convention followed in models of Cadmus multi-entity parts.
+The "entry" ID is just a convention followed in models of Cadmus multi-entries parts.
 
 A Cadmus part corresponding to a _single entity_ is a single "entry". In this case, its ID is simply provided by the part's item.
 
