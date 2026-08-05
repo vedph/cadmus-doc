@@ -68,7 +68,7 @@ The **import** methods provided in the Cadmus editor may adopt 3 different behav
 
 If you are not using the UI, you can use the Cadmus [command line tool](../tools/cadmus-tool.md#thesaurus-import-command) for more fine-grained imports, or also generic MongoDB commands, should you need to directly patch the database.
 
->You can also use the Cadmus [data migration command line tool](../tools/cadmus-mig.md#dump-thesauri-command) for bulk thesauri export.
+>You can also use the Cadmus [command line tool](../tools/cadmus-tool#dump-thesauri-command) for bulk thesauri export.
 
 ### Editing Manually
 
