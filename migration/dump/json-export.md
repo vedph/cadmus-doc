@@ -28,6 +28,7 @@ So, this is a hierarchical structure, similar to the document object model of an
 
 - in most cases, each template gets applied when it matches a specific data path (expressed via XPath).
 - the template specifies the output structure, filling it with data collected from its source.
+- templates can be nested, either materially writing them inside another template, or (better) by recalling them at a given point in processing (e.g. via a generic `xsl:apply-templates` element)
 
 Such templates are typically designed to be applied recursively, which is especially useful when the same logic must be applied to branches found in different positions.
 
@@ -35,3 +36,4 @@ The logic used to transform JSON objects in Cadmus is similar, and relies on map
 
 - each mapping matches a specific data path, expressed via a JMES path.
 - the mapping specifies the output structure,  filling it with data collected from its source.
+- mappings can be nested, i.e. each mapping can include children mappings, which in turn are matched against the source branch.
