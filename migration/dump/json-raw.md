@@ -1,8 +1,8 @@
 ---
 title: "Dumping Raw JSON"
 layout: default
-parent: "Migration"
-nav_order: 2
+parent: "Dumping"
+nav_order: 1
 ---
 
 # Dumping Raw JSON
