@@ -22,7 +22,7 @@ While this difference applies to the output of each process, the logic to select
 
 ## Mappings
 
-For the purpose of exporting, a source JSON object can be considered as a tree where each node is a property, which in turn can branch into other nodes.
+For the purpose of exporting, a source JSON object can be considered as a **tree structure** where each node is a property, which in turn can branch into other nodes.
 
 So, this is a hierarchical structure, similar to the document object model of an XML document. XML documents can be transformed into other XML documents via XSLT. In this case, the logic of the transformation is modular. Rather than having a monolithic approach, the logic is typically split into smaller bits, corresponding to templates:
 
@@ -32,8 +32,8 @@ So, this is a hierarchical structure, similar to the document object model of an
 
 Such templates are typically designed to be applied recursively, which is especially useful when the same logic must be applied to branches found in different positions.
 
-The logic used to transform JSON objects in Cadmus is similar, and relies on mappings to ensure a modular approach:
+The logic used to transform JSON objects in Cadmus is similar, and relies on **mappings** to ensure a modular approach:
 
-- each mapping matches a specific data path, expressed via a JMES path.
-- the mapping specifies the output structure,  filling it with data collected from its source.
+- each mapping matches a specific data path, expressed via a [JMESPath](https://jmespath.org) (a query language for JSON).
+- the mapping specifies the output structure, filling it with data collected from its source.
 - mappings can be nested, i.e. each mapping can include children mappings, which in turn are matched against the source branch.
