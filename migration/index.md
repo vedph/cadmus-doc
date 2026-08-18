@@ -6,7 +6,7 @@ nav_order: 4
 
 # Data Migration
 
-Migration functionality in Cadmus refer to both data import and export. The code repository providing migration is <https://github.com/vedph/cadmus-migration>.
+Migration functionality in Cadmus refer to both data import and export.
 
 Currently, there are three main areas where migration has been implemented:
 
