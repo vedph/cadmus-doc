@@ -6,6 +6,8 @@ A node mapping (`NodeMapping`) is a generic abstraction used to represent a node
 - reference to parent and/or children mappings;
 - source definition and filters to determine whether it is applicable to the currently processed source.
 
+Each mapping selects a specific path in the source JSON object, and in turn can include children mappings which do the same. Mappings are recursively applied, so that you can keep the logic of each mapping very simple (as it targets a single path) while still being able to build a complex output structure by means of nested mappings.
+
 This abstract mapping representation is then variously implemented by concrete mappings according to their output. Currently two such mappings exist:
 
 - graph node mapping, targeting an RDF graph to be actively kept in synch with the data source.
@@ -68,7 +70,7 @@ TODO
 
 ## JSON Node Mapping
 
-The JSON node mapping targets a JSON object with any schema. Its core task is to transform a source JSON object into a target JSON object having a different schema. 
+The JSON node mapping targets a JSON object with any schema. Its core task is to transform a source JSON object into a target JSON object having a different schema.
 
 This mapping adds these properties to the abstract node mapping:
 
@@ -105,8 +107,8 @@ This will output this JSON object:
 ```json
 {
   "person": {
-  	"firstName": "Jane",
-  	"lastName": "Doe"
+    "firstName": "Jane",
+    "lastName": "Doe"
   }
 }
 ```
@@ -116,13 +118,13 @@ This will output this JSON object:
 ```json
 {
   "events": [
-  	{
-  	  "type": "birth",
-  	  "year": 1265
-  	},
-  	{
-  	  "type": "death",
-  	  "year": 1321
+    {
+      "type": "birth",
+      "year": 1265
+    },
+    {
+      "type": "death",
+      "year": 1321
     }
   ]
 }
@@ -139,14 +141,32 @@ Result:
 ```json
 {
   "events": [
-  	{
-  	  "type": "birth"
-  	},
-  	{
-  	  "type": "death"
+    {
+      "type": "birth"
+    },
+    {
+      "type": "death"
     }
   ]
 }
 ```
 
-You can use your custom filters in templates.
+You can use your custom filters in templates. Mappings and other parameters are defined in a JSON configuration document, like in this example:
+
+```json
+{
+  "source": {
+    "itemIdCollector": {
+      "id": "it.vedph.item-id-collector.mongo"
+    },
+    "itemJsonReader": {
+      "id": "item-json-reader.mongo"
+    },
+    "partFilter": {},
+    "templateFilters": [],
+
+  },
+  "namedMappings": [],
+  "mappings": []
+}
+```
