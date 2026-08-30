@@ -151,40 +151,12 @@ Result:
 }
 ```
 
-You can use your custom filters in templates. Mappings and other parameters are defined in a JSON configuration document, like in this example (for MongoDB):
+## Configuration
+
+Mappings and possibly other parameters related to data export are defined in a JSON configuration document, like in this example:
 
 ```json
 {
-  "source": {
-    "itemIdCollector": {
-      "id": "it.vedph.item-id-collector.mongo",
-      "options": {
-        "pageNumber": 1,
-        "pageSize": 20,
-        "title": "...",
-        "description": "...",
-        "facetId": "...",
-        "groupId": "...",
-        "flags": null,
-        "flagMatching": 0,
-      }
-    },
-    "itemJsonReader": {
-      "id": "item-json-reader.mongo"
-    },
-    "partFilter": {
-      "isInverted": false,
-      "clauses": [
-        {
-          "typeId": "...",
-          "roleId": "..."
-        }
-      ]
-    },
-    "templateFilters": [
-      /* array of configurable objects */
-    ],
-  },
   "namedMappings": {
     "sample": {
       /* mapping */
@@ -205,7 +177,7 @@ You can use your custom filters in templates. Mappings and other parameters are 
       "partRoleFilter": "...",
       "description": "...",
       "source": "...",
-      "sid": "{$part-id}/{@eid}",
+      "sid": "...",
       "scalarPattern": null,
       "children": [
         {

@@ -37,3 +37,48 @@ The logic used to transform JSON objects in Cadmus is similar, and relies on **m
 - each mapping matches a specific data path, expressed via a [JMESPath](https://jmespath.org) (a query language for JSON).
 - the mapping specifies the output structure, filling it with data collected from its source.
 - mappings can be nested, i.e. each mapping can include children mappings, which in turn are matched against the source branch.
+
+## Configuration
+
+The export configuration is defined in a JSON document like this (see [mappings configuration](mappings.md#configuration) for the details about mappings):
+
+```json
+{
+  "source": {
+    "itemIdCollector": {
+      "id": "it.vedph.item-id-collector.mongo",
+      "options": {
+        "pageNumber": 1,
+        "pageSize": 20,
+        "title": "...",
+        "description": "...",
+        "facetId": "...",
+        "groupId": "...",
+        "flags": null,
+        "flagMatching": 0,
+      }
+    },
+    "itemJsonReader": {
+      "id": "item-json-reader.mongo"
+    },
+    "partFilter": {
+      "isInverted": false,
+      "clauses": [
+        {
+          "typeId": "...",
+          "roleId": "..."
+        }
+      ]
+    },
+    "templateFilters": [
+      /* array of configurable objects */
+    ],
+  },
+  "namedMappings": {
+    /* ... */
+  },
+  "mappings": [
+    /* ... */
+  ]
+}
+```
