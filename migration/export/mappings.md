@@ -15,20 +15,38 @@ The mapping between Cadmus source data (items and parts) and various export targ
 
 Each mapping rule projects a small bit of data. These rules are very simple and small, but they can be organized in a _tree_ structure, which nicely fits the structure of Cadmus source data (objects, i.e. trees of properties). So, each mapping rule is the root of a tree structure, where each _node_ is a mapping rule.
 
+## Source Tree
+
+For the purpose of exporting, a source JSON object can be considered as a **tree structure** where each node is a property, which in turn can branch into other nodes.
+
+So, this is a hierarchical structure, similar to the document object model of an XML document. XML documents can be transformed into other XML documents via XSLT. In this case, the logic of the transformation is modular. Rather than having a monolithic approach, the logic is typically split into smaller bits, corresponding to templates:
+
+- in most cases, each template gets applied when it matches a specific data path (expressed via XPath).
+- the template specifies the output structure, filling it with data collected from its source.
+- templates can be nested, either materially writing them inside another template, or (better) by recalling them at a given point in processing (e.g. via a generic `xsl:apply-templates` element).
+
+Such templates are typically designed to be applied recursively, which is especially useful when the same logic must be applied to branches found in different positions.
+
+The logic used to transform JSON objects in Cadmus is similar, and relies on **mappings** to ensure a modular approach:
+
+- each mapping matches a specific data path, expressed via a [JMESPath](https://jmespath.org) (a query language for JSON).
+- the mapping specifies the output structure, filling it with data collected from its source.
+- mappings can be nested, i.e. each mapping can include children mappings, which in turn are matched against the source branch.
+
 ## Node Mapping
 
 A node mapping (`NodeMapping`) is a generic abstraction used to represent a node in the properties tree underlying an object. The mapping has:
 
 - generic metadata;
-- reference to parent and/or children mappings;
+- references to parent and/or children mappings;
 - source definition and filters to determine whether it is applicable to the currently processed source.
 
 Each mapping selects a specific path in the source JSON object, and in turn can include children mappings which do the same. Mappings are recursively applied, so that you can keep the logic of each mapping very simple (as it targets a single path) while still being able to build a complex output structure by means of nested mappings.
 
 This abstract mapping representation is then variously implemented by concrete mappings according to their output. Currently two such mappings exist:
 
-- graph node mapping, targeting an RDF graph to be actively kept in synch with the data source.
-- JSON node mapping, targeting any JSON schema and designed for one-pass data export.
+- [JSON node mapping](json-export.md#json-node-mapping), targeting any JSON schema and designed for one-pass data export.
+- [graph node mapping](graph/mappings.md), targeting an RDF graph to be actively kept in synch with the data source.
 
 ## Abstract Node Mapping
 
@@ -118,3 +136,8 @@ Mappings and possibly other parameters related to data export are defined in a J
   ]
 }
 ```
+
+The distinction between `mappings` and `namedMappings` is meaningful only within the configuration itself and is a mechanism used to avoid redundancy:
+
+- `namedMappings` contain full mappings definitions keyed by a property representing the conventional name of each mapping. Thanks to this name, we can recall them within another mapping without having to duplicate their code.
+- `mappings` are either full mappings definitions or just links to named mappings. In the latter case, they only include the `name` property targeting any of the keys defined in `namedMappings`. In the above template, the mapping named `sample` is recalled as a child mapping of the first mapping.
