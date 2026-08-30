@@ -28,6 +28,7 @@ nav_order: 8
     - [Dump Command](#dump-command)
     - [Dump Thesauri Command](#dump-thesauri-command)
     - [Render Items Command](#render-items-command)
+    - [Export JSON Command](#export-json-command)
     - [Export RDF Command](#export-rdf-command)
     - [Convert JSON to XML](#convert-json-to-xml)
     - [Get Object Command](#get-object-command)
@@ -354,6 +355,29 @@ Syntax:
 - `-r PLUGIN_TAG`: the tag of the Cadmus repository provider plugin (`IRepositoryProvider`).
 - `-c COMPOSER_KEY`: the item composer key to use (default is `default`).
 - `-m MAX_ITEMS_COUNT`: the maximum number of items to render (0=all).
+
+### Export JSON Command
+
+🎯 Export Cadmus data into any JSON schema.
+
+Syntax:
+
+```sh
+./cadmus-tool export-json CONFIG_PATH -d DATABASE_NAME -o OUTPUT_DIRECTORY --pretty-print
+```
+
+- `CONFIG_PATH`: path to the JSON exporter configuration file.
+- `-d DATABASE_NAME`: the database name. Default is `cadmus`.
+- -`o OUTPUT_DIRECTORY`: the output directory. Default is `export` on your desktop.
+- `--pretty-print`: pretty-print the JSON output.
+
+>See [JSON export](../migration/export/json-export.md) for the configuration document.
+
+**Example**:
+
+```sh
+./cadmus-tool export-json c:/users/dfusi/desktop/export.json -d cadmus-tes --pretty-print
+```
 
 ### Export RDF Command
 
