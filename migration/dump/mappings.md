@@ -151,22 +151,68 @@ Result:
 }
 ```
 
-You can use your custom filters in templates. Mappings and other parameters are defined in a JSON configuration document, like in this example:
+You can use your custom filters in templates. Mappings and other parameters are defined in a JSON configuration document, like in this example (for MongoDB):
 
 ```json
 {
   "source": {
     "itemIdCollector": {
-      "id": "it.vedph.item-id-collector.mongo"
+      "id": "it.vedph.item-id-collector.mongo",
+      "options": {
+        "pageNumber": 1,
+        "pageSize": 20,
+        "title": "...",
+        "description": "...",
+        "facetId": "...",
+        "groupId": "...",
+        "flags": null,
+        "flagMatching": 0,
+      }
     },
     "itemJsonReader": {
       "id": "item-json-reader.mongo"
     },
-    "partFilter": {},
-    "templateFilters": [],
-
+    "partFilter": {
+      "isInverted": false,
+      "clauses": [
+        {
+          "typeId": "...",
+          "roleId": "..."
+        }
+      ]
+    },
+    "templateFilters": [
+      /* array of configurable objects */
+    ],
   },
-  "namedMappings": [],
-  "mappings": []
+  "namedMappings": {
+    "sample": {
+      /* mapping */
+    }
+  },
+  "mappings": [
+    {
+      "id": 0,
+      "parentId": 0,
+      "ordinal": 0,
+      "name": "...",
+      "sourceType": 0,
+      "facetFilter": "...",
+      "groupFilter": "...",
+      "flagsFilter": null,
+      "titleFilter": "...",
+      "partTypeFilter": "...",
+      "partRoleFilter": "...",
+      "description": "...",
+      "source": "...",
+      "sid": "{$part-id}/{@eid}",
+      "scalarPattern": null,
+      "children": [
+        {
+          "name": "sample"
+        }
+      ]
+    },
+  ]
 }
 ```
