@@ -1,8 +1,8 @@
 ---
 title: "Graph - JMES Path"
 layout: default
-parent: "Graph - Mappings"
-nav_order: 1
+parent: "Graph"
+nav_order: 3
 ---
 
 # JMES Path

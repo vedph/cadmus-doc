@@ -2,7 +2,7 @@
 title: "Graph - Walking Graph"
 layout: default
 parent: Graph
-nav_order: 5
+nav_order: 7
 ---
 
 # Graph Walking

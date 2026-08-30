@@ -1,8 +1,8 @@
 ---
-title: "Graph - Database"
+title: "Database"
 layout: default
 parent: Graph
-nav_order: 4
+nav_order: 5
 ---
 
 # Graph Database

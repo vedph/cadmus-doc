@@ -1,8 +1,8 @@
 ---
 title: "Graph - Walker" 
 layout: default
-parent: "Graph - Walking Graph"
-nav_order: 2
+parent: "Graph"
+nav_order: 9
 ---
 
 # Graph Walker

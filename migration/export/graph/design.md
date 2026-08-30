@@ -1,8 +1,8 @@
 ---
-title: "Graph - Designing"
+title: "Design"
 layout: default
 parent: Graph
-nav_order: 7
+nav_order: 6
 ---
 
 # Designing for Graph

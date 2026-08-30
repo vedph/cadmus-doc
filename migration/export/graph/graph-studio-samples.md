@@ -1,7 +1,8 @@
 ---
-title: "Graph - Graph Studio Examples" 
+title: "Graph Studio Examples" 
 layout: default
-parent: "Graph - Graph Studio"
+parent: "Graph"
+nav_order: 8
 ---
 
 # Graph Studio Examples

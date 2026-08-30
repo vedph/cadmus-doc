@@ -1,5 +1,5 @@
 ---
-title: "Graph - Adapters"
+title: "Adapters"
 layout: default
 parent: Graph
 nav_order: 1

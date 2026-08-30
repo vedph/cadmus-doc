@@ -1,8 +1,8 @@
 ---
 title: "Graph - Walking Graph Sample" 
 layout: default
-parent: "Graph - Walking Graph"
-nav_order: 3
+parent: "Graph"
+nav_order: 10
 ---
 
 # Walking Graph Sample
