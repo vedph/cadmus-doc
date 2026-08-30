@@ -1,5 +1,5 @@
 ---
-title: "Graph - Mappings"
+title: "Mappings"
 layout: default
 parent: Graph
 nav_order: 2

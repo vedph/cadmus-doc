@@ -1,5 +1,5 @@
 ---
-title: "Graph - Updating Mappings" 
+title: "Updating Mappings" 
 layout: default
 parent: Graph
 nav_order: 4

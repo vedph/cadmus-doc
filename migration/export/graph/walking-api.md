@@ -1,5 +1,5 @@
 ---
-title: "Graph - Walker" 
+title: "Walker" 
 layout: default
 parent: "Graph"
 nav_order: 9

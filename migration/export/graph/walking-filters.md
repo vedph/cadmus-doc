@@ -1,5 +1,5 @@
 ---
-title: "Graph - Walking Graph Filters" 
+title: "Walking Graph Filters" 
 layout: default
 parent: "Graph"
 nav_order: 8

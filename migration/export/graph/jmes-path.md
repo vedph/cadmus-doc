@@ -1,5 +1,5 @@
 ---
-title: "Graph - JMES Path"
+title: "JMES Path"
 layout: default
 parent: "Graph"
 nav_order: 3

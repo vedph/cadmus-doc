@@ -1,5 +1,5 @@
 ---
-title: "Graph - Walking Graph Sample" 
+title: "Walking Graph Sample" 
 layout: default
 parent: "Graph"
 nav_order: 10
