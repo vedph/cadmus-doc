@@ -1,7 +1,7 @@
 ---
 title: "JMES Path"
+parent: "Export"
 layout: default
-parent: "Graph"
 nav_order: 3
 ---
 
@@ -21,6 +21,8 @@ nav_order: 3
     - [Multiselect List](#multiselect-list)
     - [Multiselect Hash](#multiselect-hash)
   - [Functions](#functions)
+
+Mappings select data from a JSON object (properties tree) using JMES Path.
 
 This is just a cheatsheet derived from the excellent JMES tutorial, which also provides interactive examples.
 
