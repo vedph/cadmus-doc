@@ -82,3 +82,9 @@ The export configuration is defined in a JSON document like this (see [mappings 
   ]
 }
 ```
+
+## Executing an Export
+
+To execute a JSON export for data, use this commands in the [Cadmus CLI tool](../../tools/cadmus-tool.md):
+
+- [export JSON](../../tools//cadmus-tool.md#export)

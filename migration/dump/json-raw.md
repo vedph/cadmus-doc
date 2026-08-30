@@ -104,3 +104,10 @@ Instead, it will exclude:
 
 - i1, because it was never changed after its creation. It is still an active item (it wasn't deleted), but the framer does not include it because it got no changes in the specified time frame.
 - i3, which too was not changed in the specified time frame.
+
+## Executing a Dump
+
+To execute a raw JSON export for data and/or thesauri, use these commands in the [Cadmus CLI tool](../../tools/cadmus-tool.md):
+
+- [dump](../../tools/cadmus-tool.md#dump-command)
+- [dump thesauri](../../tools//cadmus-tool.md#dump-thesauri-command)
