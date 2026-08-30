@@ -1,8 +1,8 @@
 ---
 title: "Importing Excel" 
 layout: default
-parent: Migration
-nav_order: 5
+parent: Import
+nav_order: 1
 ---
 
 # Importing Excel Data
@@ -104,7 +104,7 @@ Whenever you find an error, it is either an error in the source data (the spread
 
 The Excel dump shows the list of decoded entries (Figure 1).
 
-![Excel dump](../img/excel-dump.png)
+![Excel dump](./img/excel-dump.png)
 
 - _Figure 1 - Excel dump_
 

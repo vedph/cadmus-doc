@@ -1,16 +1,16 @@
 ---
 title: "UI Import Tools" 
 layout: default
-parent: Migration
-nav_order: 4
+parent: Import
+nav_order: 2
 ---
 
 # UI Import Tools
 
 The Cadmus editor UI provides import functions for the most used maintenance tasks:
 
-- import [thesauri](../models/thesauri).
-- import [settings](../models/settings).
+- import [thesauri](../../models/thesauri).
+- import [settings](../../models/settings).
 - import facets.
 
 >⚠️ IMPORTANT: after any of these imports, it is advisable to force a reload of the editor, as some resources (like facets) are loaded only when the app starts, and at any rate the browser might have cached stale data.
@@ -30,7 +30,7 @@ As thesauri in turn include multiple entries, and import granularity must be ext
 - **patch**: the existing thesaurus is patched with the imported one: any existing entry has its value overwritten; any non existing entry is just added.
 - **synch**: equal to patch, with the addition that any existing entry not found in the imported thesaurus is removed.
 
-To import thesauri, follow the [instructions](../models/thesauri#importing-thesauri).
+To import thesauri, follow the [instructions](../../models/thesauri#importing-thesauri).
 
 ## Settings
 

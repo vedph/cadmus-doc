@@ -1,8 +1,8 @@
 ---
 title: "Exporting JSON"
 layout: default
-parent: "Dumping"
-nav_order: 2
+parent: "Export"
+nav_order: 3
 ---
 
 # Exporting JSON

@@ -1,4 +1,21 @@
-# Node Mapping
+---
+title: "Mappings"
+parent: "Export"
+layout: default
+nav_order: 2
+---
+
+# Mappings
+
+The mapping between Cadmus source data (items and parts) and various export targets (JSON, RDF, etc.) is defined by node mappings. This is the core of the projection mechanism, which extracts a subset of source data from an object treated as a tree of properties. A mappings-based approach provides an export architecture which is:
+
+- flexible, because it adapts to any source and target types;
+- modular, because it splits a monolithic complex logic into many smaller pieces, which fit their source models;
+- reusable, because scholars just provide mapping declarations, without having to write code, nor delving into the details of an imperative, step by step procedure.
+
+Each mapping rule projects a small bit of data. These rules are very simple and small, but they can be organized in a _tree_ structure, which nicely fits the structure of Cadmus source data (objects, i.e. trees of properties). So, each mapping rule is the root of a tree structure, where each _node_ is a mapping rule.
+
+## Node Mapping
 
 A node mapping (`NodeMapping`) is a generic abstraction used to represent a node in the properties tree underlying an object. The mapping has:
 
