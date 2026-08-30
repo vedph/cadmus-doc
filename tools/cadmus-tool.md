@@ -25,11 +25,11 @@ nav_order: 8
     - [List Users Command](#list-users-command)
     - [Update User Command](#update-user-command)
   - [Export](#export)
-  - [Dump Command](#dump-command)
-  - [Dump Thesauri Command](#dump-thesauri-command)
-  - [Render Items Command](#render-items-command)
-  - [Export RDF Command](#export-rdf-command)
-  - [Convert JSON to XML](#convert-json-to-xml)
+    - [Dump Command](#dump-command)
+    - [Dump Thesauri Command](#dump-thesauri-command)
+    - [Render Items Command](#render-items-command)
+    - [Export RDF Command](#export-rdf-command)
+    - [Convert JSON to XML](#convert-json-to-xml)
     - [Get Object Command](#get-object-command)
     - [Graph Dereference Mappings](#graph-dereference-mappings)
   - [Import](#import)
@@ -286,7 +286,7 @@ Supported commands:
 
 ## Export
 
-## Dump Command
+### Dump Command
 
 🎯 Dump any subset of Cadmus data objects into JSON file(s).
 
@@ -324,7 +324,7 @@ Example:
 ./cadmus-tool dump cadmus-ndp --indented
 ```
 
-## Dump Thesauri Command
+### Dump Thesauri Command
 
 🎯 Dump all the thesauri into a JSON file.
 
@@ -338,7 +338,7 @@ Syntax:
 - `-o OUTPUT_PATH`: the output JSON file path.
 - `--indented`: indent JSON output.
 
-## Render Items Command
+### Render Items Command
 
 🎯 [Render](./render/architecture.md) Cadmus items.
 
@@ -355,7 +355,7 @@ Syntax:
 - `-c COMPOSER_KEY`: the item composer key to use (default is `default`).
 - `-m MAX_ITEMS_COUNT`: the maximum number of items to render (0=all).
 
-## Export RDF Command
+### Export RDF Command
 
 🎯 Export Cadmus [semantic graph](../migration/graph/graph.md) into various standard RDF formats.
 
@@ -541,7 +541,7 @@ x:events/pid/birth crm:p97_from_father x:persons/ser_petracco .
 }
 ```
 
-## Convert JSON to XML
+### Convert JSON to XML
 
 🎯 Convert into XML a JSON file representing an item or part as extracted from a Cadmus database (usually via the [get-object command](https://github.com/vedph/cadmus_tool?tab=readme-ov-file#get-object-command) of the Cadmus CLI tool).
 
