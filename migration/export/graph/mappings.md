@@ -280,7 +280,7 @@ Should you want to disable this filtering (which is generally _not_ recommended,
 
 ## Sample
 
-As a sample, consider a [historical events part](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events.md). This contains any number of events, optionally with their place and/or time, and directly-related entities.
+As a sample, consider a [historical events part](https://github.com/vedph/cadmus-general/blob/master/docs/historical-events). This contains any number of events, optionally with their place and/or time, and directly-related entities.
 
 In this sample we have two events:
 
@@ -596,7 +596,7 @@ The corresponding named mapping is more complex, and includes a parent mapping w
 
 > 💡 Note that whenever the mapping process emits a node or triple, this does not imply that this will be effectively added to the graph. The node or triple will be added only when they are not already present, because the generated graph will be merged into the existing, much larger one. So, emitting a node for the place ensures that we have it (otherwise, we could not create triples using it), but it will do no harm if that node already exists.
 
-- date: the `date` mapping looks more interesting, as dealing with its complex [model](https://github.com/vedph/cadmus-bricks/blob/master/docs/historical-date.md) requires a macro (you can play with this model using the corresponding UI widget in [this demo page](https://cadmus-bricks-v3.fusi-soft.com/refs/historical-date)). We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
+- date: the `date` mapping looks more interesting, as dealing with its complex [model](https://github.com/vedph/cadmus-bricks/blob/master/docs/historical-date) requires a macro (you can play with this model using the corresponding UI widget in [this demo page](https://cadmus-bricks-v3.fusi-soft.com/refs/historical-date)). We emit two nodes for each date: one with an approximate numeric value, calculated from the historical date model, and useful for processing data (for filtering, sorting, etc.); another with the human-friendly (yet parsable) representation of the date. The logic required for this could not be represented by the simple mapping model, which is purely declarative, and is bound to be simple for performance reasons. Rather, we use a [macro](#macros), i.e. an external function, previously registered with the mapper (via the Cadmus data profile). Macro are pluggable components, so they represent an easy and powerful extension point. In this case, the macro `_hdate` is used to calculate the values from the JSON code representing the historical date's model. The output is stored in a couple of metadata, and then used in the triples.
 
 #### Birth event - assertion
 
@@ -672,7 +672,7 @@ The corresponding mapping template is:
 
 This is connected to a specific conventional usage of the generic event's tag in this example. Events have a general purpose `tag` property, an optional string with arbitrary content which can be used for grouping or tagging the event according to some criteria.
 
-In this example, we assume that the event's tag refers to a named period, like "early Middle Ages", "late Middle Ages", etc. Typically, this comes from a [thesaurus](../../models/thesauri.md). Of course, this is something specific to each project; that's just a demo.
+In this example, we assume that the event's tag refers to a named period, like "early Middle Ages", "late Middle Ages", etc. Typically, this comes from a [thesaurus](../../models/thesauri). Of course, this is something specific to each project; that's just a demo.
 
 Again, this is a reference:
 
@@ -1132,7 +1132,7 @@ These triples say that:
 
 So, these are the outcome of the mapping process. The user is not aware of all this: his only task is filling in a form in a UI. This form lists events. Then, whenever he saves his work, the mapping process for the edited part steps in, and generates this graph of nodes. The graph will then be merged to the graph stored in the database. Thanks to the SID, whenever the same part is changed, the mappings will be run again, and the resulting graph will be merged into the existing graph.
 
-Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 10 nodes and 28 triples. Of course, a form with a list of events where you can insert date, place and pick related entities is generally easier to use than having to manually encode all these nodes and triples without necessarily knowing anything about RDF, much similar to the way Cadmus [renders](../rendering/architecture.md) full TEI from its data without users having to know about XML. Also, just like in rendering output from the same data we are free to completely change the target TEI scheme, here in projecting graph nodes and links we are free to completely change the target ontologies by just changing our mappings.
+Here, the user just filled in a form by entering a couple of events in the events part of the Petrarch person item. This part contains all the relevant events of his life, starting with birth and ending with death. From these data, the mappings automatically projected 10 nodes and 28 triples. Of course, a form with a list of events where you can insert date, place and pick related entities is generally easier to use than having to manually encode all these nodes and triples without necessarily knowing anything about RDF, much similar to the way Cadmus [renders](../rendering/architecture) full TEI from its data without users having to know about XML. Also, just like in rendering output from the same data we are free to completely change the target TEI scheme, here in projecting graph nodes and links we are free to completely change the target ontologies by just changing our mappings.
 
 To make things easier, a UI is provided also for creating and testing the mappings themselves.
 

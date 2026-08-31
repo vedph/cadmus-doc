@@ -105,7 +105,7 @@ Instead, it will exclude:
 
 ## Executing a Dump
 
-To execute a raw JSON export for data and/or thesauri, use these commands in the [Cadmus CLI tool](../../tools/cadmus-tool.md):
+To execute a raw JSON export for data and/or thesauri, use these commands in the [Cadmus CLI tool](../../tools/cadmus-tool):
 
 - [dump](../../tools/cadmus-tool.md#dump-command)
 - [dump thesauri](../../tools//cadmus-tool.md#dump-thesauri-command)

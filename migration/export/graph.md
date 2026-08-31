@@ -64,7 +64,7 @@ At any rate, given that they are a completely independent resource, this means t
 
 So, at the heart of the graph is the projection via mapping. The mapping flow includes these main steps:
 
-(1) a **source object** is provided to the mapper. This can be any type, but the current implementation relies on objects serialized into JSON. Usually, these come from MongoDB directly, so JSON is already at hand. Source object are Cadmus _items_ or _parts_ ([thesauri](../../models/thesauri.md) can be imported as nodes, but this does not happen via mapping as it's a single procedure, whatever the thesaurus). At any rate, ultimately from the point of view of the mapper any source object is just JSON code representing it.
+(1) a **source object** is provided to the mapper. This can be any type, but the current implementation relies on objects serialized into JSON. Usually, these come from MongoDB directly, so JSON is already at hand. Source object are Cadmus _items_ or _parts_ ([thesauri](../../models/thesauri) can be imported as nodes, but this does not happen via mapping as it's a single procedure, whatever the thesaurus). At any rate, ultimately from the point of view of the mapper any source object is just JSON code representing it.
 
 >⚙️ Technically, between the _source_ object and the _mappings_ there is an intermediate layer, represented by [adapter components](graph/adapters). Their task is adapting that object to the mappings, and providing additional information from it.
 

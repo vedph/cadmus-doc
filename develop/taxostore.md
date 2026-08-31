@@ -1,6 +1,6 @@
 # Adding Taxonomy Store
 
-- 📖 [documentation](../linking/taxonomies.md)
+- 📖 [documentation](../linking/taxonomies)
 
 - [Adding Taxonomy Store](#adding-taxonomy-store)
   - [Backend](#backend)

@@ -44,11 +44,11 @@ By convention, this `eid` metadatum, which generates a data pin for the `Metadat
 
 ## Composite Links
 
-A more advanced and powerful way of linking data in Cadmus is provided by composite links, implemented in the [asserted composite ID brick](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README.md).
+A more advanced and powerful way of linking data in Cadmus is provided by composite links, implemented in the [asserted composite ID brick](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-refs-asserted-ids/README).
 
 >Demo: <https://cadmus-bricks-v3.fusi-soft.com/refs/asserted-composite-id>
 
-This is now the preferred way of representing links in items (when the brick is wrapped in a `PinLinksPart`) or inside a part (using the brick directly), because it allows to use the same model and UI for any target: external, internal and [taxonomy](taxonomies.md) links.
+This is now the preferred way of representing links in items (when the brick is wrapped in a `PinLinksPart`) or inside a part (using the brick directly), because it allows to use the same model and UI for any target: external, internal and [taxonomy](taxonomies) links.
 
 ### Composite Links: External Targets
 

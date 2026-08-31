@@ -7,7 +7,7 @@ nav_order: 9
 
 # Importing Excel Data
 
-Procedure for [importing Excel data](../../migration/import/import-xlsx.md). In this document, `__PRJ__` is the name of your project.
+Procedure for [importing Excel data](../../migration/import/import-xlsx). In this document, `__PRJ__` is the name of your project.
 
 - [example: TES import tool](https://github.com/vedph/cadmus-tes/tree/master/tes-tool)
 

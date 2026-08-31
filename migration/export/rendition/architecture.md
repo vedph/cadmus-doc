@@ -237,7 +237,7 @@ root --> 1[qu]
 5 --> 6[_XX]
 ```
 
->The tree structure may seem an overcomplication when dealing with a single linear branch, but it is useful when rendering more complex data. For instance, we might be able to transform a linear tree into a binary branching tree, and adopt a parallel segmentation strategy, like in [this example](./samples/tei-simple-ps.md).
+>The tree structure may seem an overcomplication when dealing with a single linear branch, but it is useful when rendering more complex data. For instance, we might be able to transform a linear tree into a binary branching tree, and adopt a parallel segmentation strategy, like in [this example](./samples/tei-simple-ps).
 
 Note that here a node contains text with a LF character, which is used to mark the end of the original line. Typically this is adjusted in the next step so that such nodes are split.
 

@@ -103,7 +103,7 @@ The main purpose of this step is providing a clearer set of nodes in advance, so
 ]
 ```
 
-▶️ (2) use the [Cadmus CLI tool](../../../tools/cadmus-tool.md) to import the nodes, e.g.:
+▶️ (2) use the [Cadmus CLI tool](../../../tools/cadmus-tool) to import the nodes, e.g.:
 
 ```sh
 ./cadmus-tool graph-import c:/users/dfusi/desktop/nodes.json cadmus-itinera -g repository-provider.itinera

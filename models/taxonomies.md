@@ -1,6 +1,6 @@
 # Taxonomies
 
-In most cases, taxonomies in Cadmus are relatively static and small data, defined via [thesauri](thesauri.md). Some projects anyway have more specialized requirements for specific taxonomies which could not be optimally satisfied by thesauri alone.
+In most cases, taxonomies in Cadmus are relatively static and small data, defined via [thesauri](thesauri). Some projects anyway have more specialized requirements for specific taxonomies which could not be optimally satisfied by thesauri alone.
 
 For instance, consider a huge taxonomy about iconographic subjects, including a deep hierarchy of thousands of entries. In this scenario, we would have these requirements:
 

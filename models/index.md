@@ -59,7 +59,7 @@ When starting a project, you typically follow this procedure:
 
 - decide which are your **entities**. Usually you start from top-level entities, represented by items.
 - for each entity, decide the **parts** used to describe all what you want to say about it. You can reuse general parts or parts from other projects, and also create new parts of your own.
-- for each part used, define its closed **vocabularies**. Most parts have such vocabularies to allow for a consistent and user-friendly model. Most of these vocabularies are implemented as [thesauri](../linking/thesauri.md), but they can also be [taxonomies](../linking/taxonomies.md).
-- define the **relationships** among entities and use the proper models to implement them as [links](../linking/index.md). If you are linking an item to external or internal resources, you can just add a links part to it. If you are linking a specific object inside a part's (or fragment's) model, you can use the links "brick" in its definition.
+- for each part used, define its closed **vocabularies**. Most parts have such vocabularies to allow for a consistent and user-friendly model. Most of these vocabularies are implemented as [thesauri](../linking/thesauri), but they can also be [taxonomies](../linking/taxonomies).
+- define the **relationships** among entities and use the proper models to implement them as [links](../linking/index). If you are linking an item to external or internal resources, you can just add a links part to it. If you are linking a specific object inside a part's (or fragment's) model, you can use the links "brick" in its definition.
 
 >A brick is a self-contained micro-model used as the building block of bigger objects like parts or fragments. For instance, a structured date is a brick, and you can insert it into the model of any part or fragment requiring it. Each brick has its model and its UI widget. You can play with stock Cadmus bricks at <https://cadmus-bricks-v3.fusi-soft.com/>.

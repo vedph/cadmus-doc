@@ -12,7 +12,7 @@ nav_order: 4
 
 # Adding Backend Part Seeders
 
-Part seeders are used to generate mock data for the editor. There can be a part seeder class for each [part class](parts.md).
+Part seeders are used to generate mock data for the editor. There can be a part seeder class for each [part class](parts).
 
 >The part seeder project requires at the 📦 `Cadmus.Seed` package. Typically you add a seeder for each part or fragment.
 

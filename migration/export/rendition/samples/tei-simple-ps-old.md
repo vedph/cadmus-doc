@@ -34,7 +34,7 @@ Apart from segmentation issues anyway (which here are removed by the flattening 
 
 ## Text and Apparatus
 
-Let us consider this critical text (extracted with simplifications from a real world example; I include portions of text attached to the [apparatus layer](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus.md) in square brackets):
+Let us consider this critical text (extracted with simplifications from a real world example; I include portions of text attached to the [apparatus layer](https://github.com/vedph/cadmus-philology/blob/master/docs/fr.apparatus) in square brackets):
 
 ```txt
 [tecum] [ludere] sicut ipsa [possem]

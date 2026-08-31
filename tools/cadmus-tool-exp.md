@@ -61,7 +61,7 @@ Syntax:
 
 ## Render Items Command
 
-🎯 [Render](./render/architecture.md) Cadmus items.
+🎯 [Render](./render/architecture) Cadmus items.
 
 Syntax:
 
@@ -91,7 +91,7 @@ Syntax:
 - -`o OUTPUT_DIRECTORY`: the output directory. Default is `export` on your desktop.
 - `--pretty-print`: pretty-print the JSON output.
 
->See [JSON export](../migration/export/json-export.md) for the configuration document.
+>See [JSON export](../migration/export/json-export) for the configuration document.
 
 **Example**:
 
@@ -101,7 +101,7 @@ Syntax:
 
 ## Export RDF Command
 
-🎯 Export Cadmus [semantic graph](../migration/graph/graph.md) into various standard RDF formats.
+🎯 Export Cadmus [semantic graph](../migration/graph/graph) into various standard RDF formats.
 
 Syntax:
 

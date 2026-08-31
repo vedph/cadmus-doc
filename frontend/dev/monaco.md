@@ -18,7 +18,7 @@ To make it easier to integrate Monaco in your editor, you can use [this thin wra
 1. `npm i @cisstech/nge`.
 2. add `importProvidersFrom(NgeMonacoModule.forRoot({})),` in the providers of `appConfig`.
 
-If using [CTE plugins](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-text-ed/README.md), add to your `app.config` the required plugins, e.g.:
+If using [CTE plugins](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-text-ed/README), add to your `app.config` the required plugins, e.g.:
 
 ```ts
 import {

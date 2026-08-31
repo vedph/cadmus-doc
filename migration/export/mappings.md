@@ -46,7 +46,7 @@ Each mapping selects a specific path in the source JSON object, and in turn can 
 This abstract mapping representation is then variously implemented by concrete mappings according to their output. Currently two such mappings exist:
 
 - [JSON node mapping](json-export.md#json-node-mapping), targeting any JSON schema and designed for one-pass data export.
-- [graph node mapping](graph/mappings.md), targeting an RDF graph to be actively kept in synch with the data source.
+- [graph node mapping](graph/mappings), targeting an RDF graph to be actively kept in synch with the data source.
 
 ## Abstract Node Mapping
 
