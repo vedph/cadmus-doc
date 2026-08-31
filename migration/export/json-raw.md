@@ -1,11 +1,11 @@
 ---
-title: "Dumping Raw JSON"
+title: "Dumping JSON"
 layout: default
 parent: "Export"
 nav_order: 1
 ---
 
-# Dumping Raw JSON
+# Dumping JSON
 
 Dumping Cadmus data is a process designed for migrating data either fully or incrementally, but also to provide logic for time frame-based data browsing.
 
