@@ -75,7 +75,7 @@ Then, the `source` property determines the input data we select from our source 
 - from our data object, select the property named `metadata`. This happens to be an array, i.e. a list of objects, each representing a metadatum with two properties: `name` and `value`.
 - among the entries of this metadata list, select the one whose name is `eid`.
 
->The [SID](mappings.md#source-id-sid) (source ID) is an ID used by the mapper to identify the source data connected to this mapping. Whenever these data change (because a user saves a part matching this SID), Cadmus will be able to find which mappings should be run again to update the graph. The SID here is equal to the part's GUID suffixed with the EID.
+>The [SID](../mappings.md#source-id-sid) (source ID) is an ID used by the mapper to identify the source data connected to this mapping. Whenever these data change (because a user saves a part matching this SID), Cadmus will be able to find which mappings should be run again to update the graph. The SID here is equal to the part's GUID suffixed with the EID.
 
 Finally, the output is:
 

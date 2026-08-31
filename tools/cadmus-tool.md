@@ -8,6 +8,7 @@ nav_order: 8
 
 The main Cadmus configuration and utility command-line tool is `cadmus-tool`.
 
+- [code repository](https://github.com/vedph/cadmus_tool)
 - [database commands](cadmus-tool-db.md)
 - [user accounts commands](cadmus-tool-acc.md)
 - [export commands](cadmus-tool-exp.md)

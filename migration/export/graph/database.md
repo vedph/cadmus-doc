@@ -54,7 +54,7 @@ Example:
   - `unsuffixed` (string): the UID as calculated without its optional final suffix (e.g. `x:ms-decorations/angel-1v`).
   - `has-suffix` (bool): true if the SID should be built by adding suffix `#` + `id` to `unsuffixed` (e.g. `3` generates the complete UID `x:ms-decorations/angel-1v#3`).
 
-This table is used to generate UIDs, ensuring that each combination of a [SID](mappings#source-id-sid) (=source ID) + a generated entity identifier gets a unique UID.
+This table is used to generate UIDs, ensuring that each combination of a [SID](../mappings.md#source-id-sid) (=source ID) + a generated entity identifier gets a unique UID.
 
 This essentially is a lookup table, which gets filled whenever a new UID for a graph entity gets calculated. While SID calculation is idempotent (=the same source always has the same globally unique ID), UID calculation is not, because to ensure friendly values UIDs are generated from user-entered data, like an item's title.
 
