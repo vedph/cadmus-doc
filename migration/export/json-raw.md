@@ -19,16 +19,14 @@ The _data dumper_ relies on the data framer to select the items (and their parts
 
 The source Cadmus database contains among others these essential collections:
 
-- **items**: a list of fixed-schema records with essential metadata about each item. Items have among other properties `_id`
-  (a GUID), `timeCreated`, `timeModified`.
+- **items**: a list of fixed-schema records with essential metadata about each item. Items have among other properties `_id` (a GUID), `timeCreated`, `timeModified`.
 - **parts**: a list of varialble-schema records with some fixed essential metadata about each part. Parts have among other properties `_id` (a GUID), `timeCreated`, `timeModified`, and an `itemId`, which works like a foreign key to link that part to a specific item.
 - **history-items**: items editing history.
 - **history-parts**: parts editing history.
 
 History collections are used to store copies of items and parts, whenever they get saved in the database during editing. When this happens, a copy of the item/part is stored in the corresponding history collection: the entry has its own `_id` (a GUID), and the GUID of its source item/part in `referenceId`.
 
-Also, there is a `status` numeric field with values 0=created, 1=updated, 2=deleted. When an item/part is first created, a copy of it is stored in history with status=created; then, on each successive update, a copy of it is stored in history with
-status=updated. If it gets deleted, the item/part is removed from its collection (`items` or `parts`), but a copy of it before deletion is stored in the corresponding history part, with status=deleted.
+Also, there is a `status` numeric field with values 0=created, 1=updated, 2=deleted. When an item/part is first created, a copy of it is stored in history with status=created; then, on each successive update, a copy of it is stored in history with status=updated. If it gets deleted, the item/part is removed from its collection (`items` or `parts`), but a copy of it before deletion is stored in the corresponding history part, with status=deleted.
 
 Thus, in a sense the full dataset is in the history collections, while `items` and `parts` just include the currently active items and parts, without the deleted ones, and updated to their latest versions. That's why the data framer uses history collections as its data source, and typically applies a time filter to frame a specific time window to look at data.
 
