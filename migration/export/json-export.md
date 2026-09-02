@@ -68,7 +68,7 @@ The export configuration is defined in a JSON document like this (see [mappings 
 
 ## JSON Node Mapping
 
-The JSON node mapping is derived from the [abstract node mapping](mappings.md#abstract-node-mapping) and targets a JSON object with any schema. Its core task is to transform a source JSON object into a target JSON object having a different schema.
+The JSON node mapping is derived from the [abstract node mapping](mappings#abstract-node-mapping) and targets a JSON object with any schema. Its core task is to transform a source JSON object into a target JSON object having a different schema.
 
 This mapping **adds** these properties to the abstract node mapping:
 
@@ -549,14 +549,38 @@ Let us imagine that we want to select and transform a subset of these data into 
       "dubious": false,
       "scope": "tes"
     }
-  ],
-  "sources": [
+  ]
+}
+```
+
+Here is the corresponding export configuration:
+
+```json
+{
+  "source": {
+    "itemIdCollector": {
+       "id": "it.vedph.item-id-collector.mongo",
+       "options": {
+        "facetId": "inscription"
+       }
+    }
+  },
+  "itemJsonReader": {
+    "id": "item-json-reader.mongo"
+  },
+  "templateFilters": [
     {
-      "citation": "Mercuri 2002, pp. 558-561",
-      "url": "https://doi.org/10.3406/mefr.2002.10720"
+      "id": "fluid-filter.historical-date"
+    },
+    {
+      "id": "fluid-filter.mongo-thesaurus"
     }
   ],
-  "detailUrl": "/tes/sites/CASTI_01"
+  "mappings": [
+    {
+      "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories"
+    }
+  ]
 }
 ```
 
