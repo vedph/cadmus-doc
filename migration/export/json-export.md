@@ -38,7 +38,7 @@ The export configuration is defined in a JSON document like this (see [mappings 
         "facetId": "...",
         "groupId": "...",
         "flags": null,
-        "flagMatching": 0,
+        "flagMatching": 0
       }
     },
     "itemJsonReader": {
@@ -55,7 +55,7 @@ The export configuration is defined in a JSON document like this (see [mappings 
     },
     "templateFilters": [
       /* array of configurable objects */
-    ],
+    ]
   },
   "namedMappings": {
     /* ... */
@@ -98,7 +98,7 @@ Assume that we have 2 mappings with these properties:
   - `source`: `surname`
   - `output`: `{ "person": {"lastName": {{ value | json }} } }`
 
->As Fluid does not JSON-encode its output by default, we use the mapper's built-in `json` filter (e.g. `{{ value | json }}`) to safely embed arbitrary values into it.
+> As Fluid does not JSON-encode its output by default, we use the mapper's built-in `json` filter (e.g. `{{ value | json }}`) to safely embed arbitrary values into it.
 
 This will output this JSON object:
 
@@ -157,7 +157,7 @@ Here is a realistic example using a single item with its parts as source. To get
 - an additional `_status` property (this is used in JSON dump).
 - an additional `_parts` property which is an array including all the parts in the item.
 
->Note that each part object includes its metadata and then a `content` property with its data, plus a copy of the part's metadata. This small redundancy is by design since the first versions of Cadmus, as it allows storage scenarios where part metadata are separated from content.
+> Note that each part object includes its metadata and then a `content` property with its data, plus a copy of the part's metadata. This small redundancy is by design since the first versions of Cadmus, as it allows storage scenarios where part metadata are separated from content.
 
 ```json
 {
@@ -258,7 +258,7 @@ Here is a realistic example using a single item with its parts as source. To get
       "thesaurusScope": null,
       "content": {
         "grooveType": null,
-        "techniques": [ "execution:chiselled" ],
+        "techniques": ["execution:chiselled"],
         "tools": [],
         "note": null,
         "id": "6338cbda-0cda-460e-bca1-addf7a70a8b6",
@@ -469,7 +469,7 @@ Here is a realistic example using a single item with its parts as source. To get
       "roleId": "ins-lng",
       "thesaurusScope": null,
       "content": {
-        "categories": [ "grc" ],
+        "categories": ["grc"],
         "id": "1dc341ba-15a1-4a95-a2b0-1203a8b97238",
         "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
         "typeId": "it.vedph.categories",
@@ -493,7 +493,7 @@ Here is a realistic example using a single item with its parts as source. To get
       "roleId": "ins-fn",
       "thesaurusScope": null,
       "content": {
-        "categories": [ "function:building", "function:dedication" ],
+        "categories": ["function:building", "function:dedication"],
         "id": "dc9e1d49-aa8a-4f1a-9a88-a90da11b8784",
         "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
         "typeId": "it.vedph.categories",
@@ -559,26 +559,29 @@ Here is the corresponding export configuration:
 {
   "source": {
     "itemIdCollector": {
-       "id": "it.vedph.item-id-collector.mongo",
-       "options": {
+      "id": "it.vedph.item-id-collector.mongo",
+      "options": {
         "facetId": "inscription"
-       }
-    }
-  },
-  "itemJsonReader": {
-    "id": "item-json-reader.mongo"
-  },
-  "templateFilters": [
-    {
-      "id": "fluid-filter.historical-date"
+      }
     },
-    {
-      "id": "fluid-filter.mongo-thesaurus"
-    }
-  ],
+    "itemJsonReader": {
+      "id": "item-json-reader.mongo"
+    },
+    "templateFilters": [
+      {
+        "id": "fluid-filter.historical-date"
+      },
+      {
+        "id": "fluid-filter.mongo-thesaurus"
+      }
+    ]
+  },
   "mappings": [
     {
-      "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories"
+      "description": "select categories:ins-fn entry values",
+      "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories",
+      "output": "[{{ value | json }}]",
+      "targetProperty": "functions"
     }
   ]
 }
@@ -588,4 +591,4 @@ Here is the corresponding export configuration:
 
 To execute a JSON export for data, use this commands in the [Cadmus CLI tool](../../tools/cadmus-tool):
 
-- [export JSON](../../tools//cadmus-tool.md#export)
+- [export JSON](../../tools/cadmus-tool.md#export)
