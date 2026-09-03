@@ -555,6 +555,7 @@ Let us imagine that we want to select and transform a subset of these data into 
 
 Here is the corresponding export configuration:
 
+{% raw %}
 ```json
 {
   "source": {
@@ -578,6 +579,18 @@ Here is the corresponding export configuration:
   },
   "mappings": [
     {
+      "description": "title => title",
+      "source": "title",
+      "output": "{{ value | json }}",
+      "targetProperty": "title"
+    },
+    {
+      "description": "description => summary",
+      "source": "description",
+      "output": "{{ value | json }}",
+      "targetProperty": "summary"
+    },
+    {
       "description": "select categories:ins-fn entry values",
       "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories",
       "output": "[{{ value | json }}]",
@@ -586,6 +599,7 @@ Here is the corresponding export configuration:
   ]
 }
 ```
+{% endraw %}
 
 ## Executing an Export
 
