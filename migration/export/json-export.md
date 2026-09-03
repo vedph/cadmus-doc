@@ -151,7 +151,7 @@ Result:
 
 ## Example
 
-Here is a realistic example using a single item with its parts as source. To get such a JSON you can use the [JSON dump](json-dump) command in the [CLI tool](../../tools/cadmus-tool). The generated JSON code includes:
+Here is a realistic example usigng a single item with its parts as source. To get such a **JSON input** you can use the [JSON dump](json-dump) command in the [CLI tool](../../tools/cadmus-tool). The generated JSON code includes:
 
 - item's metadata.
 - an additional `_status` property (this is used in JSON dump).
@@ -526,7 +526,7 @@ The item refers to an inscription and its parts are:
 - `it.vedph.categories`:`ins-lng` listing the language(s) used in the inscription (`grc`=Ancient Greek in BCP47).
 - `it.vedph.categories`:`ins-fn` listing the inscription's functions ("building", "dedication").
 
-Let us imagine that we want to select and transform a subset of these data into this JSON output:
+Let us imagine that we want to select and transform a subset of these data into this **JSON output**:
 
 ```json
 {
@@ -549,7 +549,7 @@ Let us imagine that we want to select and transform a subset of these data into 
 }
 ```
 
-The [thesaurus](../../models/thesauri.md) for `categories:ins-fn` contains entries like these:
+The **[thesaurus](../../models/thesauri.md)** for `categories:ins-fn` contains entries like these:
 
 ```json
 {
@@ -609,6 +609,18 @@ Here is the corresponding export configuration:
       "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories",
       "output": "[{{ value | json }}]",
       "targetProperty": "functions"
+    },
+    {
+      "description": "locations[0] => location.latitude, altitude, longitude, certainty",
+      "source": "_parts[?typeId=='it.vedph.geo.asserted-locations'].content.locations[0]",
+      "output": "{ \"latitude\": {{value.latitude | json}}, \"longitude\": {{value.longitude | json}}, \"altitude\": {{value.altitude | json}}, \"certainty\": {{assertion.rank | json}}}",
+      "targetProperty": "location"
+    },
+    {
+      "description": "dates[0] => date.text, .scope",
+      "source": "_parts[?typeId=='it.vedph.geo.asserted-locations'].content.dates[0]",
+      "output": "{ \"text\": {{. | historical-date | json}}, \"scope\": \"tes\"}",
+      "targetProperty": "date"
     }
   ]
 }
