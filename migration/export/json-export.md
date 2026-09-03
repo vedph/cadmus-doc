@@ -533,21 +533,35 @@ Let us imagine that we want to select and transform a subset of these data into 
   "projectIds": ["tes"],
   "title": "ISic000822",
   "summary": "Insediamento con necropoli nei Monti Iblei, documentato tra il VII e l'inizio del V secolo a.C.",
-  "siteTypes": ["settlement", "necropolis"],
-  "features": ["status-marker", "representations-figurative", "inscriptions"],
+  "functions": ["building", "dedication"],
   "location": {
     "latitude": 36.9507789,
     "longitude": 14.6504504,
     "altitude": 650,
     "certainty": null
   },
-  "chronology": [
+  "date": [
     {
-      "from": -700,
-      "to": -475,
-      "approximate": true,
-      "dubious": false,
+      "text": "c. 600 -- 551 BC",
       "scope": "tes"
+    }
+  ]
+}
+```
+
+The [thesaurus](../../models/thesauri.md) for `categories:ins-fn` contains entries like these:
+
+```json
+{
+  "id": "categories_ins-fn@en",
+  "entries": [
+    {
+      "id": "function:building",
+      "value": "building"
+    },
+    {
+      "id": "function:dedication",
+      "value": "dedication"
     }
   ]
 }
@@ -591,7 +605,7 @@ Here is the corresponding export configuration:
       "targetProperty": "summary"
     },
     {
-      "description": "select categories:ins-fn entry values",
+      "description": "categories:ins-fn entry values => functions",
       "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories",
       "output": "[{{ value | json }}]",
       "targetProperty": "functions"
