@@ -7,6 +7,7 @@ nav_order: 4
 
 # Exporting JSON
 
+{% raw %}
 Exporting JSON differs from a [raw JSON export](json-dump) as it implies selecting and remapping source data into a different JSON schema. So here we are effectively _transforming_ source data into any other schema, as required by the consumer.
 
 A typical application of this export process is a frontend designed around a set of predefined view models, specifically designed for it. Data is thus transformed into the target schema, similarly to what happens in XML via XSLT.
@@ -20,6 +21,8 @@ While this difference applies to the output of each process, the logic to select
 
 - collecting source items to export.
 - apply loaded mappings to project data from each source object's property node to the designed target.
+
+This page is a practical guide for people who have to **write** these mappings. Rather than just describing each property in isolation, it walks through the exact algorithm the mapper follows, so that you can predict what a mapping will produce before running it, and quickly diagnose it when it does not produce what you expected.
 
 ## Configuration
 
@@ -54,7 +57,7 @@ The export configuration is defined in a JSON document like this (see [mappings 
       ]
     },
     "templateFilters": [
-      /* array of configurable objects */
+      /* array of configurable objects, each with a "keys" property */
     ]
   },
   "namedMappings": {
@@ -66,92 +69,288 @@ The export configuration is defined in a JSON document like this (see [mappings 
 }
 ```
 
-## JSON Node Mapping
+Each entry in `templateFilters` registers a [Fluid filter](https://github.com/sebastienros/fluid) (see [custom filters](#custom-filters) below) so it becomes usable from your mapping `output` templates. It must specify:
 
-The JSON node mapping is derived from the [abstract node mapping](mappings#abstract-node-mapping) and targets a JSON object with any schema. Its core task is to transform a source JSON object into a target JSON object having a different schema.
+- `id`: the filter component's tag (e.g. `fluid-filter.historical-date`).
+- `keys`: the Fluid filter keyword(s) it is invoked with in a template (e.g. `historical-date`, used as `{{ value | historical-date }}`).
+- `options`: any options the filter requires (e.g. a Mongo connection string).
 
-This mapping **adds** these properties to the abstract node mapping:
+> ⚠️ **If you omit `keys`, the filter is silently never registered.** There is no error either at load time or when the template later references it: Fluid treats an unknown filter name as a no-op passthrough, not an error. So a missing `keys` typically shows up much later, as a value that just did not get transformed the way you expected.
 
-- `output`: The [Fluid template](https://github.com/sebastienros/fluid) used to render the JSON fragment output by this mapping when it matches its `NodeMapping.Source`. The template is evaluated with:
-  - `value`: the JSON value currently selected by this mapping (an object exposes its properties; an array its items; a scalar is exposed as a plain string);
-  - `metadata`: the mapper's metadata dictionary;
-  - `sid`: the SID resolved for this mapping, if any.
-- `targetProperty`: the name of the property of the root JSON object under which the output of this mapping is to be merged. This can contain the same placeholders used by SID (metadata, data expressions, macros). When null or empty, the output (which must then be a JSON object) is merged directly into the root JSON object. Multiple mappings can target the same property: when they both output objects they get deep-merged (existing properties get enriched or overridden), when they both output arrays the new items get appended, otherwise the newer output replaces the older.
+## How Mapping Works: A Mental Model
 
-Examples (to keep examples simple, we use abstract JSON objects, not true Cadmus source objects):
+Each `NodeMapping` (see [abstract node mapping](mappings#abstract-node-mapping)) matches a **source node**, and a `JsonNodeMapping` additionally renders an **output template** for it. Understanding exactly what happens between these two steps is the key to writing mappings that work on the first try. The algorithm, for each mapping, is:
 
-- **object**: consider this JSON object:
+1. **Select.** `source` is a [JMES path](jmes-path) evaluated against the mapping's current context: for a root mapping, that is the whole source object (item + parts); for a child mapping, it is whatever node its parent mapping matched (see [children mappings](#9-nested-children-mappings) below). The special value `.` means "the current context as a whole".
+2. **React to what was selected**, one of four cases:
+   - **nothing** (the path does not exist, or is JSON `null`): the mapping (and all its children) produce **no output at all**, silently. This is not an error, so a wrong `source` never throws — it just quietly leaves a hole in your output. See [pitfall #1](#pitfall-1-a-wrong-path-fails-silently-not-loudly).
+   - **an array**: the mapper automatically **loops** over its items. The mapping (and its children) run once per item, and for that run the _item itself_ becomes the new current context — you never see the raw array. A per-iteration `index` metadatum (0-based) is also available. See [array recipes](#5-map-an-array-of-scalars-into-an-array).
+   - **a scalar** (string, number, boolean): it is exposed as a **raw string**, regardless of its original JSON type. This is deliberate (so a string that happens to look like a number is not silently parsed as one), but it means numbers and booleans need care — see [pitfall #3](#pitfall-3-a-number-or-boolean-quoted-as-a-string).
+   - **an object**: it is exposed as itself, with its own properties reachable by name.
+3. **Render.** For an object or a scalar (not an array, which was already consumed by the loop in step 2), the `output` [Fluid template](https://github.com/sebastienros/fluid) is rendered with:
+   - `value`: **exactly** what was selected in step 1/2 — nothing more, nothing less. Fluid never "reaches past" your `source` expression for you: if `source` selects a wrapper object, its inner fields are one level deeper than you might expect. See [pitfall #2](#pitfall-2-an-extra-value-wrapper).
+   - `metadata`: the mapper's metadata dictionary (includes `index` while iterating an array, plus anything you or a macro added).
+   - `sid`: the [SID](mappings#source-id-sid) resolved for this mapping, if any.
+     The rendered text **must be valid JSON** on its own (a full object, or a full array). Because Fluid does not encode its output for JSON by default, always pass values through the built-in `json` filter before embedding them (e.g. `{{ value.name | json }}`), except where you deliberately want a raw, already-valid JSON literal (as when wrapping a whole selected object in `[ ... ]`, see the [array recipes](#5-map-an-array-of-scalars-into-an-array)).
+4. **Merge.** The rendered JSON is merged into the shared target object, either at its root (when `targetProperty` is empty — in which case the rendered JSON **must** itself be an object) or under `targetProperty` (which can itself use the [placeholders](#placeholders-in-sid-and-targetproperty) below). Merging follows simple, consistent rules, applied every time a mapping's output lands on the same property (whether because several sibling mappings target it, or because an array made the same mapping run more than once):
+   - object + object → **deep merge** (existing properties enriched or overridden by the new ones);
+   - array + array → **concatenate** (new items appended);
+   - anything else → the new value **replaces** the old one.
+5. **Recurse.** If the mapping has `children`, each of them is matched again, but against the node selected in step 1 — not against the root. This is what lets you decompose a complex path into small, single-purpose mappings instead of one giant template (see [nested children](#9-nested-children-mappings)).
+
+Steps 1–5 repeat, independently, for every mapping in your configuration (and every array item that triggers step 2's loop). There is no shared mutable "cursor" across mappings: each one starts fresh from its own `source`.
+
+## Placeholders in `sid` and `targetProperty`
+
+`targetProperty` (and, on any mapping, `sid`) is not rendered by Fluid — it goes through a small placeholder resolver supporting three forms, which can be mixed with literal text:
+
+| Syntax          | Meaning                                                                                                               | Example                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `{$name}`       | a **metadatum**: looks up `name` in the mapper's `Data`/`metadata` dictionary                                         | `{$slot}` → the value of `mapper.Data["slot"]`      |
+| `{@expr}`       | a **data expression**: a JMES path evaluated against the node currently selected by `source` (`.` for the whole node) | `{@type}` → the `type` property of the current node |
+| `{!name(args)}` | a **macro**: a registered `INodeMappingMacro`, with `&`-separated arguments                                           | `{!_hdate(...)}`                                    |
+
+For instance, a mapping whose `source` yields items with a `type` field can target a differently-named property per item without writing one mapping per type:
 
 ```json
 {
-  "name": "Jane",
-  "surname": "Doe"
+  "source": "events[]",
+  "output": "{ \"year\": {{ value.year | json }} }",
+  "targetProperty": "{@type}"
 }
 ```
 
-Assume that we have 2 mappings with these properties:
+> Note the different syntax families: `source`/`output` use JMES path and Fluid respectively, while `sid`/`targetProperty` use this placeholder mini-language. Mixing them up (e.g. writing a JMES path directly in `targetProperty`) is a common source of confusion — `targetProperty` only understands `{$...}`, `{@...}`, and `{!...}`.
 
-- mapping 1:
-  - `source`: `name`
-  - `output`: `{ "person": {"firstName": {{ value | json }} } }`
-- mapping 2:
-  - `source`: `surname`
-  - `output`: `{ "person": {"lastName": {{ value | json }} } }`
+## Cookbook
 
-> As Fluid does not JSON-encode its output by default, we use the mapper's built-in `json` filter (e.g. `{{ value | json }}`) to safely embed arbitrary values into it.
+All the examples below use this small source object unless otherwise noted:
 
-This will output this JSON object:
+```json
+{ "name": "Jane", "surname": "Doe" }
+```
+
+### 1. Copy a scalar property, renamed
 
 ```json
 {
-  "person": {
-    "firstName": "Jane",
-    "lastName": "Doe"
+  "source": "name",
+  "output": "{{ value | json }}",
+  "targetProperty": "fullName"
+}
+```
+
+→ `{ "fullName": "Jane" }`. `value` here is the raw string `"Jane"` (see step 2's scalar case); the `json` filter quotes it as a JSON string, which is what you want for an actual string.
+
+### 2. Copy an object as-is, at the root
+
+```json
+{
+  "source": ".",
+  "output": "{ \"greeting\": \"Hello, {{ value.name }}!\" }"
+}
+```
+
+→ `{ "greeting": "Hello, Jane!" }`, merged directly at the root because `targetProperty` is empty. This only works because the rendered output is itself an object (rule in step 4); if it were e.g. a bare string, the mapper would throw `InvalidOperationException` rather than guess where to put it.
+
+### 3. Combine sibling mappings into the same target object
+
+Two independent mappings can enrich the same object, thanks to the object+object deep-merge rule (step 4):
+
+```json
+[
+  {
+    "source": "name",
+    "output": "{ \"person\": {\"firstName\": {{ value | json }} } }"
+  },
+  {
+    "source": "surname",
+    "output": "{ \"person\": {\"lastName\": {{ value | json }} } }"
+  }
+]
+```
+
+→ `{ "person": { "firstName": "Jane", "lastName": "Doe" } }`.
+
+### 4. Build a nested object from several source fields
+
+When several output fields come from the same source node, prefer a single mapping selecting the common ancestor, rather than several siblings:
+
+```json
+{
+  "source": ".",
+  "output": "{ \"address\": { \"street\": \"{{ value.street }}\", \"city\": \"{{ value.city }}\" } }"
+}
+```
+
+Given source:
+
+```json
+{
+  "street": "123 Main St",
+  "city": "Anytown"
+}
+```
+
+The output is:
+
+```json
+{ "address": {
+  "street": "123 Main St",
+  "city": "Anytown"
   }
 }
 ```
 
-- **array**: consider this JSON object:
+### 5. Map an array of scalars into an array
+
+Given `{ "tags": ["a", "b"] }`:
 
 ```json
 {
-  "events": [
+  "source": "tags",
+  "output": "[{{ value | json }}]",
+  "targetProperty": "tags"
+}
+```
+
+Here `source` selects the whole `tags` array, so per step 2 the mapper **loops**: the mapping runs twice, once per item, each time with `value` bound to a single tag string. Each run's output is a one-item array (`["a"]`, then `["b"]`); per step 4's array+array rule these get concatenated into the final `["a", "b"]`. This is why the template wraps a single item in `[ ... ]` rather than trying to render the whole array at once — by the time your template runs, the array is already gone, replaced by one of its items.
+
+### 6. Map an array of objects, reshaping each item
+
+Given `{ "events": [ { "type": "birth", "year": 1265 }, { "type": "death", "year": 1321 } ] }`:
+
+```json
+{
+  "source": "events",
+  "output": "[ { \"type\": {{ value.type | json }} } ]",
+  "targetProperty": "events"
+}
+```
+
+→ `{ "events": [ { "type": "birth" }, { "type": "death" } ] }`. Same looping/concatenation mechanism as above, but each item is an object so you can pick a subset of its properties (here, dropping `year`).
+
+### 7. Pick a single item from an array
+
+Indexing collapses the array back to a single node, so the mapper does **not** loop, and `value` is bound directly to that one item (an object, not an array):
+
+```json
+{
+  "source": "events[0]",
+  "output": "{ \"firstEventType\": {{ value.type | json }} }"
+}
+```
+
+→ `{ "firstEventType": "birth" }`.
+
+### 8. Numbers and booleans: getting real JSON types out
+
+Given `{ "age": 42 }`, this looks reasonable but is wrong:
+
+```json
+{
+  "source": "age",
+  "output": "{ \"age\": {{ value | json }} }"
+}
+```
+
+→ `{ "age": "42" }` — a **quoted string**, not a number. This is [pitfall #3](#pitfall-3-a-number-or-boolean-quoted-as-a-string): a directly-selected scalar is always a raw .NET string (step 2), and the `json` filter always JSON-encodes whatever it is given as a string when given a string, so a raw numeric-looking string becomes a quoted string. There are two correct fixes:
+
+- select the parent object instead, and reach the field as a Fluid member access — this way the value passes through normal JSON parsing (which does preserve its type) rather than the scalar-string shortcut:
+
+  ```json
+  {
+    "source": ".",
+    "output": "{ \"age\": {{ value.age | json }} }"
+  }
+  ```
+
+  → `{ "age": 42 }`, correctly numeric.
+
+- or, if you really must select the scalar directly, drop the `json` filter and interpolate it bare: `{ "age": {{ value }} }` also produces `{ "age": 42 }`, because the raw text `42` is already valid (unquoted) JSON. This only works for numbers/booleans/`null` — never do this for a string value, since the result would not be valid JSON (`{ "name": Jane }`).
+
+### 9. Nested (children) mappings
+
+Instead of one large `output` reaching deep into a structure, split it into a parent mapping that narrows the context, and children that fill in the details (step 5). Given `{ "person": { "name": "Jane", "age": 42 } }`:
+
+```json
+{
+  "source": "person",
+  "children": [
     {
-      "type": "birth",
-      "year": 1265
+      "source": ".",
+      "output": "{ \"fullName\": {{ value.name | json }} }"
     },
     {
-      "type": "death",
-      "year": 1321
+      "source": ".",
+      "output": "{ \"age\": {{ value.age | json }} }"
     }
   ]
 }
 ```
 
-Mapping:
+Each child's `source` (`.`) is evaluated against the parent's selected node (`person`), not the document root — this is the mechanism that lets deeply nested schemas be expressed as a shallow tree of small, single-purpose mappings, mirroring the structure of the source data itself.
 
-- `source`: `events`
-- `output`: `[ { \"type\": {{ value.type | json }} } ]`
-- `targetProperty`: `events`
+## Custom Filters
 
-Result:
+`JsonTemplateNodeMapper.Filters` is preloaded with Fluid's standard filters, including the `json` filter used throughout this page. Two Cadmus-specific ones ship with the exporter, both registered by tag under a `keys` entry in `source.templateFilters` (see [Configuration](#configuration)):
 
-```json
-{
-  "events": [
-    {
-      "type": "birth"
-    },
-    {
-      "type": "death"
-    }
-  ]
-}
+- `fluid-filter.historical-date` (typically keyed as `historical-date`): parses its input as a `HistoricalDate` (either a string like `"123 AD"`, or the JSON shape produced by serializing one) and returns either its numeric sort value (default), or, with a `"text"` argument, its textual form:
+
+  ```json
+  "output": "{ \"when\": {{ value | historical-date: 'text' | json }} }"
+  ```
+
+- `fluid-filter.mongo-thesaurus` (typically keyed as `mongo-thesaurus`, requires a `connectionString` option): scans its string input for `$[thesaurusId|entryId]` references and replaces each with the corresponding thesaurus entry's value, looked up in MongoDB (falling back through `@eng`/`@en`, and following alias thesauri). It leaves anything that is not a match untouched, so you typically build the reference around your raw code first:
+
+  ```json
+  "output": "[{{ value | prepend: '$[categories_ins-fn@en|' | append: ']' | mongo-thesaurus | json }}]"
+  ```
+
+  Given a source category code `function:building` and a thesaurus `categories_ins-fn@en` with an entry `function:building` → `building`, this produces `["building"]`.
+
+You can also register your own filters in code, before calling `Map`:
+
+```csharp
+mapper.Filters.AddFilter("shout", (input, _, _) =>
+    new ValueTask<FluidValue>(new StringValue(input.ToStringValue().ToUpperInvariant())));
 ```
 
-## Example
+**A misspelled or unregistered filter name is not an error.** Fluid treats it as a no-op: `{{ value | nope | json }}` on `"Jane"` silently renders `"Jane"`, exactly as if `| nope` had not been written at all — no exception, no warning, at parse time or at render time. This is [pitfall #4](#pitfall-4-an-unknown-filter-is-a-silent-no-op) below.
 
-Here is a realistic example usigng a single item with its parts as source. To get such a **JSON input** you can use the [JSON dump](json-dump) command in the [CLI tool](../../tools/cadmus-tool). The generated JSON code includes:
+## Troubleshooting Checklist
+
+These are, in order, the mistakes most likely to make a mapping produce the wrong thing while looking perfectly reasonable — each one drawn from an actual failure, not a hypothetical.
+
+### Pitfall #1: a wrong path fails silently, not loudly
+
+Per step 2, a `source` that matches nothing (or `null`) makes the mapping produce **no output**, without throwing. A `null`/missing field in your result is the mapper telling you "I found nothing here" — it is not a bug to work around downstream, it is a `source` (or a member access inside `output`) to fix. Before trusting an `output` template, verify what `source` actually selects, independently: paste your source JSON and the JMES path into an [online evaluator](https://jmespath.org/) (or a small unit test asserting on `value`'s shape) and confirm you get what you expect, _before_ writing the template around it.
+
+### Pitfall #2: an extra `value` wrapper
+
+Many Cadmus part models wrap their payload in an extra layer, e.g. a `value` property (an asserted location entry is `{ "tag": ..., "value": { "latitude": ..., "longitude": ... }, "assertion": ... }`, not `{ "latitude": ..., "longitude": ... }` directly).
+
+Since `value` in your template is exactly what `source` selected, this means an extra `.value` hop is often needed: `value.value.latitude`, not `value.latitude`. There is no shortcut here other than checking the actual JSON shape of whatever `source` selects — different parts nest differently, and assuming they are all flat is the single most common mistake when writing a new mapping.
+
+### Pitfall #3: a number or boolean quoted as a string
+
+Covered in [recipe #8](#8-numbers-and-booleans-getting-real-json-types-out): a directly-selected scalar is always a raw string, so piping it through `json` always yields a quoted string, even for a source number or boolean.
+
+### Pitfall #4: an unknown filter is a silent no-op
+
+Covered in [custom filters](#custom-filters): a typo in a filter name, or forgetting to list it under `keys` in `source.templateFilters`, does not raise any error — the filter name is simply skipped, and the value flows through unchanged. If a `historical-date`- or thesaurus-resolved value looks suspiciously like the raw, untransformed source value, this is the first thing to check.
+
+### Pitfall #5: `.` is not a valid Fluid expression
+
+`source` and `targetProperty` both accept `.` to mean "the current node", but `output` is Fluid, which has no such shorthand — `{{ . | json }}` fails to parse (`A value was expected`). Always start a Fluid expression from `value`, `metadata`, or `sid`.
+
+### Pitfall #6: mismatched `targetProperty` types across sibling/iteration outputs
+
+Step 4's merge rules are forgiving between object+object and array+array, but anything else _replaces_ rather than merges. If one mapping (or one array iteration) unexpectedly produces a scalar or a differently-shaped object under a `targetProperty` that another mapping also targets, the second one silently overwrites the first rather than erroring — keep the shape of a given `targetProperty` consistent across every mapping (and every array iteration) that can write to it.
+
+## Complete Worked Example
+
+Here is a realistic example using a single item with its parts as source. To get such a **JSON input** you can use the [JSON dump](json-dump) command in the [CLI tool](../../tools/cadmus-tool). The generated JSON code includes:
 
 - item's metadata.
 - an additional `_status` property (this is used in JSON dump).
@@ -175,114 +374,10 @@ Here is a realistic example usigng a single item with its parts as source. To ge
   "_status": 0,
   "_parts": [
     {
-      "_id": "fcf6d7ac-ab97-462b-b9d8-d87ff53cec3b",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.pin-links",
-      "roleId": null,
-      "thesaurusScope": null,
-      "content": {
-        "links": [
-          {
-            "target": {
-              "gid": "Syracusae",
-              "label": "Syracusae",
-              "itemId": null,
-              "partId": null,
-              "partTypeId": null,
-              "roleId": null,
-              "name": null,
-              "value": null
-            },
-            "scope": "toponym-ancient",
-            "tag": "origin",
-            "features": null,
-            "note": null,
-            "assertion": null
-          },
-          {
-            "target": {
-              "gid": "Siracusa",
-              "label": "Siracusa",
-              "itemId": null,
-              "partId": null,
-              "partTypeId": null,
-              "roleId": null,
-              "name": null,
-              "value": null
-            },
-            "scope": "toponym-modern",
-            "tag": "origin",
-            "features": null,
-            "note": null,
-            "assertion": null
-          },
-          {
-            "target": {
-              "gid": "places/462503",
-              "label": "Syracusae",
-              "itemId": null,
-              "partId": null,
-              "partTypeId": null,
-              "roleId": null,
-              "name": null,
-              "value": null
-            },
-            "scope": "pleiades",
-            "tag": "origin",
-            "features": null,
-            "note": null,
-            "assertion": null
-          }
-        ],
-        "id": "fcf6d7ac-ab97-462b-b9d8-d87ff53cec3b",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.pin-links",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0270304Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0530055Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.053Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
-      "_id": "6338cbda-0cda-460e-bca1-addf7a70a8b6",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.epigraphy.technique",
-      "roleId": null,
-      "thesaurusScope": null,
-      "content": {
-        "grooveType": null,
-        "techniques": ["execution:chiselled"],
-        "tools": [],
-        "note": null,
-        "id": "6338cbda-0cda-460e-bca1-addf7a70a8b6",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.epigraphy.technique",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0271851Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0784502Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.078Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
       "_id": "83a128de-56ea-4ec5-a812-3e9c3f68797a",
       "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
       "typeId": "it.vedph.asserted-historical-dates",
       "roleId": null,
-      "thesaurusScope": null,
       "content": {
         "dates": [
           {
@@ -311,64 +406,14 @@ Here is a realistic example usigng a single item with its parts as source. To ge
               "slide": 0
             }
           }
-        ],
-        "id": "83a128de-56ea-4ec5-a812-3e9c3f68797a",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.asserted-historical-dates",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0269935Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.046236Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.026Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.046Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
-      "_id": "e8f247c0-9374-4e95-a10a-a8badd1035c6",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.metadata",
-      "roleId": null,
-      "thesaurusScope": null,
-      "content": {
-        "metadata": [
-          {
-            "type": "string",
-            "name": "eid",
-            "value": "ISic000822"
-          },
-          {
-            "type": "string",
-            "name": "preservation-place",
-            "value": "Tempio di Apollo"
-          }
-        ],
-        "id": "e8f247c0-9374-4e95-a10a-a8badd1035c6",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.metadata",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0267433Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0356082Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.026Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.035Z" },
-      "userId": "zeus",
-      "_status": 0
+        ]
+      }
     },
     {
       "_id": "8ffcd758-c2b0-4350-b27f-dad6f57e4042",
       "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
       "typeId": "it.vedph.geo.asserted-locations",
       "roleId": null,
-      "thesaurusScope": null,
       "content": {
         "locations": [
           {
@@ -376,7 +421,7 @@ Here is a realistic example usigng a single item with its parts as source. To ge
             "value": {
               "eid": null,
               "label": "Syracusae",
-              "latitude": 37.084150000000001,
+              "latitude": 37.08415,
               "longitude": 15.27628,
               "altitude": null,
               "radius": null,
@@ -385,183 +430,47 @@ Here is a realistic example usigng a single item with its parts as source. To ge
             },
             "assertion": null
           }
-        ],
-        "id": "8ffcd758-c2b0-4350-b27f-dad6f57e4042",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.geo.asserted-locations",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0270825Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.059378Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.059Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
-      "_id": "ef14eb25-53fc-442f-bd28-83c21b6d9949",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.epigraphy.support",
-      "roleId": null,
-      "thesaurusScope": null,
-      "content": {
-        "material": "material:stone:limestone",
-        "objectType": "object:arch_element:crepidoma",
-        "features": null,
-        "size": null,
-        "textAreas": null,
-        "counts": [],
-        "note": null,
-        "id": "ef14eb25-53fc-442f-bd28-83c21b6d9949",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.epigraphy.support",
-        "roleId": null,
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0271248Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0665338Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.066Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
-      "_id": "ca82d23f-e32a-4597-9a75-29a287003b16",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.token-text",
-      "roleId": "base-text",
-      "thesaurusScope": null,
-      "content": {
-        "citation": null,
-        "lines": [
-          {
-            "y": 1,
-            "text": "Κλεομ [c.3-5]ε\u0304ς ∶ ἐποίε\u0304σε το\u0304\u0313πέλο\u0304νι ∶ ͱο Κνιδ\u0323ι\u0323ε\u0323[ί]δ\u0323α ∶ τ\u0323ἐν\u0323τ\u0323ε\u0323[λ]ε\u0342 στύλεια ∶ κα[λὰ] ϝ\u0323έργ[α]"
-          }
-        ],
-        "id": "ca82d23f-e32a-4597-9a75-29a287003b16",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.token-text",
-        "roleId": "base-text",
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0273507Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0874133Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.087Z" },
-      "userId": "zeus",
-      "_status": 0
-    },
-    {
-      "_id": "1dc341ba-15a1-4a95-a2b0-1203a8b97238",
-      "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-      "typeId": "it.vedph.categories",
-      "roleId": "ins-lng",
-      "thesaurusScope": null,
-      "content": {
-        "categories": ["grc"],
-        "id": "1dc341ba-15a1-4a95-a2b0-1203a8b97238",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.categories",
-        "roleId": "ins-lng",
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0273077Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0833095Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.083Z" },
-      "userId": "zeus",
-      "_status": 0
+        ]
+      }
     },
     {
       "_id": "dc9e1d49-aa8a-4f1a-9a88-a90da11b8784",
       "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
       "typeId": "it.vedph.categories",
       "roleId": "ins-fn",
-      "thesaurusScope": null,
       "content": {
-        "categories": ["function:building", "function:dedication"],
-        "id": "dc9e1d49-aa8a-4f1a-9a88-a90da11b8784",
-        "itemId": "80b23b04-625d-4a7c-8cfa-d512034af643",
-        "typeId": "it.vedph.categories",
-        "roleId": "ins-fn",
-        "thesaurusScope": null,
-        "timeCreated": "2026-08-30T16:41:07.0271677Z",
-        "creatorId": "zeus",
-        "timeModified": "2026-08-30T16:41:07.0727355Z",
-        "userId": "zeus"
-      },
-      "timeCreated": { "$date": "2026-08-30T16:41:07.027Z" },
-      "creatorId": "zeus",
-      "timeModified": { "$date": "2026-08-30T16:41:07.072Z" },
-      "userId": "zeus",
-      "_status": 0
+        "categories": ["function:building", "function:dedication"]
+      }
     }
   ]
 }
 ```
 
-The item refers to an inscription and its parts are:
+> This is trimmed for readability: the full dump also repeats each part's metadata inside `content`, and includes several more parts (technique, support, text, language category, Pleiades links...). The [Item.json test asset](https://github.com/vedph/cadmus-core/blob/master/Cadmus.Export.Json.Test/Assets/Item.json) has the complete, untrimmed version, and every mapping below is verified against it.
 
-- `it.vedph.pin-links`: links targeting Pleiades places.
-- `it.vedph.epigraphy.technique`: epigraphic technique ("chiselled").
-- `it.vedph.asserted-historical-dates`: date(s) (600-551 BC).
-- `it.vedph.metadata`: identifier (`ISic000822`) and preservation place (`Tempio di Apollo`).
+The item refers to an inscription; the parts relevant to this example are:
+
+- `it.vedph.asserted-historical-dates`: date (600-551 BC).
 - `it.vedph.geo.asserted-locations`: geographical coordinates (37.08415, 15.27628 for Syracusae).
-- `it.vedph.epigraphy.support`: material support description ("limestone", "crepidoma").
-- `it.vedph.token-text`: text in Leiden notation, line by line.
-- `it.vedph.categories`:`ins-lng` listing the language(s) used in the inscription (`grc`=Ancient Greek in BCP47).
-- `it.vedph.categories`:`ins-fn` listing the inscription's functions ("building", "dedication").
+- `it.vedph.categories`:`ins-fn` listing the inscription's functions (`function:building`, `function:dedication`).
 
 Let us imagine that we want to select and transform a subset of these data into this **JSON output**:
 
 ```json
 {
-  "projectIds": ["tes"],
   "title": "ISic000822",
   "summary": "Insediamento con necropoli nei Monti Iblei, documentato tra il VII e l'inizio del V secolo a.C.",
-  "functions": ["building", "dedication"],
+  "functions": ["function:building", "function:dedication"],
   "location": {
-    "latitude": 36.9507789,
-    "longitude": 14.6504504,
-    "altitude": 650,
+    "latitude": 37.08415,
+    "longitude": 15.27628,
+    "altitude": null,
     "certainty": null
   },
   "date": [
     {
-      "text": "c. 600 -- 551 BC",
+      "text": "600 -- 551 BC",
       "scope": "tes"
-    }
-  ]
-}
-```
-
-The **[thesaurus](../../models/thesauri.md)** for `categories:ins-fn` contains entries like these:
-
-```json
-{
-  "id": "categories_ins-fn@en",
-  "entries": [
-    {
-      "id": "function:building",
-      "value": "building"
-    },
-    {
-      "id": "function:dedication",
-      "value": "dedication"
     }
   ]
 }
@@ -569,7 +478,6 @@ The **[thesaurus](../../models/thesauri.md)** for `categories:ins-fn` contains e
 
 Here is the corresponding export configuration:
 
-{% raw %}
 ```json
 {
   "source": {
@@ -584,10 +492,8 @@ Here is the corresponding export configuration:
     },
     "templateFilters": [
       {
-        "id": "fluid-filter.historical-date"
-      },
-      {
-        "id": "fluid-filter.mongo-thesaurus"
+        "id": "fluid-filter.historical-date",
+        "keys": ["historical-date"]
       }
     ]
   },
@@ -605,30 +511,37 @@ Here is the corresponding export configuration:
       "targetProperty": "summary"
     },
     {
-      "description": "categories:ins-fn entry values => functions",
+      "description": "categories:ins-fn codes => functions",
       "source": "_parts[?typeId=='it.vedph.categories' && roleId=='ins-fn'].content.categories",
       "output": "[{{ value | json }}]",
       "targetProperty": "functions"
     },
     {
-      "description": "locations[0] => location.latitude, altitude, longitude, certainty",
+      "description": "locations[0] => location.{latitude,longitude,altitude,certainty}",
       "source": "_parts[?typeId=='it.vedph.geo.asserted-locations'].content.locations[0]",
-      "output": "{ \"latitude\": {{value.latitude | json}}, \"longitude\": {{value.longitude | json}}, \"altitude\": {{value.altitude | json}}, \"certainty\": {{assertion.rank | json}}}",
+      "output": "{ \"latitude\": {{ value.value.latitude | json }}, \"longitude\": {{ value.value.longitude | json }}, \"altitude\": {{ value.value.altitude | json }}, \"certainty\": {{ value.assertion.rank | json }} }",
       "targetProperty": "location"
     },
     {
-      "description": "dates[0] => date.text, .scope",
-      "source": "_parts[?typeId=='it.vedph.geo.asserted-locations'].content.dates[0]",
-      "output": "{ \"text\": {{. | historical-date | json}}, \"scope\": \"tes\"}",
+      "description": "asserted-historical-dates dates[0] => date[0].{text,scope}",
+      "source": "_parts[?typeId=='it.vedph.asserted-historical-dates'].content.dates[0]",
+      "output": "[{ \"text\": {{ value | historical-date: 'text' | json }}, \"scope\": \"tes\" }]",
       "targetProperty": "date"
     }
   ]
 }
 ```
-{% endraw %}
+
+A few things worth pointing out about this configuration, tying back to the model above:
+
+- the `location` mapping needs the extra `value.value.*` hop (pitfall #2), because `locations[0]` selects `{ "tag", "value": { "latitude", ... }, "assertion" }`, not the coordinates directly; and `value.assertion.rank` rather than a bare `assertion.rank`, since `assertion` is only reachable as a member of `value`, never as a top-level Fluid variable on its own.
+- `assertion` is `null` in the source, so `certainty` correctly comes out as `null` too — a missing/null member access does not throw, it just propagates as `null` (do not confuse this with pitfall #1, which is about `source` itself matching nothing: here `source` does match, and it is a specific _member_ of the matched node that is absent).
+- the `date` mapping's `historical-date` filter is only usable because it was registered under `keys: ["historical-date"]` in `templateFilters` — dropping that line would silently turn `{{ value | historical-date: 'text' | json }}` into `{{ value | json }}` (pitfall #4), rendering the raw `{ "a": {...}, "b": {...} }` structure instead of `"600 -- 551 BC"`.
+- both the `functions` and `date` mappings wrap a single rendered object in `[ ... ]`, even though their `source` does not end in `[0]` for `functions` (it loops instead — see [recipe #5](#5-map-an-array-of-scalars-into-an-array)) and does for `date` (it does not loop — see [recipe #7](#7-pick-a-single-item-from-an-array)); either way, the goal is an array under `targetProperty`, so the template must render one.
 
 ## Executing an Export
 
 To execute a JSON export for data, use this commands in the [Cadmus CLI tool](../../tools/cadmus-tool):
 
 - [export JSON](../../tools/cadmus-tool.md#export)
+  {% endraw %}
