@@ -46,7 +46,7 @@ dotnet new sln -n Cadmus__PRJ__
 
 ```bash
 dotnet new classlib -n Cadmus.__PRJ__.Parts
-dotnet sln Cadmus__PRJ__.sln add Cadmus.__PRJ__.Parts/Cadmus.__PRJ__.Parts.csproj
+dotnet sln Cadmus__PRJ__.slnx add Cadmus.__PRJ__.Parts/Cadmus.__PRJ__.Parts.csproj
 ```
 
 This will hold parts and fragments specific to your projects. Usually a single library is enough, but you are free to distribute components across several libraries should you need more granularity for their reuse.
@@ -54,48 +54,63 @@ This will hold parts and fragments specific to your projects. Usually a single l
 ▶️ (2) delete the empty `Class1.cs` file from the newly created project and (as for any library which is meant to be published into a NuGet package) add metadata for it, e.g.:
 
 ```xml
-<!-- inside the "main" PropertyGroup: -->
-<IncludeSymbols>true</IncludeSymbols>
-<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-<Authors>Daniele Fusi</Authors>
-<Company>Fusi</Company>
-<Product>Cadmus</Product>
-<Description>Parts for Cadmus __PRJ__.</Description>
-<Copyright>by Daniele Fusi 2025</Copyright>
-<NeutralLanguage>en-US</NeutralLanguage>
-<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-<PackageTags>Cadmus;parts</PackageTags>
-<Version>0.0.1</Version>
-<FileVersion>0.0.1</FileVersion>
-<AssemblyVersion>0.0.1</AssemblyVersion>
+<PropertyGroup>
+  <IncludeSymbols>true</IncludeSymbols>
+  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  <Authors>Daniele Fusi</Authors>
+  <Company>Fusi</Company>
+  <Product>Cadmus</Product>
+  <Description>Parts for Cadmus __PRJ__.</Description>
+  <Copyright>by Daniele Fusi 2026</Copyright>
+  <NeutralLanguage>en-US</NeutralLanguage>
+  <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+  <PackageTags>Cadmus;parts</PackageTags>
+  <DebugType>portable</DebugType>
+  <DebugSymbols>true</DebugSymbols>
+  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  <Deterministic>true</Deterministic>
+  <Version>0.0.1</Version>
+  <FileVersion>0.0.1</FileVersion>
+  <AssemblyVersion>0.0.1</AssemblyVersion>
+</PropertyGroup>
+
+<PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+
+<ItemGroup>
+  <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="10.0.400" />
+</ItemGroup>
 ```
 
-▶️ (3) add another _C# .NET 9 class library_ named `Cadmus.Seed.__PRJ__.Parts` to provide the mock data seeders for your components. This is not strictly a requirement, but it's suggested to let you play with the editor while building it. Once created, delete the empty `Class1.cs` file from it and add metadata as above.
+▶️ (3) add another _C# class library_ named `Cadmus.Seed.__PRJ__.Parts` to provide the mock data seeders for your components. This is not strictly a requirement, but it's suggested to let you play with the editor while building it. Once created, delete the empty `Class1.cs` file from it and add metadata as above.
 
 ```bash
 dotnet new classlib -n Cadmus.Seed.__PRJ__.Parts
-dotnet sln Cadmus__PRJ__.sln add Cadmus.Seed.__PRJ__.Parts/Cadmus.Seed.__PRJ__.Parts.csproj
+dotnet sln Cadmus__PRJ__.slnx add Cadmus.Seed.__PRJ__.Parts/Cadmus.Seed.__PRJ__.Parts.csproj
 ```
 
-▶️ (4) add another _C# .NET 9 class library_ named `Cadmus.__PRJ__.Services` to provide some API services to plug into your API. Once created, delete the empty `Class1.cs` file from it, and add metadata as above.
+▶️ (4) add another _C# class library_ named `Cadmus.__PRJ__.Services` to provide some API services to plug into your API. Once created, delete the empty `Class1.cs` file from it, and add metadata as above.
 
 ```bash
 dotnet new classlib -n Cadmus.__PRJ__.Services
-dotnet sln Cadmus__PRJ__.sln add Cadmus.__PRJ__.Services/Cadmus.__PRJ__.Services.csproj
+dotnet sln Cadmus__PRJ__.slnx add Cadmus.__PRJ__.Services/Cadmus.__PRJ__.Services.csproj
 ```
 
 ▶️ (5) add a _XUnit Test Project_ named `Cadmus.__PRJ__.Parts.Test` to contain the tests for the `Cadmus.__PRJ__.Parts` library. Alternatively, any other unit test framework can be used; this just reflects my preferences, and is suggested as the test templates I provide use XUnit. Once created, delete the empty `UnitTest1.cs` class.
 
 ```bash
 dotnet new xunit -n Cadmus.__PRJ__.Parts.Test
-dotnet sln Cadmus__PRJ__.sln add Cadmus.__PRJ__.Parts.Test/Cadmus.__PRJ__.Parts.Test.csproj
+dotnet sln Cadmus__PRJ__.slnx add Cadmus.__PRJ__.Parts.Test/Cadmus.__PRJ__.Parts.Test.csproj
 ```
 
 ▶️ (6) add a _XUnit Test Project_ named `Cadmus.Seed.__PRJ__.Parts.Test` to contain the tests for the `Cadmus.Seed.__PRJ__.Parts` library. Alternatively, any other unit test framework can be used; this just reflects my preferences, and is suggested as the test templates I provide use XUnit. Once created, delete the empty `UnitTest1.cs` class.
 
 ```bash
 dotnet new xunit -n Cadmus.Seed.__PRJ__.Parts.Test
-dotnet sln Cadmus__PRJ__.sln add Cadmus.Seed.__PRJ__.Parts.Test/Cadmus.Seed.__PRJ__.Parts.Test.csproj
+dotnet sln Cadmus__PRJ__.slnx add Cadmus.Seed.__PRJ__.Parts.Test/Cadmus.Seed.__PRJ__.Parts.Test.csproj
 ```
 
 Your solution should now look like this (here `PRJ` is `Pura`):
@@ -142,7 +157,7 @@ dotnet add package Cadmus.Core
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Core" Version="7.0.3" />
+  <PackageReference Include="Cadmus.Core" Version="16.0.3" />
 </ItemGroup>
 ```
 
@@ -191,9 +206,9 @@ dotnet add package Cadmus.Seed
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Bogus" Version="35.6.4" />
-  <PackageReference Include="Cadmus.Core" Version="8.0.11" />
-  <PackageReference Include="Cadmus.Seed" Version="8.0.11" />
+  <PackageReference Include="Bogus" Version="35.6.5" />
+  <PackageReference Include="Cadmus.Core" Version="16.0.3" />
+  <PackageReference Include="Cadmus.Seed" Version="16.0.3" />
 </ItemGroup>
 ```
 
@@ -217,11 +232,23 @@ Once your parts, seeders, and services are ready, typically you should package t
 
 To package the libraries for NuGet (you must have a free account for it), you should do this just once:
 
-▶️ (1) not required, but suggested: ensure that you have added these to the `PropertyGroup` of each csproj to be packaged:
+▶️ (1) not required, but suggested: ensure that you have added these properties and references to each `.csproj` to be packaged:
 
 ```xml
-<IncludeSymbols>true</IncludeSymbols>
-<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+<PropertyGroup>
+  <IncludeSymbols>true</IncludeSymbols>
+  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  <DebugType>portable</DebugType>
+  <DebugSymbols>true</DebugSymbols>
+  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  <Deterministic>true</Deterministic>
+</PropertyGroup>
+
+<ItemGroup>
+  <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="10.0.400" />
+</ItemGroup>
 ```
 
 This ensures that symbols are included when building the package.
@@ -233,21 +260,19 @@ Once you have setup your projects in this way, just publish them like in this ba
 ```bat
 @echo off
 echo BUILD Cadmus PRJ Packages
-del .\Cadmus.PRJ.Parts\bin\Debug\*.nupkg
+del .\Cadmus.PRJ.Parts\bin\Release\*.nupkg
 
 cd .\Cadmus.PRJ.Parts
-dotnet pack -c Debug -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 cd..
 
 cd .\Cadmus.PRJ.Services
-dotnet pack -c Debug -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 cd..
 
 cd .\Cadmus.Seed.PRJ.Parts
-dotnet pack -c Debug -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 cd..
 
 pause
 ```
-
-(in this sample I'm publishing the `Debug` versions for diagnostic purposes, but you should pick the `Release` version once you are comfortable with it).
