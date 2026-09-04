@@ -14,15 +14,15 @@ A typical application of this export process is a frontend designed around a set
 
 This export process shares its source data selection and mapping logic with the [graph](../graph/graph) exporter, which targets RDF, with an important difference:
 
-- the graph exporter is designed to constantly map items into an RDF graph, keeping it in synch with user edits. Whenever users save their edits in the editor, data gets selected and mapped to target the graph according to the chosen ontologies. Users can even edit the target RDF graph directly to manually extend it.
-- the JSON export process instead is not designed to export data in real-time. Rather, its purpose is to provide a massive JSON-based data transform and export, to be later consumed by a third-party client. So, the task of the JSON exporter is only to generate JSON documents, without caring about their usage. The graph exporter instead targets a graph database actively updating it to keep the graph in synch with user edits. Then, at any moment one can also export the nodes and triples of this graph into various standard formats to consume them as required.
+- the _graph exporter_ is designed to constantly map items into an RDF graph, keeping it in synch with user edits. Whenever users save their edits in the editor, data gets selected and mapped to target the graph according to the chosen ontologies. Users can even edit the target RDF graph directly to manually extend it.
+- the _JSON exporter_ instead is not designed to export data in real-time. Rather, its purpose is to provide a massive JSON-based data transform and export, to be later consumed by a third-party client: for instance, a view-model for a web UI based on exported data. So, the task of the JSON exporter is only to generate JSON documents, without caring about their usage. The graph exporter instead targets a graph database actively updating it to keep the graph in synch with user edits. Then, at any moment one can also export the nodes and triples of this graph into various standard formats to consume them as required.
 
 While this difference applies to the output of each process, the logic to select the items and parts to export and map them into a different target is shared for these tasks, covered by [mappings](mappings):
 
 - collecting source items to export.
 - apply loaded mappings to project data from each source object's property node to the designed target.
 
-This page is a practical guide for people who have to **write** these mappings. Rather than just describing each property in isolation, it walks through the exact algorithm the mapper follows, so that you can predict what a mapping will produce before running it, and quickly diagnose it when it does not produce what you expected.
+This page is a practical guide for people who have to write these mappings. Rather than just describing each property in isolation, it walks through the exact algorithm the mapper follows, so that you can predict what a mapping will produce before running it, and quickly diagnose it when it does not produce what you expected.
 
 ## Configuration
 
@@ -73,7 +73,7 @@ Each entry in `templateFilters` registers a [Fluid filter](https://github.com/se
 
 - `id`: the filter component's tag (e.g. `fluid-filter.historical-date`).
 - `keys`: the Fluid filter keyword(s) it is invoked with in a template (e.g. `historical-date`, used as `{{ value | historical-date }}`).
-- `options`: any options the filter requires (e.g. a Mongo connection string).
+- `options`: any options the filter requires (e.g. a connection string).
 
 > ⚠️ **If you omit `keys`, the filter is silently never registered.** There is no error either at load time or when the template later references it: Fluid treats an unknown filter name as a no-op passthrough, not an error. So a missing `keys` typically shows up much later, as a value that just did not get transformed the way you expected.
 
@@ -541,7 +541,7 @@ A few things worth pointing out about this configuration, tying back to the mode
 
 ## Executing an Export
 
-To execute a JSON export for data, use this commands in the [Cadmus CLI tool](../../tools/cadmus-tool):
+To execute a JSON export for data, use this command in the [Cadmus CLI tool](../../tools/cadmus-tool):
 
 - [export JSON](../../tools/cadmus-tool.md#export)
   {% endraw %}
