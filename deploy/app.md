@@ -26,6 +26,7 @@ nav_order: 2
     - [Other Services](#other-services)
   - [4. Configure Frontend App](#4-configure-frontend-app)
   - [Updating Services](#updating-services)
+  - [Ubuntu Old Kernel and MongoDB](#ubuntu-old-kernel-and-mongodb)
 
 Essentially, to host Cadmus app on a server you should just customize the default _Docker compose script_, which is designed for hosting the system on a local machine. This usually resolves to changing some URIs, and replacing mock security data.
 
@@ -53,6 +54,11 @@ services:
       - mongo-vol:/data/db
     networks:
       - cadmus-__PRJ__-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # PostgreSQL
   cadmus-__PRJ__-pgsql:
@@ -70,6 +76,11 @@ services:
       - pgsql-vol:/var/lib/postgresql/data
     networks:
       - cadmus-__PRJ__-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Biblio API
   # TODO: remove this service if not required
@@ -80,8 +91,10 @@ services:
     ports:
       - 5000:8080
     depends_on:
-      - cadmus__PRJ__mongo
-      - cadmus__PRJ__pgsql
+      cadmus-__PRJ__-mongo:
+        condition: service_healthy
+      cadmus-__PRJ__-pgsql:
+        condition: service_healthy
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus__PRJ__mongo:27017/{0}
@@ -109,8 +122,10 @@ services:
       # TODO: change 5080 with your API port in the host
       - 5080:8080
     depends_on:
-      - cadmus-__PRJ__-mongo
-      - cadmus-__PRJ__-pgsql
+      cadmus-__PRJ__-mongo:
+        condition: service_healthy
+      cadmus-__PRJ__-pgsql:
+        condition: service_healthy
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-__PRJ__-mongo:27017/{0}
@@ -140,7 +155,7 @@ services:
       - 4200:80
     depends_on:
       - cadmus-__PRJ__-api
-      - cadmus-biblio-api
+      - cadmus-biblio-api # TODO: remove if not required
     volumes:
       # TODO: add env.js file with overrides in the same folder of this compose script
       - ./env.js:/usr/share/nginx/html/env.js
@@ -178,7 +193,8 @@ mongo-express:
     - ME_CONFIG_MONGODB_PORT=27017
     - ME_CONFIG_BASICAUTH=false
   depends_on:
-    - cadmus-__PRJ__-mongo
+      cadmus-__PRJ__-mongo:
+        condition: service_healthy
   networks:
     - cadmus-__PRJ__-network
 ```
@@ -679,3 +695,32 @@ To update any service from the stack, the typical procedure is:
 > If you update multiple containers at once, just append their names after `-d`: e.g. `docker compose up -d cadmus-gve-app cadmus-gve-api`.
 
 💡 To remove dangling images you can use `docker image prune -a` which removes all the images not referenced by any container (whether it is running or not).
+
+## Ubuntu Old Kernel and MongoDB
+
+If MongoDB cannot start in newer Ubuntu hosts (beyond version 24) look in its log for a message like:
+
+>MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility with this version of MongoDB. See_ <https://jira.mongodb.org/browse/SERVER-121912> _for more information.
+
+Ubuntu 24.04 LTS (Noble Numbat) is the latest stable version of Ubuntu you can use to run MongoDB without breaking it. Ubuntu 26.04 comes with Linux kernel 7.0 (or 6.19+). An incompatibility exists between recent Linux kernel releases and the TCMalloc memory allocator library vendored inside MongoDB.
+
+Affected Kernel ranges are 6.19 up to 7.0.13. Fixed Kernel Ranges: start with Kernel 7.0.14 and newer. MongoDB Patched versions of MongoDB (which remove the startup check when running on patched kernels like 7.0.14+) start from version 8.0.30.
+
+In this case you need to update Ubuntu kernel (while also ensuring to use the latest MongoDB or at least 8.0.30+):
+
+```sh
+sudo add-apt-repository ppa:cappelikan/ppa -y
+sudo apt update && sudo apt install mainline -y
+sudo mainline install 7.0.14
+sudo reboot
+```
+
+If you can't do that, you can use this workaround by adding an environment variable to the MongoDB container:
+
+```yml
+cadmus-ndp-mongo:
+    image: mongo
+    # ... etc.
+    environment:
+      - GLIBC_TUNABLES=glibc.pthread.rseq=1
+```
