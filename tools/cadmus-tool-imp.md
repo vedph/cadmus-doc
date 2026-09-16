@@ -181,3 +181,66 @@ You must include the header row as the first row of the file. This allows changi
 4. target
 
 You can add a header row or not, and use whatever name you want, as columns get identified by their order. You can anyway specify the sheet number, the first row number, and the first column number.
+
+## TaxoStore Import Command
+
+🎯 Import a taxonomies store into its database, creating it if not existing.
+
+```sh
+taxo-tool import-store <TREES_CSV> <NODES_CSV> -d <DATABASE_NAME> [-c <CONNECTION_TEMPLATE>]
+```
+
+- `TREES_CSV`, `NODES_CSV`: paths to the seed CSV files.
+- `-d`/`--database`: name of the database to create and seed.
+- `-c`/`--connection`: optional PostgreSQL connection string template, with `{0}` as a placeholder for the database name (e.g. `Server=localhost;Database={0};User Id=postgres;Password=postgres`). When omitted, it is read from the `TaxoStore` connection string in the tool's own configuration (`appsettings.json`/`appsettings.local.json`/environment variables, resolved next to the tool's executable).
+
+Example `appsettings.json` next to `taxo-tool.exe`:
+
+```json
+{
+  "ConnectionStrings": {
+    "TaxoStore": "Server=localhost;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True"
+  }
+}
+```
+
+Example usage, creating and seeding database `taxo`:
+
+```sh
+taxo-tool import-store wwwroot/taxo/trees.csv wwwroot/taxo/nodes.csv -d taxo
+```
+
+**CSV File Formats:**
+
+- 📁 `trees.csv`:
+
+```csv
+id,name,note
+products,Products,"Product taxonomy"
+categories,Categories,"Category hierarchy"
+```
+
+- 📁 `nodes.csv`:
+
+```csv
+tree_n,parent_key,key,label,filtered_label,flags
+1,,electronics,Electronics,electronics,
+1,electronics,computers,Computers,computers,
+1,electronics,phones,Mobile Phones,mobile phones,
+2,,food,Food & Beverages,food beverages,
+```
+
+Fields in `trees.csv`:
+
+- `id`: unique tree identifier (key), used to reference the tree externally.
+- `name`: human-friendly display name for the tree.
+- `note`: optional descriptive note about the tree.
+
+Fields in `nodes.csv`:
+
+- `tree_n`: tree number (1-based index from trees.csv).
+- `parent_key`: key of the parent node (empty for root nodes).
+- `key`: unique identifier within the tree.
+- `label`: display label.
+- `filtered_label`: searchable label (auto-generated if empty).
+- `flags`: optional flags string.
