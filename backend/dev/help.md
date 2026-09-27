@@ -59,7 +59,18 @@ window.__env.helpUrlSeparator = "__";
 window.__env.helpUrlCheck = true;
 ```
 
-2. ensure that your part/fragment editor template contains the help component:
+2. import HelpComponent into your part/fragment editor:
+
+```ts
+import {
+  CloseSaveButtonsComponent,
+  ModelEditorComponentBase,
+  // ADD THIS:
+  HelpLinkComponent,
+} from '@myrmidon/cadmus-ui';
+```
+
+3. ensure that your part/fragment editor template contains the help component:
 
 ```html
 <form [formGroup]="form" (submit)="save()">
