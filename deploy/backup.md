@@ -329,168 +329,315 @@ The following scripts can be used on Windows Powershell and correspond to the ab
 - 📁 **backup** (replace `PRJ` with your project name):
 
 ```ps1
-# Backup script for Cadmus databases.
+# Backup script for Cadmus databases (Windows PowerShell 5.1 or PowerShell 7+).
+# Requires mongodump (MongoDB Database Tools) and pg_dump (PostgreSQL client tools) in PATH.
 # You can schedule this in Windows Task Scheduler (e.g., daily at 3:00 AM).
-# Task Action: powershell.exe -ExecutionPolicy Bypass -File "C:\path\to\cadmus-dump.ps1"
+# Task Action: powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\path\to\backup.ps1"
 
 # --- Configuration ---
-# Set the base directory for backups
+# Set the base directory for backups. A relative path is resolved against this script's folder
+# (Task Scheduler starts scripts in C:\Windows\System32, so the current directory is unreliable).
 $BaseBackupDir = ".\backup"
-# Get the current date in YYYYMMDD format
+$MongoPort = 27017
+# Note: Using 127.0.0.1 requires your DB services to be configured with '127.0.0.1:PORT:PORT' in docker-compose.yml
+$PgHost = "127.0.0.1"
+$PgPort = 5432
+$PgUser = "postgres"
+$PgPassword = "postgres"
+
+# --- Setup ---
+if (-not [System.IO.Path]::IsPathRooted($BaseBackupDir)) {
+    $BaseBackupDir = Join-Path -Path $PSScriptRoot -ChildPath $BaseBackupDir
+}
+# Absolute path is required: .NET file APIs do not follow PowerShell's current location
+$BaseBackupDir = [System.IO.Path]::GetFullPath($BaseBackupDir)
+
+# Get the current date in YYYYMMDD format for the directory name
 $DateDirName = Get-Date -Format "yyyyMMdd"
 # Define the full path for today's backup directory
 $TodayBackupDir = Join-Path -Path $BaseBackupDir -ChildPath $DateDirName
 
-# Ensure the base and target directories exist
-if (-not (Test-Path -Path $TodayBackupDir)) {
-    Write-Host "Creating backup directory: $TodayBackupDir"
-    New-Item -ItemType Directory -Path $TodayBackupDir -Force | Out-Null
+# Ensure the required tools are available
+foreach ($tool in "mongodump", "pg_dump") {
+    if (-not (Get-Command $tool -CommandType Application -ErrorAction SilentlyContinue)) {
+        Write-Host "ERROR: $tool not found in PATH." -ForegroundColor Red
+        exit 1
+    }
 }
+$PgDumpExe = (Get-Command "pg_dump" -CommandType Application | Select-Object -First 1).Source
+
+# Create the date-stamped folder for today's backup (also creates the base directory)
+Write-Host "Creating backup directory: $TodayBackupDir"
+New-Item -ItemType Directory -Path $TodayBackupDir -Force | Out-Null
+
+# Names of databases whose dump failed
+$Failures = New-Object System.Collections.Generic.List[string]
 
 # --- MongoDB Dump ---
+function Export-MongoDump {
+    param (
+        [string]$Database,
+        [string]$OutputFile
+    )
+    Write-Host "Dumping $Database..."
+    & mongodump "--port=$MongoPort" "--db=$Database" "--archive=$OutputFile" --gzip
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: mongodump failed for $Database (exit code $LASTEXITCODE)." -ForegroundColor Red
+        Remove-Item -LiteralPath $OutputFile -Force -ErrorAction SilentlyContinue
+        $script:Failures.Add($Database)
+    }
+}
+
 Write-Host "Dumping MongoDB databases..."
 
 # Dump cadmus-PRJ (main data)
-mongodump --port=27017 --db cadmus-PRJ --archive="$TodayBackupDir\cadmus-PRJ-mongo.gz" --gzip
+Export-MongoDump -Database "cadmus-PRJ" -OutputFile (Join-Path $TodayBackupDir "cadmus-PRJ-mongo.gz")
 
 # Dump cadmus-PRJ-log (logs)
-mongodump --port=27017 --db cadmus-PRJ-log --archive="$TodayBackupDir\cadmus-PRJ-log-mongo.gz" --gzip
+Export-MongoDump -Database "cadmus-PRJ-log" -OutputFile (Join-Path $TodayBackupDir "cadmus-PRJ-log-mongo.gz")
 
 # --- PostgreSQL Dump ---
-Write-Host "Dumping PostgreSQL databases..."
-
-# Export the PostgreSQL password for child processes
-$env:PGPASSWORD = 'postgres'
-
-# Helper function to run pg_dump and compress with Gzip in PowerShell
+# Runs pg_dump and gzips its binary output directly to file
+# (piping through PowerShell would re-encode the output as text).
 function Export-PgDumpGzip {
     param (
         [string]$Database,
         [string]$OutputFile
     )
-    $fileStream = [System.IO.File]::Create($OutputFile)
-    $gzipStream = [System.IO.Compression.GZipStream]::new($fileStream, [System.IO.Compression.CompressionMode]::Compress)
-    
-    # Pipe pg_dump directly into the compression stream
-    $psi = [System.Diagnostics.ProcessStartInfo]::new()
-    $psi.FileName = "pg_dump"
-    $psi.Arguments = "-h 127.0.0.1 -U postgres -d $Database -w"
-    $psi.RedirectStandardOutput = $true
-    $psi.UseShellExecute = $false
+    Write-Host "Dumping $Database..."
 
-    $process = [System.Diagnostics.Process]::Start($psi)
-    $process.StandardOutput.BaseStream.CopyTo($gzipStream)
-    $process.WaitForExit()
+    $fileStream = $null
+    $gzipStream = $null
+    $process = $null
+    $exitCode = -1
+    try {
+        $fileStream = [System.IO.File]::Create($OutputFile)
+        $gzipStream = New-Object System.IO.Compression.GZipStream($fileStream, [System.IO.Compression.CompressionMode]::Compress)
 
-    $gzipStream.Close()
-    $fileStream.Close()
+        $psi = New-Object System.Diagnostics.ProcessStartInfo
+        $psi.FileName = $PgDumpExe
+        # -w ensures it fails rather than hangs waiting for a password
+        $psi.Arguments = "-h $PgHost -p $PgPort -U $PgUser -d `"$Database`" -w"
+        $psi.RedirectStandardOutput = $true
+        $psi.UseShellExecute = $false
+
+        $process = [System.Diagnostics.Process]::Start($psi)
+        $process.StandardOutput.BaseStream.CopyTo($gzipStream)
+        $process.WaitForExit()
+        $exitCode = $process.ExitCode
+    }
+    catch {
+        Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    finally {
+        # Closing the gzip stream flushes the gzip footer and closes the file stream
+        if ($null -ne $gzipStream) { $gzipStream.Dispose() }
+        if ($null -ne $fileStream) { $fileStream.Dispose() }
+        if ($null -ne $process) { $process.Dispose() }
+    }
+
+    if ($exitCode -ne 0) {
+        Write-Host "ERROR: pg_dump failed for $Database (exit code $exitCode)." -ForegroundColor Red
+        Remove-Item -LiteralPath $OutputFile -Force -ErrorAction SilentlyContinue
+        $script:Failures.Add($Database)
+    }
 }
 
-Export-PgDumpGzip -Database "cadmus-PRJ" -OutputFile "$TodayBackupDir\cadmus-PRJ-pgsql.gz"
-Export-PgDumpGzip -Database "cadmus-PRJ-auth" -OutputFile "$TodayBackupDir\cadmus-PRJ-auth-pgsql.gz"
+Write-Host "Dumping PostgreSQL databases..."
 
-# Security best practice: remove password from environment
-Remove-Item Env:\PGPASSWORD
+# Export the PostgreSQL password so child processes (pg_dump) can see it
+$env:PGPASSWORD = $PgPassword
+try {
+    Export-PgDumpGzip -Database "cadmus-PRJ" -OutputFile (Join-Path $TodayBackupDir "cadmus-PRJ-pgsql.gz")
+    Export-PgDumpGzip -Database "cadmus-PRJ-auth" -OutputFile (Join-Path $TodayBackupDir "cadmus-PRJ-auth-pgsql.gz")
+}
+finally {
+    # Security best practice: remove the password from the environment
+    Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
+}
+
+if ($Failures.Count -gt 0) {
+    Write-Host "Backup completed with errors in $TodayBackupDir. Failed: $($Failures -join ', ')" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "Backup completed successfully in $TodayBackupDir"
+exit 0
 ```
 
 - 📁 **restore** (replace `PRJ` with your project name):
 
 ```ps1
-# Restore script for Cadmus databases.
+# Restore script for Cadmus databases (Windows PowerShell 5.1 or PowerShell 7+).
+# Requires mongorestore (MongoDB Database Tools) and psql, dropdb, createdb (PostgreSQL client tools) in PATH.
 # Usage: .\restore.ps1 -DateDir 20260928
 # Or pass the folder name as the first positional argument: .\restore.ps1 20260928
+# WARNING: existing data in the target databases is replaced by the backup.
 
 param (
     [Parameter(Mandatory = $true, Position = 0)]
+    [ValidatePattern('^\d{8}$')]
     [string]$DateDir,
 
+    # A relative path is resolved against this script's folder, matching backup.ps1
     [string]$BaseBackupDir = ".\backup"
 )
 
+# --- Configuration ---
+$MongoPort = 27017
+# Note: Using 127.0.0.1 requires your DB services to be configured with '127.0.0.1:PORT:PORT' in docker-compose.yml
+$PgHost = "127.0.0.1"
+$PgPort = 5432
+$PgUser = "postgres"
+$PgPassword = "postgres"
+
 # --- Path Validation ---
+if (-not [System.IO.Path]::IsPathRooted($BaseBackupDir)) {
+    $BaseBackupDir = Join-Path -Path $PSScriptRoot -ChildPath $BaseBackupDir
+}
+# Absolute path is required: .NET file APIs do not follow PowerShell's current location
+$BaseBackupDir = [System.IO.Path]::GetFullPath($BaseBackupDir)
 $TargetBackupDir = Join-Path -Path $BaseBackupDir -ChildPath $DateDir
 
-if (-not (Test-Path -Path $TargetBackupDir)) {
-    Write-Error "Backup directory not found: $TargetBackupDir"
+if (-not (Test-Path -LiteralPath $TargetBackupDir -PathType Container)) {
+    Write-Host "ERROR: Backup directory $TargetBackupDir does not exist." -ForegroundColor Red
     exit 1
 }
 
-Write-Host "Starting restore process from: $TargetBackupDir" -ForegroundColor Cyan
+# Ensure the required tools are available
+foreach ($tool in "mongorestore", "psql", "dropdb", "createdb") {
+    if (-not (Get-Command $tool -CommandType Application -ErrorAction SilentlyContinue)) {
+        Write-Host "ERROR: $tool not found in PATH." -ForegroundColor Red
+        exit 1
+    }
+}
+$PsqlExe = (Get-Command "psql" -CommandType Application | Select-Object -First 1).Source
+
+Write-Host "===================================================="
+Write-Host " Starting Cadmus Database Restore from: $DateDir"
+Write-Host "===================================================="
+
+# Names of databases whose restore failed
+$Failures = New-Object System.Collections.Generic.List[string]
 
 # --- MongoDB Restore ---
+function Import-MongoDump {
+    param (
+        [string]$Database,
+        [string]$InputFile
+    )
+    if (-not (Test-Path -LiteralPath $InputFile -PathType Leaf)) {
+        Write-Warning "$InputFile not found. Skipping."
+        return
+    }
+    Write-Host "Restoring $Database..."
+    # The archive already holds the database name, so --db is not used (it is deprecated with --archive).
+    # --drop clears seeded collections before writing backup data.
+    & mongorestore "--port=$MongoPort" "--nsInclude=$Database.*" --drop "--archive=$InputFile" --gzip
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: mongorestore failed for $Database (exit code $LASTEXITCODE)." -ForegroundColor Red
+        $script:Failures.Add($Database)
+    }
+}
+
 Write-Host "`n[1/2] Restoring MongoDB databases..." -ForegroundColor Yellow
 
-$mongoPrjFile = Join-Path$TargetBackupDir "cadmus-PRJ-mongo.gz"
-$mongoLogFile = Join-Path$TargetBackupDir "cadmus-PRJ-log-mongo.gz"
-
-if (Test-Path $mongoPrjFile) {
-    Write-Host "Restoring cadmus-PRJ..."
-    mongorestore --port=27017 --db cadmus-PRJ --archive="$mongoPrjFile" --gzip --drop
-} else {
-    Write-Warning "File not found: $mongoPrjFile"
-}
-
-if (Test-Path $mongoLogFile) {
-    Write-Host "Restoring cadmus-PRJ-log..."
-    mongorestore --port=27017 --db cadmus-PRJ-log --archive="$mongoLogFile" --gzip --drop
-} else {
-    Write-Warning "File not found: $mongoLogFile"
-}
+Import-MongoDump -Database "cadmus-PRJ" -InputFile (Join-Path $TargetBackupDir "cadmus-PRJ-mongo.gz")
+Import-MongoDump -Database "cadmus-PRJ-log" -InputFile (Join-Path $TargetBackupDir "cadmus-PRJ-log-mongo.gz")
 
 # --- PostgreSQL Restore ---
-Write-Host "`n[2/2] Restoring PostgreSQL databases..." -ForegroundColor Yellow
-
-# Export the PostgreSQL password for child processes
-$env:PGPASSWORD = 'postgres'
-
-# Helper function to decompress Gzip and stream into pg_restore / psql
+# Recreates the database (the plain SQL dump would otherwise clash with seeded tables),
+# then decompresses the dump and streams it into psql's standard input.
 function Import-PgDumpGzip {
     param (
         [string]$Database,
         [string]$InputFile
     )
 
-    if (-not (Test-Path $InputFile)) {
-        Write-Warning "File not found: $InputFile"
+    if (-not (Test-Path -LiteralPath $InputFile -PathType Leaf)) {
+        Write-Warning "$InputFile not found. Skipping."
         return
     }
 
     Write-Host "Restoring $Database..."
 
-    # Open the compressed archive stream
-    $fileStream = [System.IO.File]::OpenRead($InputFile)
-    $gzipStream = [System.IO.Compression.GZipStream]::new($fileStream, [System.IO.Compression.CompressionMode]::Decompress)
+    # --force (PostgreSQL 13+) terminates open connections, e.g. from a running Cadmus API
+    & dropdb -h $PgHost -p $PgPort -U $PgUser -w --if-exists --force $Database
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: dropdb failed for $Database (exit code $LASTEXITCODE)." -ForegroundColor Red
+        $script:Failures.Add($Database)
+        return
+    }
+    & createdb -h $PgHost -p $PgPort -U $PgUser -w $Database
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: createdb failed for $Database (exit code $LASTEXITCODE)." -ForegroundColor Red
+        $script:Failures.Add($Database)
+        return
+    }
 
-    # Launch psql process to consume decompressed SQL output
-    $psi = [System.Diagnostics.ProcessStartInfo]::new()
-    $psi.FileName = "psql"
-    $psi.Arguments = "-h 127.0.0.1 -U postgres -d $Database -w"
-    $psi.RedirectStandardInput = $true
-    $psi.UseShellExecute = $false
+    $fileStream = $null
+    $gzipStream = $null
+    $process = $null
+    $exitCode = -1
+    try {
+        $fileStream = [System.IO.File]::OpenRead($InputFile)
+        $gzipStream = New-Object System.IO.Compression.GZipStream($fileStream, [System.IO.Compression.CompressionMode]::Decompress)
 
-    $process = [System.Diagnostics.Process]::Start($psi)
+        $psi = New-Object System.Diagnostics.ProcessStartInfo
+        $psi.FileName = $PsqlExe
+        # -X: ignore psqlrc; -q: quiet; -1: single transaction; ON_ERROR_STOP: fail on first error
+        $psi.Arguments = "-h $PgHost -p $PgPort -U $PgUser -d `"$Database`" -w -X -q -1 -v ON_ERROR_STOP=1"
+        $psi.RedirectStandardInput = $true
+        $psi.UseShellExecute = $false
 
-    # Stream decompressed data directly to standard input of psql
-    $gzipStream.CopyTo($process.StandardInput.BaseStream)
-    $process.StandardInput.BaseStream.Close()
+        $process = [System.Diagnostics.Process]::Start($psi)
+        try {
+            $gzipStream.CopyTo($process.StandardInput.BaseStream)
+        }
+        catch [System.IO.IOException] {
+            # psql exited early (its error is already on the console); exit code is checked below
+        }
+        finally {
+            $process.StandardInput.Close()
+        }
+        $process.WaitForExit()
+        $exitCode = $process.ExitCode
+    }
+    catch {
+        Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    finally {
+        if ($null -ne $gzipStream) { $gzipStream.Dispose() }
+        if ($null -ne $fileStream) { $fileStream.Dispose() }
+        if ($null -ne $process) { $process.Dispose() }
+    }
 
-    $process.WaitForExit()
-    $gzipStream.Close()
-    $fileStream.Close()
+    if ($exitCode -ne 0) {
+        Write-Host "ERROR: psql failed for $Database (exit code $exitCode)." -ForegroundColor Red
+        $script:Failures.Add($Database)
+    }
 }
 
-$pgPrjFile  = Join-Path $TargetBackupDir "cadmus-PRJ-pgsql.gz"
-$pgAuthFile = Join-Path $TargetBackupDir "cadmus-PRJ-auth-pgsql.gz"
+Write-Host "`n[2/2] Restoring PostgreSQL databases..." -ForegroundColor Yellow
 
-Import-PgDumpGzip -Database "cadmus-PRJ" -InputFile $pgPrjFile
-Import-PgDumpGzip -Database "cadmus-PRJ-auth" -InputFile $pgAuthFile
+# Export the PostgreSQL password for child processes
+$env:PGPASSWORD = $PgPassword
+try {
+    Import-PgDumpGzip -Database "cadmus-PRJ" -InputFile (Join-Path $TargetBackupDir "cadmus-PRJ-pgsql.gz")
+    Import-PgDumpGzip -Database "cadmus-PRJ-auth" -InputFile (Join-Path $TargetBackupDir "cadmus-PRJ-auth-pgsql.gz")
+}
+finally {
+    # Remove the password from the environment
+    Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
+}
 
-# Remove password from environment
-Remove-Item Env:\PGPASSWORD
+if ($Failures.Count -gt 0) {
+    Write-Host "`nRestore completed with errors. Failed: $($Failures -join ', ')" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "`nRestore operation completed successfully!" -ForegroundColor Green
+exit 0
 ```
 
 ---
