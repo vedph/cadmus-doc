@@ -14,6 +14,7 @@ nav_order: 4
   - [Transfer - LFTP](#transfer---lftp)
   - [Transfer - GDrive](#transfer---gdrive)
   - [Crontab](#crontab)
+  - [Windows Scripts](#windows-scripts)
   - [Host Setup](#host-setup)
     - [MongoDB Client](#mongodb-client)
     - [PostgreSQL Client](#postgresql-client)
@@ -314,6 +315,183 @@ You could launch all these scripts sequentially:
 ```
 
 >⚠️ Ensure all scripts are executable: `chmod +x /home/crontab-scripts/*.sh`.
+
+---
+
+## Windows Scripts
+
+The following scripts can be used on Windows Powershell and correspond to the above for Linux. Note that:
+
+- PostgreSQL requires the target databases (`cadmus-PRJ` and `cadmus-PRJ-auth`) to already exist prior to running psql. If restoring to a fresh environment, create empty databases first (`createdb -h 127.0.0.1 -U postgres cadmus-PRJ`).
+- the `mongorestore` command includes `--drop`, which drops existing collections before restoring to prevent duplicate key conflicts. Remove `--drop` if you prefer merging into existing collections.
+- ensure `mongorestore` and `psql` are available in your system `PATH`.
+
+- 📁 **backup** (replace `PRJ` with your project name):
+
+```ps1
+# Backup script for Cadmus databases.
+# You can schedule this in Windows Task Scheduler (e.g., daily at 3:00 AM).
+# Task Action: powershell.exe -ExecutionPolicy Bypass -File "C:\path\to\cadmus-dump.ps1"
+
+# --- Configuration ---
+# Set the base directory for backups
+$BaseBackupDir = ".\backup"
+# Get the current date in YYYYMMDD format
+$DateDirName = Get-Date -Format "yyyyMMdd"
+# Define the full path for today's backup directory
+$TodayBackupDir = Join-Path -Path $BaseBackupDir -ChildPath $DateDirName
+
+# Ensure the base and target directories exist
+if (-not (Test-Path -Path $TodayBackupDir)) {
+    Write-Host "Creating backup directory: $TodayBackupDir"
+    New-Item -ItemType Directory -Path $TodayBackupDir -Force | Out-Null
+}
+
+# --- MongoDB Dump ---
+Write-Host "Dumping MongoDB databases..."
+
+# Dump cadmus-PRJ (main data)
+mongodump --port=27017 --db cadmus-PRJ --archive="$TodayBackupDir\cadmus-PRJ-mongo.gz" --gzip
+
+# Dump cadmus-PRJ-log (logs)
+mongodump --port=27017 --db cadmus-PRJ-log --archive="$TodayBackupDir\cadmus-PRJ-log-mongo.gz" --gzip
+
+# --- PostgreSQL Dump ---
+Write-Host "Dumping PostgreSQL databases..."
+
+# Export the PostgreSQL password for child processes
+$env:PGPASSWORD = 'postgres'
+
+# Helper function to run pg_dump and compress with Gzip in PowerShell
+function Export-PgDumpGzip {
+    param (
+        [string]$Database,
+        [string]$OutputFile
+    )
+    $fileStream = [System.IO.File]::Create($OutputFile)
+    $gzipStream = [System.IO.Compression.GZipStream]::new($fileStream, [System.IO.Compression.CompressionMode]::Compress)
+    
+    # Pipe pg_dump directly into the compression stream
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = "pg_dump"
+    $psi.Arguments = "-h 127.0.0.1 -U postgres -d $Database -w"
+    $psi.RedirectStandardOutput = $true
+    $psi.UseShellExecute = $false
+
+    $process = [System.Diagnostics.Process]::Start($psi)
+    $process.StandardOutput.BaseStream.CopyTo($gzipStream)
+    $process.WaitForExit()
+
+    $gzipStream.Close()
+    $fileStream.Close()
+}
+
+Export-PgDumpGzip -Database "cadmus-PRJ" -OutputFile "$TodayBackupDir\cadmus-PRJ-pgsql.gz"
+Export-PgDumpGzip -Database "cadmus-PRJ-auth" -OutputFile "$TodayBackupDir\cadmus-PRJ-auth-pgsql.gz"
+
+# Security best practice: remove password from environment
+Remove-Item Env:\PGPASSWORD
+
+Write-Host "Backup completed successfully in $TodayBackupDir"
+```
+
+- 📁 **restore** (replace `PRJ` with your project name):
+
+```ps1
+# Restore script for Cadmus databases.
+# Usage: .\restore.ps1 -DateDir 20260928
+# Or pass the folder name as the first positional argument: .\restore.ps1 20260928
+
+param (
+    [Parameter(Mandatory = $true, Position = 0)]
+    [string]$DateDir,
+
+    [string]$BaseBackupDir = ".\backup"
+)
+
+# --- Path Validation ---
+$TargetBackupDir = Join-Path -Path $BaseBackupDir -ChildPath $DateDir
+
+if (-not (Test-Path -Path $TargetBackupDir)) {
+    Write-Error "Backup directory not found: $TargetBackupDir"
+    exit 1
+}
+
+Write-Host "Starting restore process from: $TargetBackupDir" -ForegroundColor Cyan
+
+# --- MongoDB Restore ---
+Write-Host "`n[1/2] Restoring MongoDB databases..." -ForegroundColor Yellow
+
+$mongoPrjFile = Join-Path$TargetBackupDir "cadmus-PRJ-mongo.gz"
+$mongoLogFile = Join-Path$TargetBackupDir "cadmus-PRJ-log-mongo.gz"
+
+if (Test-Path $mongoPrjFile) {
+    Write-Host "Restoring cadmus-PRJ..."
+    mongorestore --port=27017 --db cadmus-PRJ --archive="$mongoPrjFile" --gzip --drop
+} else {
+    Write-Warning "File not found: $mongoPrjFile"
+}
+
+if (Test-Path $mongoLogFile) {
+    Write-Host "Restoring cadmus-PRJ-log..."
+    mongorestore --port=27017 --db cadmus-PRJ-log --archive="$mongoLogFile" --gzip --drop
+} else {
+    Write-Warning "File not found: $mongoLogFile"
+}
+
+# --- PostgreSQL Restore ---
+Write-Host "`n[2/2] Restoring PostgreSQL databases..." -ForegroundColor Yellow
+
+# Export the PostgreSQL password for child processes
+$env:PGPASSWORD = 'postgres'
+
+# Helper function to decompress Gzip and stream into pg_restore / psql
+function Import-PgDumpGzip {
+    param (
+        [string]$Database,
+        [string]$InputFile
+    )
+
+    if (-not (Test-Path $InputFile)) {
+        Write-Warning "File not found: $InputFile"
+        return
+    }
+
+    Write-Host "Restoring $Database..."
+
+    # Open the compressed archive stream
+    $fileStream = [System.IO.File]::OpenRead($InputFile)
+    $gzipStream = [System.IO.Compression.GZipStream]::new($fileStream, [System.IO.Compression.CompressionMode]::Decompress)
+
+    # Launch psql process to consume decompressed SQL output
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = "psql"
+    $psi.Arguments = "-h 127.0.0.1 -U postgres -d $Database -w"
+    $psi.RedirectStandardInput = $true
+    $psi.UseShellExecute = $false
+
+    $process = [System.Diagnostics.Process]::Start($psi)
+
+    # Stream decompressed data directly to standard input of psql
+    $gzipStream.CopyTo($process.StandardInput.BaseStream)
+    $process.StandardInput.BaseStream.Close()
+
+    $process.WaitForExit()
+    $gzipStream.Close()
+    $fileStream.Close()
+}
+
+$pgPrjFile  = Join-Path $TargetBackupDir "cadmus-PRJ-pgsql.gz"
+$pgAuthFile = Join-Path $TargetBackupDir "cadmus-PRJ-auth-pgsql.gz"
+
+Import-PgDumpGzip -Database "cadmus-PRJ" -InputFile $pgPrjFile
+Import-PgDumpGzip -Database "cadmus-PRJ-auth" -InputFile $pgAuthFile
+
+# Remove password from environment
+Remove-Item Env:\PGPASSWORD
+
+Write-Host "`nRestore operation completed successfully!" -ForegroundColor Green
+```
 
 ---
 
