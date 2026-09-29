@@ -15,9 +15,13 @@ To this end, every Cadmus project has its `docker-compose.yml` script which crea
 
 To start the editor, follow this procedure:
 
-1. prerequisite: [install Docker](docker.md) if you do not already have it.
-2. locate the Cadmus repository project you want to play with. Usually such projects are named after the project abbreviation, e.g. `cadmus-ndp-app` is the name of the frontend editor for a project whose abbreviation is NDP. Once located, download the `docker-compose.yml` file you find in it, saving it in any directory in your computer. It is good practice to reserve a specific directory for it, as this makes things easier when you use multiple scripts.
-3. open a terminal in the folder where you placed the downloaded `docker-compose.yml` and run this command (omit `sudo` if using Windows):
+▶️ (1) prerequisite: [install Docker](docker.md) if you do not already have it.
+
+▶️ (2) locate the Cadmus repository project you want to play with. Usually such projects are named after the project abbreviation, e.g. `cadmus-ndp-app` is the name of the frontend editor for a project whose abbreviation is NDP. Once located, download the `docker-compose.yml` file you find in it, saving it in any directory in your computer. It is good practice to reserve a specific directory for it, as this makes things easier when you use multiple scripts.
+
+> 💡 Pick a script's folder name which is short and contains just letters, preferably all lowercase, without diacritics or spaces. This will make it easier to refer to these folder names when using the terminal.
+
+▶️ (3) open a terminal in the folder where you placed the downloaded `docker-compose.yml` and run this command (omit `sudo` if using Windows):
 
 ```sh
 sudo docker compose up
@@ -29,7 +33,7 @@ This should fire up a number of services, each outputting diagnostic messages to
 >
 > ⚠️ Also note that the default script assumes you do not have MongoDB or PostgreSQL database services running on your system. If this is not the case, change the script to either change the database ports (so that they can run side by side to your existing services), or use them rather than creating database services containers.
 
-4. open your browser and goto <localhost:4200>. The Cadmus editor homepage should open. Click the login menu item and enter these fake default credentials:
+▶️ (4) open your browser and goto <localhost:4200>. The Cadmus editor homepage should open. Click the login menu item and enter these fake default credentials:
 
 - username: `zeus`
 - password: `P4ss-W0rd!`
