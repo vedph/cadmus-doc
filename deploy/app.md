@@ -47,6 +47,7 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_DATA_DIR=/data/db
+      - GLIBC_TUNABLES=glibc.pthread.rseq=0
     ports:
       # expose port only in loopback (for local backup)
       - 127.0.0.1:27017:27017
@@ -73,7 +74,8 @@ services:
       # expose port only in loopback (for local backup)
       - 127.0.0.1:5432:5432
     volumes:
-      - pgsql-vol:/var/lib/postgresql/data
+      # from 18+ no longer use /var/lib/postgresql/data
+      - pgsql-vol:/var/lib/postgresql
     networks:
       - cadmus-__PRJ__-network
     healthcheck:
