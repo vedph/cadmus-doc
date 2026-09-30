@@ -47,6 +47,32 @@ nav_order: 2
 ./cadmus-tool list-users
 ```
 
+## Seed Users Command
+
+🎯 Seed user accounts from a list.
+
+```sh
+./cadmus-tool seed-users JSON_FILE_PATH DB_NAME [-d]
+```
+
+- `-d` / `--dry`: dry run.
+
+The users list format is like:
+
+```json
+[
+  {
+    "UserName": "doe",
+    "Password": "P4ss-W0rd!",
+    "Email": "john.doe@somewhere.com",
+    "Roles": ["admin", "editor", "operator", "visitor"],
+    "FirstName": "John",
+    "LastName": "Doe"
+  },
+  // ...
+]
+```
+
 ## Update User Command
 
 🎯 Update a user account.
