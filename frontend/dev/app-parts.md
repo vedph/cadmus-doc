@@ -8,9 +8,9 @@ nav_order: 9
 - [Creating Frontend Parts](#creating-frontend-parts)
   - [1. Add Part Model](#1-add-part-model)
   - [2. Add Part Editor](#2-add-part-editor)
-    - [2.1. Generic Part Editor Template](#21-generic-part-editor-template)
-    - [2.2. List Part Editor Template](#22-list-part-editor-template)
-      - [List Entry Editor Template](#list-entry-editor-template)
+    - [2.1. How a Part Editor Works](#21-how-a-part-editor-works)
+    - [2.2. Generic Part Editor Template](#22-generic-part-editor-template)
+    - [2.3. List Part Editor Template](#23-list-part-editor-template)
   - [3. Add PG Editor Wrapper](#3-add-pg-editor-wrapper)
   - [4. Add Sub-Route](#4-add-sub-route)
   - [5. Add Part Mapping to App](#5-add-part-mapping-to-app)
@@ -115,138 +115,220 @@ export const __NAME___PART_SCHEMA = {
 
 ## 2. Add Part Editor
 
-The part editor UI is a dumb component which essentially uses a form to represent the data of a part's model. These data are adapted to the form when loading them, and converted back to the part's model when saving.
+The part editor is a dumb component which edits the part's model through an Angular **signal form** (`@angular/forms/signals`). Its data is converted into an editable _draft_ when loading, and the draft is converted back into the part's model when saving.
 
-▶️ (1) in `src/lib`, add a **part editor dumb component** named after the part (e.g. `ng g component note-part` for `NotePartComponent` after the model `NotePart`), and extending `ModelEditorComponentBase<T>` where `T` is the part's type. Here we usually have two cases: - a generic part - a part consisting only of a list of entities.
+▶️ (1) in `src/lib`, add a **part editor dumb component** named after the part (e.g. `ng g component note-part` for `NotePartComponent` after the model `NotePart`), extending `ModelEditorComponentBase<T>` (from `@myrmidon/cadmus-ui`), where `T` is the part's type. There are usually two cases, each with its own template below:
 
-Two different templates are provided here.
+- a generic part (2.1);
+- a part whose model is just a list of entries (2.2).
 
-### 2.1. Generic Part Editor Template
+In the templates, replace `__NAME__` with your model's name, in the casing required by each place (e.g. `CodBinding` in class names, `cod-binding` in file names and selectors, `COD_BINDING` in constants), and `__PRJ__` with your project's prefix.
+
+### 2.1. How a Part Editor Works
+
+Every part editor has the same three pieces:
+
+1. a **draft** interface (`...Controls`), the editable shape behind the form, with a pure `toDraft(part)` function mapping the part into it;
+2. the **draft signal and the form**: `_draft = linkedSignal(() => toDraft(this.data()?.value))` and `form = this.createForm(this._draft, schema)`. The draft is rebuilt whenever new data is bound;
+3. `getValue()`, which builds the part from the draft when saving.
+
+`ModelEditorComponentBase` does everything else, so do not reimplement it:
+
+| member                                          | what it does                                                                                          |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `data` (model), `identity`, `disabled` (inputs) | the edited part with its thesauri, the part's identity, and a flag disabling the whole form.          |
+| `editorClose`, `dirtyChange` (outputs)          | emitted on close, and when the dirty state changes.                                                   |
+| `isDirty`, `modelName`, `helpUrl`               | signals: dirty state, human-friendly part name, URL of the help page if any.                          |
+| `userLevel`                                     | the current user's level (0-4). Use `[noSave]="userLevel < 2"` on the save button.                    |
+| `createForm(draft, schema?)`                    | creates the form. The whole form is disabled while `disabled` is true.                                |
+| `save()`, `close()`                             | save (only when the form is valid, else it marks it as touched to show errors), and request to close. |
+| `getEditedPart(typeId)`                         | a copy of the edited part, or a new part when creating it. Start `getValue()` from it.                |
+| `initSettings(typeId, callback)`                | loads the editor's settings from the profile (call it in the constructor).                            |
+| `onDataSet(data)`                               | override only if you must react to new data beyond the draft. Usually you don't need it.              |
+
+Whenever new data is bound or saved, the base class resets the form's interaction state (dirty, touched). So never call `form().reset()` when data arrives, nor set field values from an `effect`.
+
+**Rules to follow** (each of them prevents a bug found in real editors):
+
+- ⚠️ **no `<form>` element** in the template. Bind each control with `[formField]="form.x"`, and save through `(saveRequest)="save()"` on `<cadmus-close-save-buttons>`. A `<form>` would make Enter in any input of any child widget save the whole part.
+- ⚠️ **the draft must have a value for every field**, also when there is no part (new part). Use `''` for empty text (native inputs need strings, so a `string | null` field fails template type-checking), `number | null` for numeric inputs, `[]` for arrays. Fields bound only to Material selects and checkboxes, or to child editors, may be `null`. In `getValue()`, trim strings and save empty optional values as `undefined`.
+- ⚠️ **child editor outputs go through `setFieldFromChild`**. Many child editors (e.g. doc references, proper names, asserted IDs, historical dates) emit a normalized copy of their value right after receiving it (e.g. `undefined` for a `null`). If your handler sets the field and calls `markAsDirty()`, the editor becomes dirty as soon as it opens, and the user gets a "pending changes" prompt when closing it without having changed anything. So write every handler of a child's `(xxxChange)` output as `setFieldFromChild(this.form.x, value)`. Instead, handlers of the user's own actions (add, delete, move an entry, pick an item) set the value and call `markAsDirty()` directly.
+- ⚠️ **copy arrays of objects with `copyFormValue()`** when they enter the draft (`toDraft`), when they leave it (`getValue`), and when they come from a child editor. The form tags every object in its arrays with a hidden identity `Symbol`, and object spread (`{ ...x }`) copies it. Never copy objects from the form with spread. Class instances whose methods you need are an exception: keep them as they are.
+- **thesauri** are `computed()` signals over `this.data()?.thesauri?.['thesaurus-id']?.entries`. When a thesaurus is optional, offer a free text input as a fallback for the select.
+- **settings** come from `initSettings()`, and may arrive after the data. If the draft depends on them, keep them in a signal and read it in the `linkedSignal`.
+- **validation** is declared in the form's schema function: `required`, `maxLength`, `minLength`, `min`, `max`, `pattern`, `validate` (custom), `applyEach` (array items), `disabled` (conditional disabling), all from `@angular/forms/signals`. Error kinds are camel case (`getError('maxLength')`, not `maxlength`). `required()` does not flag an empty array: use `NgxToolsSignalValidators.strictMinLength(p.entries, 1)` from `@myrmidon/ngx-tools`. Do not put validation attributes like `required`, `min` or `max` on `[formField]` elements: Angular rejects them (`NG8022`), so use schema rules, with `{ when: () => ... }` for conditional ones.
+- **Monaco editor** (`ngx-monaco-editor`): it reports text set by code as a user change. Do not bind it with `[formField]`. Use `[value]="form.text().value()"`, `(valueChange)="setFieldFromEditor(form.text, $event)"` and `(blur)="form.text().markAsTouched()"`, exposing the helper on the component with `public readonly setFieldFromEditor = setFieldFromEditor;`.
+- use `ChangeDetectionStrategy.OnPush`, and in templates read signals (`form.x().value()`, `edited()`), never plain properties which change later.
+- if you override `ngOnInit`, call `super.ngOnInit()`.
+
+The helpers `copyFormValue`, `setFieldFromChild`, `sameFormValue`, `setFieldFromEditor` and `isImplicitSubmission` are all exported by `@myrmidon/cadmus-ui`.
+
+### 2.2. Generic Part Editor Template
+
+This template shows the most common cases: a text field, a field bound to an optional thesaurus, and a child editor (here doc references, from `@myrmidon/cadmus-refs-doc-references`). Replace them with your own fields.
 
 ▶️ (1) write code and HTML template:
 
 - 📁 part editor code:
 
 ```ts
-// NAME-part.component.ts
+// __NAME__-part.component.ts
 
-import { Component, OnInit, signal } from "@angular/core";
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from "@angular/forms";
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  linkedSignal,
+} from "@angular/core";
+import { TitleCasePipe } from "@angular/common";
+import { FormField, maxLength, required } from "@angular/forms/signals";
 
-import { CommonModule } from "@angular/common";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatExpansionModule } from "@angular/material/expansion";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatSelectModule } from "@angular/material/select";
-import { MatTooltipModule } from "@angular/material/tooltip";
+import {
+  MatCard,
+  MatCardActions,
+  MatCardAvatar,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from "@angular/material/card";
+import { MatOption } from "@angular/material/core";
+import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect } from "@angular/material/select";
 // ... etc.
 
-import { AuthJwtService } from "@myrmidon/auth-jwt-login";
-import { EditedObject, ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
-import { ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
+import { ThesaurusEntry } from "@myrmidon/cadmus-core";
+import {
+  CloseSaveButtonsComponent,
+  HelpLinkComponent,
+  ModelEditorComponentBase,
+  copyFormValue,
+  setFieldFromChild,
+} from "@myrmidon/cadmus-ui";
+// EXAMPLE: a child editor; remove if not used
+import {
+  DocReference,
+  DocReferencesComponent,
+} from "@myrmidon/cadmus-refs-doc-references";
 
 import { __NAME__Part, __NAME___PART_TYPEID } from "../__NAME__-part";
 
 /**
+ * The editable draft behind the form. Use '' for empty text (native inputs
+ * need strings), number | null for numbers, [] for arrays.
+ */
+interface __NAME__PartControls {
+  // TODO: replace with your fields
+  tag: string;
+  text: string;
+  references: DocReference[];
+}
+
+/**
+ * Part -> draft. Must return a value for each field also when there is no
+ * part. Copy arrays of objects with copyFormValue.
+ */
+function toDraft(part?: __NAME__Part | null): __NAME__PartControls {
+  return {
+    // TODO: replace with your fields
+    tag: part?.tag || "",
+    text: part?.text || "",
+    references: copyFormValue(part?.references || []),
+  };
+}
+
+// OPTIONAL: the settings for this editor, from the profile
+// export interface __NAME__PartSettings {
+//   // TODO: settings properties
+// }
+
+/**
  * __NAME__ part editor component.
- * Thesauri: ...TODO list of thesauri IDs...
+ * Thesauri: TODO list of thesauri IDs, e.g. __NAME__-tags (optional),
+ * doc-reference-types, doc-reference-tags (optional).
  */
 @Component({
   selector: "cadmus-__NAME__-part",
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatCardModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatSelectModule,
-    MatTooltipModule,
+    FormField,
+    TitleCasePipe,
+    MatCard,
+    MatCardActions,
+    MatCardAvatar,
+    MatCardContent,
+    MatCardHeader,
+    MatCardTitle,
+    MatError,
+    MatFormField,
+    MatIcon,
+    MatInput,
+    MatLabel,
+    MatOption,
+    MatSelect,
     // ... etc.
+    DocReferencesComponent,
     // cadmus
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
   ],
   templateUrl: "./__NAME__-part.component.html",
-  styleUrls: ["./__NAME__-part.component.scss"],
+  styleUrl: "./__NAME__-part.component.scss",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class __NAME__PartComponent
-  extends ModelEditorComponentBase<__NAME__Part>
-  implements OnInit
-{
-  // TODO: add your form controls here, e.g.:
-  // public tag: FormControl<string | null>;
-  // public text: FormControl<string | null>;
+export class __NAME__PartComponent extends ModelEditorComponentBase<__NAME__Part> {
+  // thesauri (TODO: replace with yours):
+  // __NAME__-tags
+  public readonly tagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.["__NAME__-tags"]?.entries,
+  );
+  // doc-reference-types
+  public readonly refTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.["doc-reference-types"]?.entries,
+  );
+  // doc-reference-tags
+  public readonly refTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.["doc-reference-tags"]?.entries,
+  );
 
-  // TODO: add your thesauri entries here, e.g.:
-  // public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  // OPTIONAL: settings (see the constructor; import signal from @angular/core)
+  // private readonly _settings = signal<__NAME__PartSettings | undefined>(undefined);
 
-  constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
-    super(authService, formBuilder);
-    // form
-    // TODO: create your form controls (but NOT the form itself), e.g.:
-    // this.tag = formBuilder.control(null, Validators.maxLength(100));
-    // this.text = formBuilder.control('', Validators.required, { nonNullable: true });
+  // the draft is rebuilt from each new data. If it depends on settings,
+  // read them here too: toDraft(this.data()?.value, this._settings())
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // TODO: replace with your rules
+    maxLength(p.tag, 100);
+    required(p.text);
+    maxLength(p.text, 5000);
+  });
+
+  // OPTIONAL: a constructor is needed only to load settings
+  // constructor() {
+  //   super();
+  //   this.initSettings<__NAME__PartSettings>(__NAME___PART_TYPEID, (s) =>
+  //     this._settings.set(s),
+  //   );
+  // }
+
+  // EXAMPLE: handler of a child editor's output. Always use setFieldFromChild
+  // here: it ignores the copy which the child emits of the value it received,
+  // so that opening the part does not make it dirty.
+  public onReferencesChange(references: DocReference[]): void {
+    setFieldFromChild(this.form.references, copyFormValue(references || []));
   }
 
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      // TODO: assign your created form controls to the form returned here, e.g.:
-      // tag: this.tag,
-      // text: this.text,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    // TODO: setup thesauri entries here, e.g.:
-    // const key = 'note-tags';
-    // if (this.hasThesaurus(key)) {
-    //  this.tagEntries.set(thesauri[key].entries);
-    // } else {
-    //  this.tagEntries.set(undefined);
-    // }
-  }
-
-  private updateForm(part?: __NAME__Part | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    // TODO: set values of your form controls, e.g.:
-    // this.tag.setValue(part.tag || null);
-    // this.text.setValue(part.text);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<__NAME__Part>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
-
+  // draft -> part
   protected getValue(): __NAME__Part {
-    let part = this.getEditedPart(__NAME___PART_TYPEID) as __NAME__Part;
-    // TODO: assign values to your part properties from form controls, e.g.:
-    // part.tag = this.tag.value || undefined;
-    // part.text = this.text.value?.trim() || '';
+    const part = this.getEditedPart(__NAME___PART_TYPEID) as __NAME__Part;
+    const draft = this._draft();
+    // TODO: replace with your fields
+    part.tag = draft.tag.trim() || undefined;
+    part.text = draft.text.trim();
+    part.references = draft.references.length
+      ? copyFormValue(draft.references)
+      : undefined;
     return part;
   }
 }
@@ -255,184 +337,223 @@ export class __NAME__PartComponent
 - 📁 part editor HTML template:
 
 ```html
-<!-- NAME-part.component.html -->
+<!-- __NAME__-part.component.html -->
+<!-- no <form> here: the part is saved by the save button -->
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>picture_in_picture</mat-icon>
+    </div>
+    <mat-card-title
+      >{{ (modelName() | titlecase) || "__NAME__ Part" }}</mat-card-title
+    >
+    <cadmus-help-link [url]="helpUrl()" />
+  </mat-card-header>
 
-<form [formGroup]="form" (submit)="save()">
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>picture_in_picture</mat-icon>
-      </div>
-      <mat-card-title>
-        <!-- TODO: add title for part in interpolation like:
-             (modelName() | titlecase) || "__NAME__ Part" -->
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content> TODO: your template here... </mat-card-content>
-    <mat-card-actions>
-      <cadmus-close-save-buttons
-        [form]="form"
-        [noSave]="userLevel < 2"
-        (closeRequest)="close()"
-      />
-    </mat-card-actions>
-  </mat-card>
-</form>
+  <mat-card-content>
+    <!-- TODO: replace with your controls -->
+
+    <!-- tag (bound to thesaurus) -->
+    @if (tagEntries()?.length) {
+    <mat-form-field>
+      <mat-label>tag</mat-label>
+      <mat-select [formField]="form.tag">
+        <mat-option [value]="''">(none)</mat-option>
+        @for (e of tagEntries(); track e.id) {
+        <mat-option [value]="e.id">{{ e.value }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
+    <!-- tag (free) -->
+    @else {
+    <mat-form-field>
+      <mat-label>tag</mat-label>
+      <input matInput [formField]="form.tag" />
+      @if ( form.tag().getError("maxLength") && (form.tag().dirty() ||
+      form.tag().touched()) ) {
+      <mat-error>tag too long</mat-error>
+      }
+    </mat-form-field>
+    }
+
+    <!-- text -->
+    <div>
+      <mat-form-field class="long-text">
+        <mat-label>text</mat-label>
+        <textarea matInput [formField]="form.text"></textarea>
+        @if ( form.text().getError("required") && (form.text().dirty() ||
+        form.text().touched()) ) {
+        <mat-error>text required</mat-error>
+        } @if ( form.text().getError("maxLength") && (form.text().dirty() ||
+        form.text().touched()) ) {
+        <mat-error>text too long</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- EXAMPLE: child editor: input from the field's value, output through
+         a handler using setFieldFromChild -->
+    <cadmus-refs-doc-references
+      [references]="form.references().value()"
+      [typeEntries]="refTypeEntries()"
+      [tagEntries]="refTagEntries()"
+      (referencesChange)="onReferencesChange($event)"
+    />
+  </mat-card-content>
+
+  <mat-card-actions>
+    <cadmus-close-save-buttons
+      [form]="form"
+      [noSave]="userLevel < 2"
+      (closeRequest)="close()"
+      (saveRequest)="save()"
+    />
+  </mat-card-actions>
+</mat-card>
 ```
 
-> Note that the `modelName()` human-friendly part name property is dynamically defined according to the `model-types` thesaurus for both pure parts and parts with a specific role. That's why we have a template title like (between double braces) `(modelName() | titlecase) || "__NAME__ Part"`. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role.
+> Note that the `modelName()` human-friendly part name is dynamically defined according to the `model-types` thesaurus for both pure parts and parts with a specific role. That's why the title is `(modelName() | titlecase) || "__NAME__ Part"`. For instance, if you are going to use a categories part with role "eras", you should add to that thesaurus an entry with ID `it.vedph.categories:eras` whose value will be used as the human-friendly name for that part type with that specific role.
 
-▶️ (2) ensure the component has been added to the `public-api.ts` barrel file (and, if still using modules, to the library module's `declarations` and `exports`).
+▶️ (2) ensure the component has been added to the `public-api.ts` barrel file.
 
-> If your editor needs to be customized with specific settings, you can add them to the backend JSON profile and retrieve them in the editor's code. To this end, inject the `AppRepository` service and request the setting object for the editor of the part/fragment type ID and role via its `getSettingFor(typeId, roleId?)` method. This will return an object with any model, representing all the settings for that specific editor.
+💡 Some practical tips:
 
-### 2.2. List Part Editor Template
+- **child editors which reset on any new object**: pass a child editor's input from the field's value (`form.x().value()`), as above. A few child editors reset their whole state whenever they get a different object (e.g. `NoteSetComponent`): for them, pass instead a `computed()` built only from `data()` (and settings), so that their own changes do not make them reset.
+- **disabled state**: `disabled` disables all the form's fields, but not child editors bound with plain inputs. If a child editor has a `disabled` input, bind it to `disabled()`.
+- **sub-forms**: a form which is not part of the edited model (e.g. a "new keyword" input with its add button) is a separate `form(signal(...))`, so that it does not affect the part's dirty and valid state. Handle Enter-to-add on its input with `(keydown.enter)`.
+- **rows** (lists of editable objects edited in place, like metadata name=value pairs): use an array in the draft, `applyEach(p.rows, (row) => { ... })` for their rules, and iterate the field tree in the template: `@for (row of form.rows; track row) { <input matInput [formField]="row.name" /> }`. Change the array by setting a new one (e.g. `this.form.rows().value.set([...rows, newRow])` followed by `markAsDirty()`); never `push` into it.
+- **settings**: if your editor needs to be customized with settings, add them to the backend JSON profile, and load them with `this.initSettings<YourSettings>(TYPEID, (s) => this._settings.set(s))` in the constructor. The settings are looked up by the part's type ID and role.
+
+### 2.3. List Part Editor Template
+
+This template is for a part whose model is just a list of entries, each edited by a separate entry editor component (see [the entry editor template](#list-entry-editor-template) below). The list is a single field of the form (`entries`), changed as a whole by the user's actions (add, edit, delete, move).
+
+> Typically you edit each single entry in its own component, generated with `ng g component <NAME>-editor`, where NAME is the model's name (e.g. `cod-binding-editor` for the entries of the `cod-bindings-part`). Remember to export it from the library's `public-api.ts` barrel file. The same template is used for any child editor of a single object.
 
 ▶️ (1) write code and HTML template:
 
 - 📁 list part editor code:
 
 ```ts
-// NAME-part.component.ts
+// __NAME__s-part.component.ts
 
-import { Component, OnInit, signal } from "@angular/core";
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from "@angular/forms";
-import { take } from "rxjs/operators";
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from "@angular/core";
+import { TitleCasePipe } from "@angular/common";
 
-import { CommonModule } from "@angular/common";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
+import { MatButton, MatIconButton } from "@angular/material/button";
+import {
+  MatCard,
+  MatCardActions,
+  MatCardAvatar,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from "@angular/material/card";
 import { MatExpansionModule } from "@angular/material/expansion";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatSelectModule } from "@angular/material/select";
-import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatIcon } from "@angular/material/icon";
+import { MatTooltip } from "@angular/material/tooltip";
 // ... etc.
 
-import { NgxToolsValidators } from "@myrmidon/ngx-tools";
+import { NgxToolsSignalValidators, FlatLookupPipe } from "@myrmidon/ngx-tools";
 import { DialogService } from "@myrmidon/ngx-mat-tools";
-import { AuthJwtService } from "@myrmidon/auth-jwt-login";
-import { CloseSaveButtonsComponent, ModelEditorComponentBase } from "@myrmidon/cadmus-ui";
-import { EditedObject, ThesauriSet, ThesaurusEntry } from "@myrmidon/cadmus-core";
+import { ThesaurusEntry } from "@myrmidon/cadmus-core";
+import {
+  CloseSaveButtonsComponent,
+  HelpLinkComponent,
+  ModelEditorComponentBase,
+  copyFormValue,
+} from "@myrmidon/cadmus-ui";
 
 import {
   __NAME__,
   __NAME__sPart,
   __NAME__S_PART_TYPEID,
 } from "../__NAME__s-part";
+import { __NAME__EditorComponent } from "../__NAME__-editor/__NAME__-editor.component";
+
+interface __NAME__sPartControls {
+  entries: __NAME__[];
+}
+
+function toDraft(part?: __NAME__sPart | null): __NAME__sPartControls {
+  // copy: the form tags the objects in its arrays
+  return { entries: copyFormValue(part?.__NAME__s || []) };
+}
 
 /**
  * __NAME__sPart editor component.
- * Thesauri: ...TODO list of thesauri IDs...
+ * Thesauri: TODO list of thesauri IDs, e.g. __NAME__-types (optional).
  */
 @Component({
   selector: "cadmus-__NAME__s-part",
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatCardModule,
+    TitleCasePipe,
+    MatButton,
+    MatCard,
+    MatCardActions,
+    MatCardAvatar,
+    MatCardContent,
+    MatCardHeader,
+    MatCardTitle,
     MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatSelectModule,
-    MatTooltipModule,
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
+    FlatLookupPipe,
     // ... etc.
+    __NAME__EditorComponent,
     // cadmus
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
   ],
   templateUrl: "./__NAME__s-part.component.html",
-  styleUrls: ["./__NAME__s-part.component.scss"],
+  styleUrl: "./__NAME__s-part.component.scss",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class __NAME__sPartComponent
-  extends ModelEditorComponentBase<__NAME__sPart>
-  implements OnInit
-{
+export class __NAME__sPartComponent extends ModelEditorComponentBase<__NAME__sPart> {
+  private readonly _dialogService = inject(DialogService);
+
+  // the entry being edited (a copy), and its index (-1 for a new entry)
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<__NAME__ | undefined>(undefined);
 
-  // TODO: add your thesauri entries here, e.g.:
-  // cod-binding-tags
-  // public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  // thesauri (TODO: replace with yours):
+  // __NAME__-types
+  public readonly typeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.["__NAME__-types"]?.entries,
+  );
 
-  public entries: FormControl<__NAME__[]>;
-
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.entries = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      entries: this.entries,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    // TODO setup your thesauri entries here, e.g.:
-    // let key = 'cod-binding-tags';
-    // if (this.hasThesaurus(key)) {
-    //   this.tagEntries.set(thesauri[key].entries);
-    // } else {
-    //   this.tagEntries.set(undefined);
-    // }
-  }
-
-  private updateForm(part?: __NAME__sPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.entries.setValue(part.__NAME__s || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<__NAME__sPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // at least 1 entry (required() does not flag an empty array)
+    NgxToolsSignalValidators.strictMinLength(p.entries, 1);
+  });
 
   protected getValue(): __NAME__sPart {
-    let part = this.getEditedPart(__NAME__S_PART_TYPEID) as __NAME__sPart;
-    part.__NAME__s = this.entries.value || [];
+    const part = this.getEditedPart(__NAME__S_PART_TYPEID) as __NAME__sPart;
+    part.__NAME__s = copyFormValue(this._draft().entries);
     return part;
   }
 
   public add__NAME__(): void {
     const entry: __NAME__ = {
-      // TODO: set your entry default properties...
-    };
+      // TODO: set your entry default properties, e.g. the first type:
+      // type: this.typeEntries()?.length ? this.typeEntries()![0].id : '',
+    } as __NAME__;
     this.edit__NAME__(entry, -1);
   }
 
   public edit__NAME__(entry: __NAME__, index: number): void {
     this.editedIndex.set(index);
+    // structuredClone also drops the form's Symbol tag
     this.edited.set(structuredClone(entry));
   }
 
@@ -441,16 +562,16 @@ export class __NAME__sPartComponent
     this.edited.set(undefined);
   }
 
+  // these are user actions: they set the list and mark it as dirty
   public save__NAME__(entry: __NAME__): void {
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
     if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex(), 1, entry);
     }
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     this.close__NAME__();
   }
 
@@ -462,11 +583,10 @@ export class __NAME__sPartComponent
           if (this.editedIndex() === index) {
             this.close__NAME__();
           }
-          const entries = [...this.entries.value];
+          const entries = [...this.form.entries().value()];
           entries.splice(index, 1);
-          this.entries.setValue(entries);
-          this.entries.markAsDirty();
-          this.entries.updateValueAndValidity();
+          this.form.entries().value.set(entries);
+          this.form.entries().markAsDirty();
         }
       });
   }
@@ -475,26 +595,24 @@ export class __NAME__sPartComponent
     if (index < 1) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
   }
 
   public move__NAME__Down(index: number): void {
-    if (index + 1 >= this.entries.value.length) {
+    if (index + 1 >= this.form.entries().value().length) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
   }
 }
 ```
@@ -502,109 +620,122 @@ export class __NAME__sPartComponent
 - 📁 list part editor HTML template:
 
 ```html
-<!-- NAME-part.component.html -->
+<!-- __NAME__s-part.component.html -->
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>picture_in_picture</mat-icon>
+    </div>
+    <mat-card-title
+      >{{ (modelName() | titlecase) || "__NAME__s Part" }}</mat-card-title
+    >
+    <cadmus-help-link [url]="helpUrl()" />
+  </mat-card-header>
 
-<form [formGroup]="form" (submit)="save()">
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>picture_in_picture</mat-icon>
-      </div>
-      <mat-card-title>
-        <!-- TODO: add title for part -->
-        <!-- {{ (modelName() | titlecase) || "__NAME__ Part" }} -->
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div>
-        <button
-          type="button"
-          mat-flat-button
-          color="primary"
-          (click)="add__NAME__()"
-        >
-          <mat-icon>add_circle</mat-icon> __NAME__
-        </button>
-      </div>
-      @if (entries.value.length) {
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            TODO: add model properties
-          </tr>
-        </thead>
-        <tbody>
-          @for (entry of entries.value; track entry; let i = $index; let first =
-          $first; let last = $last) {
-          <tr [class.selected]="entry === edited()">
-            <td class="fit-width">
-              <button
-                type="button"
-                mat-icon-button
-                color="primary"
-                matTooltip="Edit this __NAME__"
-                (click)="edit__NAME__(entry, i)"
-              >
-                <mat-icon class="mat-primary">edit</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                matTooltip="Move this __NAME__ up"
-                [disabled]="first"
-                (click)="move__NAME__Up(i)"
-              >
-                <mat-icon>arrow_upward</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                matTooltip="Move this __NAME__ down"
-                [disabled]="last"
-                (click)="move__NAME__Down(i)"
-              >
-                <mat-icon>arrow_downward</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                color="warn"
-                matTooltip="Delete this __NAME__"
-                (click)="delete__NAME__(i)"
-              >
-                <mat-icon class="mat-warn">remove_circle</mat-icon>
-              </button>
-            </td>
-            TODO: td's for properties
-          </tr>
-          }
-        </tbody>
-      </table>
-      } @if (edited()) {
-      <fieldset>
-        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
-          <mat-expansion-panel-header>
-            <mat-panel-title>__NAME__ #{{ editedIndex() + 1 }}</mat-panel-title>
-          </mat-expansion-panel-header>
-          TODO: editor control with: [model]="edited()"
-          (modelChange)="save__NAME__($event)" (editorClose)="close__NAME__()"
-        </mat-expansion-panel>
-      </fieldset>
-      }
-    </mat-card-content>
-    <mat-card-actions>
-      <cadmus-close-save-buttons
-        [form]="form"
-        [noSave]="userLevel < 2"
-        (closeRequest)="close()"
-      />
-    </mat-card-actions>
-  </mat-card>
-</form>
+  <mat-card-content>
+    <div>
+      <button
+        type="button"
+        mat-flat-button
+        class="mat-primary"
+        (click)="add__NAME__()"
+      >
+        <mat-icon>add_circle</mat-icon> __NAME__
+      </button>
+    </div>
+
+    @if (form.entries().value().length) {
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <!-- TODO: a th for each displayed property -->
+          <th>type</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for ( entry of form.entries().value(); track entry; let i = $index; let
+        first = $first; let last = $last ) {
+        <tr [class.selected]="i === editedIndex()">
+          <td class="fit-width">
+            <span class="nr">{{ i + 1 }}.</span>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Edit this __NAME__"
+              (click)="edit__NAME__(entry, i)"
+            >
+              <mat-icon class="mat-primary">edit</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Move this __NAME__ up"
+              [disabled]="first"
+              (click)="move__NAME__Up(i)"
+            >
+              <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Move this __NAME__ down"
+              [disabled]="last"
+              (click)="move__NAME__Down(i)"
+            >
+              <mat-icon>arrow_downward</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Delete this __NAME__"
+              (click)="delete__NAME__(i)"
+            >
+              <mat-icon class="mat-warn">remove_circle</mat-icon>
+            </button>
+          </td>
+          <!-- TODO: a td for each displayed property, e.g.: -->
+          <td>{{ entry.type | flatLookup: typeEntries() : "id" : "value" }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+
+    <!-- the entry editor (manual save: it emits only on its save button) -->
+    @if (edited()) {
+    <fieldset>
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            __NAME__ #{{ editedIndex() > -1 ? editedIndex() + 1 : "new" }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <cadmus-__PRJ__-__NAME__-editor
+          [data]="edited()"
+          [typeEntries]="typeEntries()"
+          (dataChange)="save__NAME__($event!)"
+          (cancelEdit)="close__NAME__()"
+        />
+      </mat-expansion-panel>
+    </fieldset>
+    }
+  </mat-card-content>
+
+  <mat-card-actions>
+    <cadmus-close-save-buttons
+      [form]="form"
+      [noSave]="userLevel < 2"
+      (closeRequest)="close()"
+      (saveRequest)="save()"
+    />
+  </mat-card-actions>
+</mat-card>
 ```
 
-- 📁 list part editor CSS styles:
+⚠️ The entry editor must use **manual save** here: `save__NAME__()` closes it, so an autosaving editor would close at the first change.
+
+- 📁 list part editor styles:
 
 ```css
 table {
@@ -612,184 +743,36 @@ table {
   border-collapse: collapse;
 }
 tbody tr:nth-child(odd) {
-  background-color: #e2e2e2;
+  background-color: var(--mat-sys-surface-container);
 }
 th {
   text-align: left;
   font-weight: normal;
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
+}
+tbody tr:hover {
+  background-color: var(--mat-sys-surface-container-high);
 }
 td.fit-width {
   width: 1px;
   white-space: nowrap;
 }
-tr.selected {
-  background-color: #d0d0d0 !important;
+tbody tr.selected {
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
 }
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid var(--mat-sys-on-surface-variant);
   border-radius: 6px;
   padding: 6px;
 }
-```
-
-#### List Entry Editor Template
-
-Typically you should edit each **single entry** in a component (generated with `ng g component <NAME>-editor` where NAME is the model's name, e.g. `cod-binding-editor` for the `cod-bindings-part` component - remember to export it both from the library's module and from its barrel `public-api.ts` file), similar to the following template (rename `model` as you prefer):
-
-- 📁 entry editor code:
-
-```ts
-import { CommonModule } from "@angular/common";
-import { Component, OnInit, effect, model, output } from "@angular/core";
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
-import {
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  takeUntil,
-} from "rxjs/operators";
-import { Subscription } from "rxjs";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-
-// material
-import { MatButtonModule } from "@angular/material/button";
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatSelectModule } from "@angular/material/select";
-import { MatTooltipModule } from "@angular/material/tooltip";
-
-@Component({
-  selector: "cadmus-__PRJ__-__NAME__",
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatSelectModule,
-    MatTooltipModule, // ... etc.
-  ],
-  templateUrl: "./__NAME__.component.html",
-  styleUrls: ["./__NAME__.component.scss"],
-})
-export class __NAME__Component {
-  public readonly data = model<__TYPE__ | undefined>();
-  public readonly cancelEdit = output(); // TODO: form controls...
-
-  public form: FormGroup; // track if the form is currently being updated programmatically
-
-  private _updatingForm = false;
-
-  constructor(private formBuilder: FormBuilder) {
-    // form
-    // TODO: create controls
-    this.form = formBuilder.group({
-      // TODO: add controls to form model
-    }); // when model changes, update form
-
-    effect(() => {
-      const data = this.data();
-      this.updateForm(data);
-    }); // autosave: TODO remove if manual save
-
-    this.form.valueChanges
-      .pipe(
-        // react only on user changes, when form is valid
-        filter(() => !this._updatingForm && this.form.valid),
-        debounceTime(500), // TODO: optionally add distinctUntilChanged with a custom comparer, e.g.: // distinctUntilChanged((prev: __TYPE__, curr: __TYPE__) => { //     // perform a deep equality check on relevant properties //     return prev.name === curr.name; // }),
-        takeUntilDestroyed()
-      )
-      .subscribe((values) => {
-        // TODO: pass false if you don't consider autosave the save action
-        this.save();
-      });
-  }
-
-  private updateForm(data: __TYPE__ | undefined | null): void {
-    this._updatingForm = true;
-
-    if (!data) {
-      this.form.reset();
-    } else {
-      // TODO set controls values via patch
-    }
-
-    this.form.markAsPristine();
-
-    // reset guard only after marking controls
-    this._updatingForm = false;
-  }
-
-  private getData(): __TYPE__ {
-    return {
-      // TODO get values from controls
-    };
-  }
-
-  public cancel(): void {
-    this.cancelEdit.emit();
-  }  // TODO: make this private if autosave is used
-  /**
-   * Saves the current form data by updating the `data` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
-   */
-
-  public save(pristine = true): void {
-    if (this.form.invalid) {
-      // show validation errors
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const data = this.getData();
-    this.data.set(data);
-
-    if (pristine) {
-      this.form.markAsPristine();
-    }
-  }
+.nr {
+  color: var(--mat-sys-on-surface-variant);
+  background-color: var(--mat-sys-surface-container);
+  border: 1px solid var(--mat-sys-on-surface-variant);
+  border-radius: 4px;
+  padding: 0 2px;
 }
-```
-
-- 📁 HTML template:
-
-```html
-<form [formGroup]="form" (submit)="save()">
-  TODO
-  <!-- buttons -->
-  <div>
-    <button
-      type="button"
-      mat-icon-button
-      matTooltip="Discard changes"
-      (click)="cancel()"
-    >
-      <mat-icon class="mat-warn">clear</mat-icon>
-    </button>
-    <button
-      type="submit"
-      mat-icon-button
-      matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
-    >
-      <mat-icon class="mat-primary">check_circle</mat-icon>
-    </button>
-  </div>
-</form>
 ```
 
 ▶️ (2) ensure the component has been added to the `public-api.ts` barrel file.
@@ -827,7 +810,7 @@ export class __NAME__PartFeatureComponent
     snackbar: MatSnackBar,
     itemService: ItemService,
     thesaurusService: ThesaurusService,
-    editorService: PartEditorService
+    editorService: PartEditorService,
   ) {
     super(
       router,
@@ -835,7 +818,7 @@ export class __NAME__PartFeatureComponent
       snackbar,
       itemService,
       thesaurusService,
-      editorService
+      editorService,
     );
   }
 
@@ -876,15 +859,15 @@ This is optional, and is required only when you are providing a library sub-rout
 Modern approach:
 
 ```ts
-import { Routes } from '@angular/router';
+import { Routes } from "@angular/router";
 
 // cadmus
-import { pendingChangesGuard } from '@myrmidon/cadmus-core';
+import { pendingChangesGuard } from "@myrmidon/cadmus-core";
 
 import {
   __NAME___PART_TYPEID,
   __NAME__PartFeatureComponent,
-} from '@myrmidon/cadmus-part-TODO';
+} from "@myrmidon/cadmus-part-TODO";
 
 export const CADMUS_PART___PRJ___PG_ROUTES: Routes = [
   {
@@ -897,17 +880,17 @@ export const CADMUS_PART___PRJ___PG_ROUTES: Routes = [
 ];
 ```
 
->💡 This is imported in `app.routes.ts` like e.g.:
+> 💡 This is imported in `app.routes.ts` like e.g.:
 
 ```ts
 export const routes: Routes = [
   // ...
   // ndp-books part
   {
-    path: 'items/:iid/ndp-books',
+    path: "items/:iid/ndp-books",
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-ndpbooks-pg').then(
-        (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES
+      import("@myrmidon/cadmus-part-ndpbooks-pg").then(
+        (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES,
       ),
     canActivate: [jwtGuard],
   },

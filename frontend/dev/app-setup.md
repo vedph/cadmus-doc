@@ -39,7 +39,7 @@ ng new cadmus-__PRJ__-app
 ▶️ (2) change the package manager to `pnpm` by replacing the corresponding line in package.json with (update your pnpm version accordingly):
 
 ```json
-"packageManager": "pnpm@10.28.1",
+"packageManager": "pnpm@12.6.0",
 ```
 
 ▶️ (3) enter the newly created directory and **add Angular Material** and **Angular localization package**:
@@ -65,7 +65,7 @@ For server-side rendering applications add the import to your `main.server.ts` f
 In this case, ensure that these settings are properly configured:
 
 1. you must have installed the NPM package `@angular/localize` (under `devDependencies`).
-2. you must add `@angular/localize/init` to your `polyfills` in `angular.json`, e.g. `"polyfills": ["zone.js", "@angular/localize/init"],` under `projects/NAME/architect/build/options` and `projects/NAME/architect/test/options`. In older code you might rather have a `polyfills.ts` file which is imported in `angular.json`; in this case, add the import there under the app imports.
+2. you must add `@angular/localize/init` to your `polyfills` in `angular.json` under `projects/NAME/architect/build/options` (and under `test/options`, if present), e.g. `"polyfills": ["@angular/localize/init"],`. New Angular apps are zoneless (their `app.config.ts` has `provideZonelessChangeDetection()`), so `zone.js` is not among the polyfills; if your app still uses zones, keep `"zone.js"` before it. In older code you might rather have a `polyfills.ts` file which is imported in `angular.json`; in this case, add the import there under the app imports.
 3. ensure `main.ts` has the reference _at the very top_:
 
    ```ts
@@ -263,7 +263,7 @@ pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myr
 
 pnpm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui
 
-pnpm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-mat-physical-size @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers ts-md5 echarts
+pnpm i @myrmidon/cadmus-refs-asserted-chronotope @myrmidon/cadmus-flags-pg @myrmidon/cadmus-flags-ui @myrmidon/cadmus-refs-asserted-ids @myrmidon/cadmus-refs-assertion @myrmidon/cadmus-refs-decorated-ids @myrmidon/cadmus-refs-doc-references @myrmidon/cadmus-refs-external-ids @myrmidon/cadmus-refs-historical-date @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-proper-name @myrmidon/cadmus-state @myrmidon/cadmus-text-block-view @myrmidon/cadmus-thesaurus-editor @myrmidon/cadmus-thesaurus-list @myrmidon/cadmus-thesaurus-ui @myrmidon/cadmus-ui @myrmidon/cadmus-ui-flag-set @myrmidon/ngx-mat-tools @myrmidon/ngx-tools @myrmidon/paged-data-browsers ts-md5 echarts
 
 pnpm i @myrmidon/cadmus-text-ed @myrmidon/cadmus-text-ed-md @myrmidon/cadmus-text-ed-txt
 
@@ -301,32 +301,13 @@ import { NgxEchartsModule } from 'ngx-echarts';
     ),
 ```
 
-▶️ 2. Typically you will also need **Monaco editor** and **Markdown**:
+▶️ 2. Typically you will also need the **Monaco editor** (used by editors like the note and comment parts), and `marked` for rendering **Markdown**:
 
-- `pnpm i @jean-merelis/ngx-monaco-editor`
-- [ngx-markdown](https://github.com/jfcere/ngx-markdown) if you have components _displaying_ Markdown: `pnpm i ngx-markdown marked`.
-
-⚠️ Note that for such libraries you should also import the providers in `app.config.ts` like:
-
-```ts
- import {
-   DefaultMonacoLoader,
-   NGX_MONACO_LOADER_PROVIDER,
- } from '@jean-merelis/ngx-monaco-editor';
-
-// ...
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    // ...
-    {
-      provide: NGX_MONACO_LOADER_PROVIDER,
-      useFactory: () => new DefaultMonacoLoader({ paths: { vs: '/vs' } }),
-    },
-    // ...
-  ],
-};
+```bash
+pnpm i monaco-editor@~0.47.0 @jean-merelis/ngx-monaco-editor marked
 ```
+
+⚠️ Install the `monaco-editor` version required by the wrapper (here `0.47.x`), not the latest one. Monaco also needs its assets in `angular.json` and a loader provider in `app.config.ts`, while the text editing plugins installed above (`@myrmidon/cadmus-text-ed*`) need their configuration in `app.config.ts`: follow [Using Monaco Editor](monaco) for all these steps.
 
 ---
 
@@ -346,12 +327,24 @@ This step is essential to let the frontend find the server, while allowing us to
   window.__env.version = "0.0.1";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
+  // enable item metadata builders in item editor
+  window.__env.hasMetadataBuilders = true;
+  // context help for part/fragment editors: URL template with placeholders
+  // {typeId}, {roleId}, {frRoleId}, {separator}, and optional [...] groups
+  // window.__env.helpUrlTemplate =
+  //   "https://www.mysite.com/help/topics/{typeId}{separator}{roleId}{separator}{frRoleId}.html";
+  // separator for {separator} (default: __)
+  // window.__env.helpUrlSeparator = "__";
+  // set to false to skip checking page availability (e.g. when CORS is not allowed)
+  // window.__env.helpUrlCheck = true;
   // UI branding: staging, dev, production (default)
   window.__env.branding = "production";
 })(this);
 ```
 
-> 💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, a MUFI root URI, etc.
+> 💡 You might need additional settings here, like e.g. a Mapbox GL API token, a Geonames account name, a MUFI root URI, etc. If you use the taxonomy parts (`@myrmidon/cadmus-part-taxo-*`), also add `window.__env.taxoUrl` with the URL of the taxonomy API, which is read by its client (`@myrmidon/taxo-store-api`).
+
+📖 The `helpUrl*` settings add a help button to part and fragment editors, linking to a page about each editor. When `helpUrlTemplate` is not set, no button is shown. See the [shell's changelog](https://github.com/vedph/cadmus-shell-v3/blob/master/CHANGELOG.md#context-help-configuration) for the placeholders, the fallback from role-specific pages to the type page, and examples.
 
 📖 If you are going to use the [external bibliography API](https://github.com/vedph/cadmus_biblioapi), also add its URL here, e.g.:
 
@@ -495,9 +488,26 @@ env.local.js
 
 ## 4. Fine-Tune Angular Settings
 
-This is suggested to enable source maps in production and avoid nasty warnings after compilation.
+This is suggested to avoid nasty warnings after compilation.
 
-▶️ In `angular.json` you will typically have to raise the warning limits for your `budget` size if getting a warning after building.
+▶️ (1) In `angular.json` you will typically have to raise the warning limits for your `budgets` size if getting a warning after building. Cadmus apps include many libraries, so their initial bundle is larger than the CLI default limits. For instance, the shell uses these limits in `projects/NAME/architect/build/configurations/production`:
+
+```json
+"budgets": [
+  {
+    "type": "initial",
+    "maximumWarning": "5MB",
+    "maximumError": "6MB"
+  },
+  {
+    "type": "anyComponentStyle",
+    "maximumWarning": "4kB",
+    "maximumError": "8kB"
+  }
+],
+```
+
+▶️ (2) if the build warns about CommonJS dependencies (e.g. those used by the graph editor, like `dagre` or `webcola`), list them in `allowedCommonJsDependencies` under `build/options`.
 
 ## 5. Add Assets
 
@@ -505,7 +515,7 @@ This is optional and depends on your visuals.
 
 ▶️ (1) copy the required icons and images in `public/img`: usually they are `logo-white-40.png` for the top bar logo (you can use your own), and a couple of banner images for the homepage (`banner-512.jpg`, `banner-1024.jpg`). The logo is used in the `app.component`'s template for the main toolbar, while banner images are used in the default homepage placeholder.
 
-▶️ (2) also, if using [lookup sets](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-refs-lookup/README.md#lookup-set), typically you will also need an icon for each lookup source, e.g. VIAF, GeoNames, etc. You can find some of these icons in the image folder of the [Cadmus shell app](https://github.com/vedph/cadmus-shell-v3/tree/master/src/assets/img).
+▶️ (2) also, if using [lookup sets](https://github.com/vedph/cadmus-bricks-shell-v3/blob/master/projects/myrmidon/cadmus-refs-lookup/README.md#lookup-set), typically you will also need an icon for each lookup source, e.g. VIAF, GeoNames, etc. You can find some of these icons in the image folder of the [Cadmus shell app](https://github.com/vedph/cadmus-shell-v3/tree/master/public/img).
 
 ---
 
@@ -586,7 +596,20 @@ The default app component must be updated with a code like that found in the [Ca
 
 ## 8. Configure Routes
 
-Setup your routes in [app.routes.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.routes.ts). As you can see from that code, most routes target a single standalone component (via `loadComponent`), while some of them target a module (via `loadChildren`). Targeting modules happens when they work as the entry point for sub-routes, like e.g. for the general or philologic parts module.
+Setup your routes in [app.routes.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.routes.ts). As you can see from that code, most routes target a single standalone component (directly via `component`, or lazily via `loadComponent`), while some of them lazily load a set of routes exported by a library (via `loadChildren`). This happens for the libraries whose components have their own sub-routes, like the general or philologic parts (e.g. `CADMUS_PART_GENERAL_PG_ROUTES`), and for your own part/fragment libraries (see [creating libraries](app-lib#routes-in-the-app)):
+
+```ts
+{
+  path: 'items/:iid/general',
+  loadChildren: () =>
+    import('@myrmidon/cadmus-part-general-pg').then(
+      (module) => module.CADMUS_PART_GENERAL_PG_ROUTES,
+    ),
+  canActivate: [jwtGuard],
+},
+```
+
+Routes are protected by the guards from `@myrmidon/auth-jwt-login` (e.g. `jwtGuard` for any logged-in user, `jwtAdminGuard` for administrators) and from Cadmus (`editorGuard` from `@myrmidon/cadmus-api`, for verified users with the admin or editor role; `pendingChangesGuard` from `@myrmidon/cadmus-core`, for editors with unsaved changes).
 
 Starting from that template, add all the routes you need, and remove those you don't need.
 
@@ -594,7 +617,12 @@ Starting from that template, add all the routes you need, and remove those you d
 
 ## 9. Configure App
 
-Finally, add to [app.config.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.config.ts) the required services. You can start from this template, and optionally add more providers if required.
+Finally, add to [app.config.ts](https://github.com/vedph/cadmus-shell-v3/blob/master/src/app/app.config.ts) the required services. You can start from this template, and optionally add more providers if required. Typically it provides:
+
+- zoneless change detection (`provideZonelessChangeDetection()`), the router with your routes, the native date adapter, and the HTTP client with the JWT interceptor (`jwtInterceptor` from `@myrmidon/auth-jwt-login`);
+- the Monaco loader and the text editing plugins with their key bindings (see [Using Monaco Editor](monaco));
+- the Cadmus extension points: `PART_EDITOR_KEYS`, `INDEX_LOOKUP_DEFINITIONS` and `ITEM_BROWSER_KEYS` (see [6](#6-add-cadmus-infrastructure)), provided under the string keys `partEditorKeys`, `indexLookupDefinitions` and `itemBrowserKeys`, as in the template;
+- optional services, like ECharts for statistics (see [2](#2-install-packages)), the configuration of lookup providers (e.g. `GEONAMES_USERNAME_TOKEN`), or URLs which must not get the JWT token (`AUTH_JWT_EXCLUDED_URLS`, e.g. for the VIAF lookup).
 
 ---
 
@@ -773,7 +801,7 @@ Finally you can use a README template like this:
 
 🐋 Quick Docker image build:
 
-1. `npm run build-lib`
+1. `pnpm run build-lib` (only if the workspace has its own libraries)
 2. update version in `env.js` and `ng build`
 3. `docker build . -t vedph2020/cadmus-__PRJ__-app:0.0.1 -t vedph2020/cadmus-__PRJ__-app:latest` (replace with the current version).
 ```
@@ -822,7 +850,7 @@ Sometimes you host multiple instances of the same editor, e.g. in a staging vs. 
 }
 ```
 
-(3) in `app.ts` change your code to provide branding:
+(3) in `app.ts` (`app.component.ts` in apps created with older Angular CLI versions) change your code to provide branding:
 
 ```ts
 // this assumes you inject private _env: EnvService in ctor:
@@ -849,7 +877,7 @@ export class App {
   });
 ```
 
-(4) in `app.html` change the class of the `mat-toolbar`:
+(4) in `app.html` (or `app.component.html`) change the class of the `mat-toolbar`:
 
 ```html
   <mat-toolbar

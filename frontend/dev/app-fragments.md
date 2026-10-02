@@ -36,9 +36,7 @@ export const __NAME___FRAGMENT_SCHEMA = {
   definitions: {},
   $schema: "http://json-schema.org/draft-07/schema#",
   $id:
-    "www.vedph.it/cadmus/fragments/<PRJ>/" +
-    __NAME___FRAGMENT_TYPEID +
-    ".json",
+    "www.vedph.it/cadmus/fragments/<PRJ>/" + __NAME___FRAGMENT_TYPEID + ".json",
   type: "object",
   title: "__NAME__Fragment",
   // TODO: add which properties are required
@@ -69,140 +67,174 @@ export const __NAME___FRAGMENT_SCHEMA = {
 
 ▶️ (2) add the export for the new file to the library's "barrel" file `public-api.ts`, e.g. `export * from './lib/<NAME>';`.
 
->If your editor needs to be customized with specific settings, you can add them to the backend JSON profile and retrieve them in the editor's code. To this end, inject the `AppRepository` service and request the setting object for the editor of the part/fragment type ID and role via its `getSettingFor(typeId, roleId?)` method. This will return an object with any model, representing all the settings for that specific editor.
+> If your editor needs to be customized with specific settings, you can add them to the backend JSON profile and load them in the editor with `initSettings`: see the fragment editor template below.
 
 ## 2. Add Fragment Editor
 
+A fragment editor works exactly like a part editor: it is a dumb component extending `ModelEditorComponentBase<T>` (from `@myrmidon/cadmus-ui`), and edits the fragment through an Angular **signal form** (`@angular/forms/signals`). Before writing it, read [How a Part Editor Works](app-parts#20-how-a-part-editor-works): its rules (no `<form>`, a value for every draft field, `setFieldFromChild` for child editors, `copyFormValue` for arrays of objects, etc.) apply to fragments too. The only differences are:
+
+- `getValue()` starts from `this.getEditedFragment()`, which keeps the fragment's `location`, instead of `getEditedPart(typeId)`;
+- the fragment's location and its portion of the base text are usually displayed in the card's header;
+- the type ID is the fragment's one (`fr.` prefix) when loading settings.
+
 ▶️ (1) add a _fragment editor dumb component_ named after the fragment (e.g. `ng g component comment-fragment` for `CommentFragmentComponent` after `CommentFragment`), and extending `ModelEditorComponentBase<T>` where `T` is the fragment's type.
+
+In the template, replace `__NAME__` with your fragment's name, in the casing required by each place (e.g. `Comment` in class names, `comment` in file names and selectors, `COMMENT` in constants).
 
 - 📁 code template:
 
 ```ts
-import { Component, OnInit } from '@angular/core';
+// __NAME__-fragment.component.ts
+
 import {
-  CloseSaveButtonsComponent,
-  EditedObject,
-  ModelEditorComponentBase,
-} from '@myrmidon/cadmus-ui';
-import {
-  FormControl,
-  FormBuilder,
-  Validators,
-  UntypedFormGroup,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+} from "@angular/core";
+import { TitleCasePipe } from "@angular/common";
+import { FormField, maxLength, required } from "@angular/forms/signals";
 
 import {
   MatCard,
-  MatCardHeader,
-  MatCardAvatar,
-  MatCardTitle,
-  MatCardSubtitle,
-  MatCardContent,
   MatCardActions,
-} from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatSelect } from '@angular/material/select';
-import { MatOption } from '@angular/material/core';
+  MatCardAvatar,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+} from "@angular/material/card";
+import { MatOption } from "@angular/material/core";
+import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect } from "@angular/material/select";
 // ... etc.
 
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import { ThesauriSet, ThesaurusEntry } from '@myrmidon/cadmus-core';
+import {
+  TextLayerService,
+  ThesaurusEntry,
+  TokenLocation,
+} from "@myrmidon/cadmus-core";
+import {
+  CloseSaveButtonsComponent,
+  HelpLinkComponent,
+  ModelEditorComponentBase,
+} from "@myrmidon/cadmus-ui";
 
 import { __NAME__Fragment } from "../__NAME__-fragment";
 
 /**
+ * The editable draft behind the form. Use '' for empty text (native inputs
+ * need strings), number | null for numbers, [] for arrays.
+ */
+interface __NAME__FragmentControls {
+  // TODO: replace with your fields
+  tag: string;
+  text: string;
+}
+
+/**
+ * Fragment -> draft. Must return a value for each field also when there is
+ * no fragment. Copy arrays of objects with copyFormValue (from
+ * @myrmidon/cadmus-ui).
+ */
+function toDraft(fr?: __NAME__Fragment | null): __NAME__FragmentControls {
+  return {
+    // TODO: replace with your fields
+    tag: fr?.tag || "",
+    text: fr?.text || "",
+  };
+}
+
+/**
  * __NAME__ fragment editor component.
- * Thesauri: TODO...
+ * Thesauri: TODO list of thesauri IDs, e.g. __NAME__-tags (optional).
  */
 @Component({
   selector: "cadmus-__NAME__-fragment",
   imports: [
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
+    TitleCasePipe,
     MatCard,
-    MatCardHeader,
-    MatCardAvatar,
-    MatIcon,
-    MatCardTitle,
-    MatCardSubtitle,
-    MatCardContent,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    MatError,
-    MatSelect,
-    MatOption,
     MatCardActions,
+    MatCardAvatar,
+    MatCardContent,
+    MatCardHeader,
+    MatCardSubtitle,
+    MatCardTitle,
+    MatError,
+    MatFormField,
+    MatIcon,
+    MatInput,
+    MatLabel,
+    MatOption,
+    MatSelect,
     // ... etc.
+    // cadmus
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
   ],
   templateUrl: "./__NAME__-fragment.component.html",
-  styleUrls: ["./__NAME__-fragment.component.scss"],
+  styleUrl: "./__NAME__-fragment.component.scss",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class __NAME__FragmentComponent
-  extends ModelEditorComponentBase<__NAME__Fragment>
-  implements OnInit {
-  // TODO: add form controls
+export class __NAME__FragmentComponent extends ModelEditorComponentBase<__NAME__Fragment> {
+  private readonly _layerService = inject(TextLayerService);
 
-  // TODO: add tag entries if required, e.g.:
-  // public tagEntries: ThesaurusEntry[] | undefined;
+  /**
+   * The portion of the base text this fragment refers to.
+   */
+  public readonly frText = computed<string | undefined>(() => {
+    const data = this.data();
+    return data?.baseText && data.value
+      ? this._layerService.getTextFragment(
+          data.baseText,
+          TokenLocation.parse(data.value.location)!,
+        )
+      : undefined;
+  });
 
-  constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
-    super(authService, formBuilder);
-    // form
-    // TODO: instantiate your form's controls
-  }
+  // thesauri (TODO: replace with yours):
+  // __NAME__-tags
+  public readonly tagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.["__NAME__-tags"]?.entries,
+  );
 
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
+  // the draft is rebuilt from each new data
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // TODO: replace with your rules
+    maxLength(p.tag, 100);
+    required(p.text);
+    maxLength(p.text, 1000);
+  });
 
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      // TODO: add controls instantiated in ctor, e.g.:
-      // tag: this.tag,      
-    });
-  }
+  // OPTIONAL: settings, loaded by the fragment's type ID, e.g.:
+  // private readonly _settings = signal<__NAME__FragmentSettings | undefined>(undefined);
+  // constructor() {
+  //   super();
+  //   this.initSettings<__NAME__FragmentSettings>(
+  //     __NAME___FRAGMENT_TYPEID,
+  //     (s) => this._settings.set(s),
+  //   );
+  // }
 
-  private updateThesauri(thesauri: ThesauriSet): void {
-    // TODO: set thesaurus entries
-    // const key = 'comment-tags';
-    // if (this.hasThesaurus(key)) {
-    //   this.tagEntries = thesauri[key].entries;
-    // } else {
-    //   this.tagEntries = undefined;
-    // }
-  }
+  // EXAMPLE: handler of a child editor's output. Always use setFieldFromChild
+  // (from @myrmidon/cadmus-ui), so that opening the fragment does not make it
+  // dirty:
+  // public onDateChange(date: HistoricalDateModel): void {
+  //   setFieldFromChild(this.form.date, date);
+  // }
 
-  private updateForm(fr?: __NAME__Fragment | null): void {
-    if (!fr) {
-      this.form.reset();  
-      return;
-    }
-    // TODO: set form controls from model, e.g.:
-    // this.tag.setValue(fr.tag);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<__NAME__Fragment>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
-
+  // draft -> fragment
   protected getValue(): __NAME__Fragment {
     const fr = this.getEditedFragment() as __NAME__Fragment;
-    // TODO: set fragment's properties from form controls, e.g.:
-    // fr.standard = this.standard.value.trim();
+    const draft = this._draft();
+    // TODO: replace with your fields
+    fr.tag = draft.tag.trim() || undefined;
+    fr.text = draft.text.trim();
     return fr;
   }
 }
@@ -211,28 +243,76 @@ export class __NAME__FragmentComponent
 - 📁 HTML template:
 
 ```html
-<form [formGroup]="form" (submit)="save()">
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>textsms</mat-icon>
-      </div>
-      <mat-card-title>__NAME__ Fragment {{ data?.value?.location }}</mat-card-title>
-      <mat-card-subtitle> {{ data?.baseText }} </mat-card-subtitle>
-    </mat-card-header>
+<!-- __NAME__-fragment.component.html -->
+<!-- no <form> here: the fragment is saved by the save button -->
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>textsms</mat-icon>
+    </div>
+    <mat-card-title>
+      {{ (modelName() | titlecase) || "__NAME__ Fragment" }} {{
+      data()?.value?.location }}
+    </mat-card-title>
+    <mat-card-subtitle>{{ frText() }}</mat-card-subtitle>
+    <cadmus-help-link [url]="helpUrl()" />
+  </mat-card-header>
 
-    <mat-card-content> TODO: add controls </mat-card-content>
+  <mat-card-content>
+    <!-- TODO: replace with your controls -->
 
-    <mat-card-actions>
-      <cadmus-close-save-buttons
-        [form]="form"
-        [noSave]="userLevel < 2"
-        (closeRequest)="close()"
-      />
-    </mat-card-actions>
-  </mat-card>
-</form>
+    <!-- tag (bound to thesaurus) -->
+    @if (tagEntries()?.length) {
+    <mat-form-field>
+      <mat-label>tag</mat-label>
+      <mat-select [formField]="form.tag">
+        <mat-option [value]="''">(none)</mat-option>
+        @for (e of tagEntries(); track e.id) {
+        <mat-option [value]="e.id">{{ e.value }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
+    <!-- tag (free) -->
+    @else {
+    <mat-form-field>
+      <mat-label>tag</mat-label>
+      <input matInput [formField]="form.tag" />
+      @if ( form.tag().getError("maxLength") && (form.tag().dirty() ||
+      form.tag().touched()) ) {
+      <mat-error>tag too long</mat-error>
+      }
+    </mat-form-field>
+    }
+
+    <!-- text -->
+    <div>
+      <mat-form-field class="long-text">
+        <mat-label>text</mat-label>
+        <textarea matInput [formField]="form.text"></textarea>
+        @if ( form.text().getError("required") && (form.text().dirty() ||
+        form.text().touched()) ) {
+        <mat-error>text required</mat-error>
+        } @if ( form.text().getError("maxLength") && (form.text().dirty() ||
+        form.text().touched()) ) {
+        <mat-error>text too long</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <cadmus-close-save-buttons
+      [form]="form"
+      [noSave]="userLevel < 2"
+      (closeRequest)="close()"
+      (saveRequest)="save()"
+    />
+  </mat-card-actions>
+</mat-card>
 ```
+
+💡 If the fragment's model is a list of entries, follow the [list part editor template](app-parts#22-list-part-editor-template), using `getEditedFragment()` in `getValue()`, and the [entry editor template](app-parts#list-entry-editor-template) for its entries.
 
 ▶️ (2) remember to add the component to the exports barrel file `public-api.ts`.
 
@@ -243,29 +323,29 @@ export class __NAME__FragmentComponent
 - 📁 editor wrapper code:
 
 ```ts
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
 
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from "@angular/material/snack-bar";
 
-import { LibraryRouteService } from '@myrmidon/cadmus-core';
+import { LibraryRouteService } from "@myrmidon/cadmus-core";
 import {
   EditFragmentFeatureBase,
   FragmentEditorService,
-} from '@myrmidon/cadmus-state';
-import { CurrentItemBarComponent } from '@myrmidon/cadmus-item-editor';
-import { DecoratedTokenTextComponent } from '@myrmidon/cadmus-ui';
-import { ApparatusFragmentComponent } from '@myrmidon/cadmus-part-philology-ui';
+} from "@myrmidon/cadmus-state";
+import { CurrentItemBarComponent } from "@myrmidon/cadmus-item-editor";
+import { DecoratedTokenTextComponent } from "@myrmidon/cadmus-ui";
+import { ApparatusFragmentComponent } from "@myrmidon/cadmus-part-philology-ui";
 
 @Component({
-  selector: 'cadmus-__NAME__-part-feature',
+  selector: "cadmus-__NAME__-part-feature",
   imports: [
     CurrentItemBarComponent,
     DecoratedTokenTextComponent,
     ApparatusFragmentComponent,
   ],
-  templateUrl: './note-__NAME__-feature.component.html',
-  styleUrls: ['./note-__NAME__-feature.component.scss'],
+  templateUrl: "./note-__NAME__-feature.component.html",
+  styleUrls: ["./note-__NAME__-feature.component.scss"],
 })
 export class __NAME__PartFeatureComponent
   extends EditFragmentFeatureBase
@@ -276,7 +356,7 @@ export class __NAME__PartFeatureComponent
     route: ActivatedRoute,
     snackbar: MatSnackBar,
     editorService: FragmentEditorService,
-    libraryRouteService: LibraryRouteService
+    libraryRouteService: LibraryRouteService,
   ) {
     super(router, route, snackbar, editorService, libraryRouteService);
   }
@@ -286,31 +366,18 @@ export class __NAME__PartFeatureComponent
     // this.roleIdInThesauri = true;
 
     // TODO: return the IDs of all the thesauri required by the wrapped editor, e.g.:
-    return ['note-tags'];
+    return ["note-tags"];
     // or just avoid overriding the function if no thesaurus required
   }
 }
 ```
 
-💡 If you need to display or use the portion of text selected for the fragment being edited:
-
-- inject `TextLayerService` in the editor class constructor (e.g. `private _layerService: TextLayerService`);
-- in `onDataSet`, get the text like in this example, where we are updating a `public frText?: string` property with it:
-
-```ts
-// get fragment's text into frText
-if (data?.baseText && data.value) {
-  this.frText = this._layerService.getTextFragment(
-    data.baseText,
-    TokenLocation.parse(data.value.location)!
-  );
-}
-```
+💡 If you need to display or use the portion of text selected for the fragment being edited, do it in the fragment editor, with the `frText` computed signal shown in its template above.
 
 - 📁 editor wrapper HTML template:
 
 ```html
-<cadmus-current-item-bar/>
+<cadmus-current-item-bar />
 <div class="base-text">
   <cadmus-decorated-token-text
     [baseText]="data?.baseText || ''"
