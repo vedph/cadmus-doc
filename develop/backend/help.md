@@ -46,7 +46,7 @@ For role-specific help, add a file named after type ID, separator and role ID (e
 
 To enable contextual help in your Cadmus editor:
 
-1. add these environment parameters to `env.js`:
+▶️ (1) add these environment parameters to `env.js`:
 
 ```js
 // URL template for help pages
@@ -59,7 +59,7 @@ window.__env.helpUrlSeparator = "__";
 window.__env.helpUrlCheck = true;
 ```
 
-2. import HelpComponent into your part/fragment editor:
+▶️ (2) import HelpComponent into your part/fragment editor:
 
 ```ts
 import {
@@ -70,7 +70,7 @@ import {
 } from '@myrmidon/cadmus-ui';
 ```
 
-3. ensure that your part/fragment editor template contains the help component:
+▶️ (3) ensure that your part/fragment editor template contains the help component:
 
 ```html
 <form [formGroup]="form" (submit)="save()">

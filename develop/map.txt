@@ -6,15 +6,18 @@ DEVELOP MAP
     - index "Developing Backend"
     - 1 core
     - 2 parts
-    - 3 part seeders
+    - 3 part-seeders
     - 4 fragments
-    - 5 fragment seeders
+    - 5 fragment-seeders
     - 6 services
     - 7 api
     - 8 tool
     - 9 help
   - 📁 frontend "Developing Frontend"
     - index
-    - 1 app
-    - 2 part
-    - 3 fragment
+    - 1 app-setup
+    - 2 app-lib
+    - 3 app-parts
+    - 4 app-fragments
+    - 5 app-object-editor
+    - 6 monaco
