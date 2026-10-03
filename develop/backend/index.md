@@ -1,6 +1,6 @@
 ---
 title: "Developing Backend"
-parent: "Cadmus Backend"
+parent: "Developing"
 layout: default
 nav_order: 1
 ---

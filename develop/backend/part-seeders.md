@@ -1,16 +1,16 @@
 ---
-title: "Adding Backend Part Seeders"
-parent: "Creating Backend Core"
+title: "Adding Part Seeders"
+parent: "Developing Backend"
 layout: default
 nav_order: 4
 ---
 
-- [Adding Backend Part Seeders](#adding-backend-part-seeders)
+- [Adding Part Seeders](#adding-part-seeders)
   - [Part Seeder](#part-seeder)
   - [Test Helper](#test-helper)
   - [Part Seeder Test](#part-seeder-test)
 
-# Adding Backend Part Seeders
+# Adding Part Seeders
 
 Part seeders are used to generate mock data for the editor. There can be a part seeder class for each [part class](parts).
 

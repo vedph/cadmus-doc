@@ -1,16 +1,16 @@
 ---
-title: "Adding Backend Services"
-parent: "Creating Backend Core"
+title: "Adding Services"
+parent: "Developing Backend"
 layout: default
-nav_order: 7
+nav_order: 6
 ---
 
-- [Adding Backend Services](#adding-backend-services)
+- [Adding Services](#adding-services)
   - [Create Services Project](#create-services-project)
     - [Repository Provider](#repository-provider)
     - [Part Seeder Factory Provider](#part-seeder-factory-provider)
 
-# Adding Backend Services
+# Adding Services
 
 ## Create Services Project
 

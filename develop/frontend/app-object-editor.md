@@ -2,7 +2,7 @@
 title: "Creating an Object Editor"
 parent: "Developing Frontend"
 layout: default
-nav_order: 11
+nav_order: 5
 ---
 
 # Creating an Object Editor

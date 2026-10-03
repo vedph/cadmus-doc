@@ -1,8 +1,8 @@
 ---
 title: "Developing Frontend"
-parent: "Cadmus Frontend"
+parent: "Developing"
 layout: default
-nav_order: 7
+nav_order: 2
 ---
 
 # Developing Frontend

@@ -2,7 +2,7 @@
 title: "Creating Frontend Fragments"
 parent: "Developing Frontend"
 layout: default
-nav_order: 10
+nav_order: 4
 ---
 
 - [Creating Frontend Fragments](#creating-frontend-fragments)

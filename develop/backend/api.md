@@ -1,8 +1,8 @@
 ---
 title: "Creating API"
-parent: "Creating Backend Core"
+parent: "Developing Backend"
 layout: default
-nav_order: 8
+nav_order: 7
 ---
 
 - [Creating API](#creating-api)
@@ -19,125 +19,55 @@ nav_order: 8
 
 The [reference API backend project](https://github.com/vedph/cadmus-api) is the model for this section.
 
-▶️ (1) create a new ASP.NET Core web API project (no authentication) named `Cadmus<PRJ>Api`: select `None` for `Authentication type`, ensure that `Enable container support` and `Use HTTPS` is disabled (we'll provide our own Docker files), ensure that `Use controllers`, `Enable OpenAPI support`, and `Do not use top-level statements` are checked.
+▶️ (1) **create a new ASP.NET Core web API project** (no authentication) named `Cadmus<PRJ>Api`: select `None` for `Authentication type`, ensure that `Enable container support` and `Use HTTPS` is disabled (we'll provide our own Docker files), ensure that `Use controllers`, `Enable OpenAPI support`, and `Do not use top-level statements` are checked.
 
->Remember to disable HTTPS. In most API configurations HTTPS is managed by a reverse proxy, and this option is not required here in development.
+> Remember to disable HTTPS. In most API configurations HTTPS is managed by a reverse proxy, and this option is not required here in development.
 
-▶️ (2) remove the mock `WeatherForecast.cs` class and its corresponding `WeatherForecastController.cs` class from the `Controllers` folder.
+▶️ (2) **remove mock** `WeatherForecast.cs` class and its corresponding `WeatherForecastController.cs` class from the `Controllers` folder.
 
-▶️ (3) add NuGet packages (run these from the project folder; remove the packages you do not need):
-
-```ps1
-dotnet add package Cadmus.Api.Config
-dotnet add package Cadmus.Api.Controllers
-dotnet add package Cadmus.Api.Controllers.Export
-dotnet add package Cadmus.Api.Controllers.Import
-dotnet add package Cadmus.Api.Models
-dotnet add package Cadmus.Api.Services
-dotnet add package Cadmus.Graph.Ef.PgSql
-dotnet add package Cadmus.Graph.Extras
-dotnet add package Cadmus.Index.Ef.PgSql
-dotnet add package Cadmus.Core
-dotnet add package Cadmus.Mongo
-dotnet add package Cadmus.Seed
-dotnet add package Cadmus.Seed.General.Parts
-dotnet add package Cadmus.Seed.Philology.Parts
-dotnet add package Fusi.Antiquity
-dotnet add package Fusi.Api.Auth.Controllers
-dotnet add package Fusi.Microsoft.Extensions.Configuration.InMemoryJson
-dotnet add package MessagingApi
-dotnet add package MessagingApi.SendGrid
-dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
-dotnet add package Microsoft.AspNetCore.OpenApi
-dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
-dotnet add package Microsoft.Extensions.Configuration
-dotnet add package Microsoft.Extensions.Logging.Debug
-dotnet add package Polly
-dotnet add package Scalar.AspNetCore
-dotnet add package Serilog
-dotnet add package Serilog.AspNetCore
-dotnet add package Serilog.Exceptions
-dotnet add package Serilog.Extensions.Hosting
-dotnet add package Serilog.Sinks.Console
-dotnet add package Serilog.Sinks.File
-dotnet add package Serilog.Sinks.MongoDB
-dotnet add package Serilog.Sinks.Postgresql.Alternative
-dotnet add package System.IdentityModel.Tokens.Jwt
-```
-
-💡 You can use a Powershell batch like this if you do not want to copy-paste each command:
-
-```ps1
-$packages = @(
-  "Cadmus.Api.Config", "Cadmus.Api.Controllers", "Cadmus.Api.Controllers.Export",
-  "Cadmus.Api.Controllers.Import", "Cadmus.Api.Models", "Cadmus.Api.Services",
-  "Cadmus.Graph.Ef.PgSql", "Cadmus.Graph.Extras", "Cadmus.Index.Ef.PgSql",
-  "Cadmus.Core", "Cadmus.Mongo", "Cadmus.Seed", "Cadmus.Seed.General.Parts",
-  "Cadmus.Seed.Philology.Parts", "Fusi.Antiquity", "Fusi.Api.Auth.Controllers",
-  "Fusi.Microsoft.Extensions.Configuration.InMemoryJson", "MessagingApi",
-  "MessagingApi.SendGrid", "Microsoft.AspNetCore.Authentication.JwtBearer",
-  "Microsoft.AspNetCore.OpenApi", "Microsoft.AspNetCore.Mvc.NewtonsoftJson",
-  "Microsoft.Extensions.Configuration", "Microsoft.Extensions.Logging.Debug",
-  "Polly", "Scalar.AspNetCore", "Serilog", "Serilog.AspNetCore",
-  "Serilog.Exceptions", "Serilog.Extensions.Hosting", "Serilog.Sinks.Console",
-  "Serilog.Sinks.File", "Serilog.Sinks.MongoDB", "Serilog.Sinks.Postgresql.Alternative",
-  "System.IdentityModel.Tokens.Jwt"
-)
-
-foreach ($pkg in $packages) {
-  dotnet add package $pkg
-}
-```
-
-💡 Alternatively, just paste this code in the project file and then use NuGet package manager to update all the packages (replace `__PRJ__` with your project name, removing project's parts if they are not present):
+▶️ (3) **add NuGet packages**, e.g. (paste these references in the project file and modify them as needed, using the NuGet package manager to update all the packages):
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Cadmus.Api.Config" Version="10.1.23" />
-  <PackageReference Include="Cadmus.Api.Controllers" Version="12.0.8" />
-  <PackageReference Include="Cadmus.Api.Controllers.Export" Version="0.0.7" />
-  <PackageReference Include="Cadmus.Api.Controllers.Import" Version="11.0.12" />
-  <PackageReference Include="Cadmus.Api.Models" Version="10.1.18" />
-  <PackageReference Include="Cadmus.Api.Services" Version="12.0.8" />
-  <PackageReference Include="Cadmus.Graph.Ef.PgSql" Version="9.0.4" />
-  <PackageReference Include="Cadmus.Graph.Extras" Version="8.0.11" />
-  <PackageReference Include="Cadmus.Index.Ef.PgSql" Version="9.0.4" />
-  <PackageReference Include="Cadmus.Core" Version="8.0.11" />
-  <PackageReference Include="Cadmus.Mongo" Version="8.0.11" />
-  <PackageReference Include="Cadmus.Seed" Version="8.0.11" />
-  <PackageReference Include="Cadmus.Seed.General.Parts" Version="7.0.7" />
-  <PackageReference Include="Cadmus.Seed.Philology.Parts" Version="10.0.1" />
-  <PackageReference Include="Fusi.Antiquity" Version="5.1.1" />
-  <PackageReference Include="Fusi.Api.Auth.Controllers" Version="6.0.5" />
-  <PackageReference Include="Fusi.Microsoft.Extensions.Configuration.InMemoryJson" Version="4.0.0" />
-  <PackageReference Include="MessagingApi" Version="5.0.0" />
-  <PackageReference Include="MessagingApi.SendGrid" Version="5.0.1" />
-  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
-  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.9" />
-  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-  <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
-  <PackageReference Include="Polly" Version="8.6.4" />
-  <PackageReference Include="Scalar.AspNetCore" Version="2.8.11" />
-  <PackageReference Include="Serilog" Version="4.3.0" />
-  <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-  <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
-  <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-  <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-  <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.1.0" />
-  <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" Version="4.2.0" />
-  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+  <PackageReference Include="Cadmus.Api.Config" />
+  <PackageReference Include="Cadmus.Api.Controllers" />
+  <PackageReference Include="Cadmus.Api.Controllers.Export" />
+  <PackageReference Include="Cadmus.Api.Controllers.Import" />
+  <PackageReference Include="Cadmus.Api.Models" />
+  <PackageReference Include="Cadmus.Api.Services" />
+  <PackageReference Include="Cadmus.Graph" />
+  <PackageReference Include="Cadmus.Graph.Ef.PgSql" />
+  <PackageReference Include="Cadmus.Graph.Extras" />
+  <PackageReference Include="Cadmus.Seed" />
+  <!-- add/remove parts packages as needed -->
+  <PackageReference Include="Cadmus.Seed.Codicology.Parts" />
+  <PackageReference Include="Cadmus.Seed.Epigraphy.Parts" />
+  <PackageReference Include="Cadmus.Seed.General.Parts" />
+  <PackageReference Include="Cadmus.Seed.Philology.Parts" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+  <PackageReference Include="Newtonsoft.Json" />
+  <PackageReference Include="Polly" />
+  <PackageReference Include="Scalar.AspNetCore" />
+  <PackageReference Include="Serilog" />
+  <PackageReference Include="Serilog.AspNetCore" />
+  <PackageReference Include="Serilog.Exceptions" />
+  <PackageReference Include="Serilog.Extensions.Hosting" />
+  <PackageReference Include="Serilog.Sinks.Console" />
+  <PackageReference Include="Serilog.Sinks.File" />
+  <PackageReference Include="Serilog.Sinks.MongoDB" />
+  <PackageReference Include="Serilog.Sinks.Postgresql.Alternative" />
 </ItemGroup>
 ```
 
->You can remove the Serilog sinks you are not going to use, like e.g. the PostgreSQL one. Also, typically you will add your project's `Cadmus.PRJ.Services` package(s). Also, if you do not use statistics in your UI you can remove `Cadmus.Api.Controllers.Export`.
+> You can remove the Serilog sinks you are not going to use, like e.g. the PostgreSQL one.
 
 ## 2. Add Settings
 
-▶️ (1) Add these settings to `appsettings.json` (replace `__PRJ__` with your project's name). Feel free to customize them as required.
+▶️ (1) **Add settings** to `appsettings.json` (replace `__PRJ__` with your project's name). Feel free to customize them as required.
 
->⚠️ Please notice that all the sensitive data like users and passwords are there only for illustration purposes, and they will be overwritten by environment variables set in the [host server](../deploy).
+> ⚠️ Please notice that all the sensitive data like users and passwords are there only for illustration purposes, and they will be overwritten by environment variables set in the [host server](../deploy).
 
 ```json
 {
@@ -180,15 +110,13 @@ foreach ($pkg in $packages) {
     "Postgres": false,
     "Console": true
   },
-  "AllowedOrigins": [
-    "http://localhost:4200",
-  ],
+  "AllowedOrigins": ["http://localhost:4200"],
   "RateLimit": {
     "IsDisabled": true,
     "PermitLimit": 100,
     "QueueLimit": 0,
     "TimeWindow": "00:01:00"
-  },  
+  },
   "Seed": {
     "ProfileSource": "%wwwroot%/seed-profile.json",
     "ItemCount": 100,
@@ -204,12 +132,7 @@ foreach ($pkg in $packages) {
       "UserName": "zeus",
       "Password": "P4ss-W0rd!",
       "Email": "dfusi@hotmail.com",
-      "Roles": [
-        "admin",
-        "editor",
-        "operator",
-        "visitor"
-      ],
+      "Roles": ["admin", "editor", "operator", "visitor"],
       "FirstName": "Daniele",
       "LastName": "Fusi"
     }
@@ -243,7 +166,7 @@ foreach ($pkg in $packages) {
 }
 ```
 
->⚠️ before API v10, the authentication database was MongoDB. Now it is a PostgreSQL database, as specified by `ConnectionStrings:Auth` and `DatabaseNames:Auth`.
+> ⚠️ before API v10, the authentication database was MongoDB. Now it is a PostgreSQL database, as specified by `ConnectionStrings:Auth` and `DatabaseNames:Auth`.
 
 ## 3. Add Program
 
@@ -306,61 +229,17 @@ public static class Program
         new StandardItemBrowserFactoryProvider(
                 config.GetConnectionString("Default")!));
 
+        // metadata builder factory provider
+        services.AddSingleton<IItemMetadataBuilderFactoryProvider>(_ =>
+            new StandardItemMetadataBuilderFactoryProvider(
+                config.GetConnectionString("Default")!));
+
         // index and graph
         ServiceConfigurator.ConfigureIndexServices(services, config);
         ServiceConfigurator.ConfigureGraphServices(services, config);
 
         // previewer
         services.AddSingleton(p => ServiceConfigurator.GetPreviewer(p, config));
-    }
-
-    /// <summary>
-    /// Configures the services.
-    /// </summary>
-    /// <param name="services">The services.</param>
-    public static void ConfigureServices(IServiceCollection services,
-        IConfiguration config, IHostEnvironment hostEnvironment)
-    {
-        // configuration
-        services.AddSingleton(_ => config);
-        ServiceConfigurator.ConfigureOptionsServices(services, config);
-
-        // security
-        ServiceConfigurator.ConfigureCorsServices(services, config);
-        ServiceConfigurator.ConfigureRateLimiterService(services, config, hostEnvironment);
-        ServiceConfigurator.ConfigureAuthServices(services, config);
-
-        // proxy
-        services.AddHttpClient();
-        services.AddResponseCaching();
-
-        // API controllers
-        services.AddControllers();
-        // camel-case JSON in response
-        services.AddMvc()
-            // https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-2.2&tabs=visual-studio#jsonnet-support
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy =
-                    JsonNamingPolicy.CamelCase;
-            });
-
-        // framework services
-        // IMemoryCache: https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory
-        services.AddMemoryCache();
-
-        // user repository service
-        services.AddScoped<IUserRepository<NamedUser>,
-            UserRepository<NamedUser, IdentityRole>>();
-
-        // messaging
-        ServiceConfigurator.ConfigureMessagingServices(services);
-
-        // logging
-        ServiceConfigurator.ConfigureLogging(services);
-
-        // app services
-        ConfigureAppServices(services, config);
     }
 
     /// <summary>
@@ -491,13 +370,16 @@ public static class Program
 
 If you are not going to use a project-specific services library, **add your app services** in a new `Services` folder:
 
-- `AppRepositoryProvider.cs`: parts
-- `AppPartSeederFactoryProvider.cs`: part seeders
+- `AppRepositoryProvider.cs`: parts.
+- `AppPartSeederFactoryProvider.cs`: part seeders.
 
-Here are two example implementations, just customize the assemblies to include:
+> 💡 It is suggested to add a `Cadmus.__PRJ__.Services` project to contain these project-specific files if you are going to reuse them. This typically happens when you plan to use a CLI tool (either the generic tool -- to build a plugin for it -- or a project-specific tool).
+
+Here are two example implementations; just customize the assemblies to include:
+
+- 📁 `AppRepositoryProvider.cs` (optional):
 
 ```cs
-// AppRepositoryProvider.cs (optional)
 using System;
 using System.Reflection;
 using Cadmus.Core;
@@ -580,8 +462,9 @@ public sealed class AppRepositoryProvider : IRepositoryProvider
 }
 ```
 
+- 📁 `AppPartSeederFactoryProvider.cs` (optional):
+
 ```cs
-// AppPartSeederFactoryProvider.cs (optional)
 using Cadmus.Core.Config;
 using Cadmus.Seed;
 using Cadmus.Seed.Epigraphy.Parts;
@@ -660,38 +543,43 @@ Inside that folder, edit:
 
 This is the core customization for the whole project. Usually, the profile file is created after the documentation is completed, and before creating the code.
 
->Inside the `messages` folder you can customize the message templates as you prefer, but usually this is not required.
+> Inside the `messages` folder you can customize the message templates as you prefer, but usually this is not required.
 
 ## 5. Setup Docker
 
 ▶️ (1) In the project's root (where the `.slnx` file is located), add a `Dockerfile` to build the Docker image (replace `__PRJ__` with your project's name):
 
 ```yml
-# Stage 1: base
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+# Stage 1: base (uses target platform architecture for ASP.NET runtime)
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 443
 
-# Stage 2: build
+# Stage 2: build/publish (SDK runs natively on host platform for speed)
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG TARGETARCH
+ARG TARGETOS
+
 WORKDIR /src
-COPY ["Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj", "Cadmus__PRJ__Api/"]
-RUN dotnet restore "Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj" -s https://api.nuget.org/v3/index.json --verbosity n
-# copy the content of the API project
+
+# Copy project files and source
 COPY . .
-# build it
-RUN dotnet build "Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj" -c Release -o /app/build
 
-# Stage 3: publish
-FROM build AS publish
-RUN dotnet publish "Cadmus__PRJ__Api/Cadmus__PRJ__Api.csproj" -c Release -o /app/publish
+# Use bash to map amd64 -> x64 and build for the target RID cleanly
+RUN /bin/bash -c '\
+    RID_ARCH="${TARGETARCH/amd64/x64}" && \
+    dotnet publish "Cadmus.__PRJ__.Api/Cadmus.__PRJ__.Api.csproj" \
+    -c Release \
+    -r "${TARGETOS:-linux}-${RID_ARCH}" \
+    --no-self-contained \
+    -o /app/publish'
 
-# Stage 4: final
+# Stage 3: final image
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Cadmus__PRJ__Api.dll"]
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Cadmus.__PRJ__.Api.dll"]
 ```
 
 ▶️ (2) add a `docker-compose.yml` file to allow you using the API in a composer stack (replace `PRJ` with your project name; of course, you can change your image name as required to fit your organization).
@@ -776,7 +664,7 @@ networks:
     driver: bridge
 ```
 
->⚠️ Note that setting `ASPNETCORE_URLS` for Docker is a requirement because the default HTTP port for ASP.NET core in development mode is 5000.
+> ⚠️ Note that setting `ASPNETCORE_URLS` for Docker is a requirement because the default HTTP port for ASP.NET core in development mode is 5000.
 
 ▶️ (3) add a `.dockerignore` file with this content:
 
@@ -808,11 +696,27 @@ LICENSE
 README.md
 ```
 
-To build a Docker image (replace `PRJ` with your project's name):
+🐋 To **build a Docker image**:
 
-```ps1
-docker buildx build . --platform linux/amd64,linux/arm64,windows/amd64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push
+(1) Before creating Docker images, ensure that you have published all the required NuGet packages and that you have a buildx builder instance running that supports multi-arch:
+
+```sh
+docker buildx create --use --name multi-arch-builder || docker buildx use multi-arch-builder
+docker buildx inspect --bootstrap
 ```
+
+> To run natively on Linux VMs, macOS (both Intel and Apple Silicon), and Windows (via WSL2 or Docker Desktop)—`linux/amd64` and `linux/arm64` are the only two targets we need. Note that `docker buildx` automatically injects variables like `TARGETARCH` and `TARGETOS` into the scope of your build. In `Dockerfile` we pass these directly to the .NET CLI commands.
+
+(2) Build for multiple platforms and push directly to Docker Hub:
+
+```sh
+docker buildx build --platform linux/amd64,linux/arm64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push .
+```
+
+> When there is no available ARM image, add `platform: linux/amd64` as a sibling of the `image` line in docker compose script to force Docker to pull and run the x64 image under emulation, e.g.:
+
+- add `platform: linux/arm64` to MongoDB and PostgreSQL. Note that some images (especially for PostgreSQL) are not available for ARM, so you may need to add `platform: linux/amd64` to them too or downgrade to a version which supports ARM (e.g. `image: postgres:16`).
+- add `platform: linux/amd64` to API and app.
 
 ## 6. Add Readme
 
@@ -823,7 +727,18 @@ docker buildx build . --platform linux/amd64,linux/arm64,windows/amd64 -t vedph2
 
 🐋 Quick Docker image build:
 
-  docker buildx build . --platform linux/amd64,linux/arm64,windows/amd64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push
+(1) ensure buildx is running:
+
+```sh
+docker buildx create --use --name multi-arch-builder || docker buildx use multi-arch-builder
+docker buildx inspect --bootstrap
+``
+
+(2) build for multiple platforms and push directly to Docker Hub:
+
+```sh
+docker buildx build --platform linux/amd64,linux/arm64 -t vedph2020/cadmus-__PRJ__-api:0.0.1 -t vedph2020/cadmus-__PRJ__-api:latest --push .
+``
 
 (replace with the current version).
 

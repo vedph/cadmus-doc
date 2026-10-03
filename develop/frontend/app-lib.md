@@ -2,7 +2,7 @@
 title: "Creating Frontend Libraries"
 parent: "Developing Frontend"
 layout: default
-nav_order: 8
+nav_order: 2
 ---
 
 - [Creating Frontend Libraries](#creating-frontend-libraries)

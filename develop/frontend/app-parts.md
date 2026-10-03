@@ -2,7 +2,7 @@
 title: "Creating Frontend Parts"
 parent: "Developing Frontend"
 layout: default
-nav_order: 9
+nav_order: 3
 ---
 
 - [Creating Frontend Parts](#creating-frontend-parts)

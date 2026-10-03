@@ -1,8 +1,8 @@
 ---
 title: "Creating Help"
-parent: "Creating Backend Core"
+parent: "Developing Backend"
 layout: default
-nav_order: 10
+nav_order: 9
 ---
 
 # Creating Help

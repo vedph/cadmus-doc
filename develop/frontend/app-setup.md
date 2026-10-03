@@ -2,7 +2,7 @@
 title: "Creating Frontend App"
 parent: "Developing Frontend"
 layout: default
-nav_order: 7
+nav_order: 1
 ---
 
 - [Creating Frontend App](#creating-frontend-app)

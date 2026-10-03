@@ -1,15 +1,15 @@
 ---
-title: "Adding Backend Fragments"
-parent: "Creating Backend Core"
+title: "Adding Fragments"
+parent: "Developing Backend"
 layout: default
-nav_order: 5
+nav_order: 4
 ---
 
-- [Adding Backend Fragments](#adding-backend-fragments)
+- [Adding Fragments](#adding-fragments)
   - [Fragment Template](#fragment-template)
   - [Fragment Test Template](#fragment-test-template)
 
-# Adding Backend Fragments
+# Adding Fragments
 
 The typical procedure is:
 

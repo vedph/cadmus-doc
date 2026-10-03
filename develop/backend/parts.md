@@ -1,21 +1,11 @@
 ---
-title: "Adding Backend Parts"
-parent: "Creating Backend Core"
+title: "Adding Parts"
+parent: "Developing Backend"
 layout: default
 nav_order: 3
 ---
 
-- [Adding Backend Parts](#adding-backend-parts)
-  - [Part - Single Entity](#part---single-entity)
-  - [Part - Multiple Entities](#part---multiple-entities)
-  - [Part Test Templates](#part-test-templates)
-    - [Part Test Helper](#part-test-helper)
-    - [Part Test - Single Entity](#part-test---single-entity)
-    - [Part Test - Multiple Entities](#part-test---multiple-entities)
-  - [Layer Parts](#layer-parts)
-    - [Layer Fragment Test Template](#layer-fragment-test-template)
-
-# Adding Backend Parts
+# Adding Parts
 
 Guidelines for **implementing a part**:
 
@@ -27,16 +17,11 @@ Guidelines for **implementing a part**:
 
 >The parts project requires at least the `Cadmus.Core` package.
 
-The typical **procedure** when adding a new part is:
+## Infrastructure
 
-1. create the part class.
-2. create the part seeder class.
-3. create the part seeder test.
-4. create the part test (using both the part under test and its part seeder).
+## Parts Project: Data Pin Helper
 
-Here I provide a number of templates, according to whether your part represents a single entity or a collection of entities. For instance, a part listing the names assigned to an item has a collection of names, each being a model on its own. Instead, a part representing a free text note is a single entity part.
-
-💡 If you need a **generic filter** for your pins, you can use a filter with the `DataPinBuilder` utility class. If using this filter many times, you may want to make it a singleton, e.g. like this:
+Once per project: if you need a **generic filter** for your pins, you can use a filter with the `DataPinBuilder` utility class. If using this filter many times, you may want to make it a singleton, e.g. like this:
 
 ```cs
 internal static class DataPinHelper
@@ -57,6 +42,76 @@ internal static class DataPinHelper
 
 >The filter used here is a builtin utility component which preserves only letters, apostrophes and whitespaces, also removing any diacritics from the letters and lowercasing them. Whitespaces are flattened into spaces and normalized. Digits are dropped (by default) or preserved according to the options specified (pass `true` as the options argument to this filter to preserve them).
 
+## Parts Test Project: Helper
+
+This helper class provides methods used to ease testing:
+
+```cs
+using Cadmus.Core;
+using Cadmus.Core.Layers;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using Xunit;
+
+namespace Cadmus.__PRJ__.Parts.Test;
+
+internal static class TestHelper
+{
+    private static readonly JsonSerializerOptions _options = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    public static string SerializePart(IPart part)
+    {
+        ArgumentNullException.ThrowIfNull(part);
+        return JsonSerializer.Serialize(part, part.GetType(), _options);
+    }
+
+    public static T? DeserializePart<T>(string json)
+        where T : class, IPart, new()
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        return JsonSerializer.Deserialize<T>(json, _options);
+    }
+
+    public static string SerializeFragment(ITextLayerFragment fr)
+    {
+        ArgumentNullException.ThrowIfNull(fr);
+        return JsonSerializer.Serialize(fr, fr.GetType(), _options);
+    }
+
+    public static T? DeserializeFragment<T>(string json)
+        where T : class, ITextLayerFragment, new()
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        return JsonSerializer.Deserialize<T>(json, _options);
+    }
+
+    public static void AssertPinIds(IPart part, DataPin pin)
+    {
+        Assert.Equal(part.ItemId, pin.ItemId);
+        Assert.Equal(part.Id, pin.PartId);
+        Assert.Equal(part.RoleId, pin.RoleId);
+    }
+
+    static public bool IsDataPinNameValid(string name) =>
+        Regex.IsMatch(name, @"^[a-zA-Z0-9\-_\.]+$");
+
+    static public void AssertValidDataPinNames(IList<DataPin> pins)
+    {
+        foreach (DataPin pin in pins)
+        {
+            Assert.True(IsDataPinNameValid(pin.Name!), pin.ToString());
+        }
+    }
+}
+```
+
+## Plan
+
 💡 The suggested order of operations for creating a part is:
 
 1. create the part.
@@ -64,7 +119,11 @@ internal static class DataPinHelper
 3. create the seeder tests.
 4. create the part tests.
 
-## Part - Single Entity
+---
+
+## ⚙️ Part Code - Single Entity
+
+A single-entity part is a part whose model represents a single entity with various properties; as opposed to a multiple-entities part, whose model is just an array of objects sharing the same sub-model.
 
 In the following template replace `__NAME__` with your part's name, minus the `Part` suffix:
 
@@ -151,9 +210,95 @@ public sealed class __NAME__Part : PartBase
 }
 ```
 
-## Part - Multiple Entities
+### ⚙️ Part Test Code - Single Entity
 
-You can use this template when your part is just a container of an object representing an entry in a list of entries. Of course you are free to add more properties besides the list; this template just makes it easier to deal with typical objects-container parts.
+```cs
+using System;
+using Xunit;
+using Cadmus.Core;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Cadmus.__PRJ__.Parts.Test;
+
+public sealed class __NAME__PartTest
+{
+    private static __NAME__Part GetPart()
+    {
+        __NAME__PartSeeder seeder = new();
+        IItem item = new Item
+        {
+            FacetId = "default",
+            CreatorId = "zeus",
+            UserId = "zeus",
+            Description = "Test item",
+            Title = "Test Item",
+            SortKey = ""
+        };
+        return (__NAME__Part)seeder.GetPart(item, null, null)!;
+    }
+
+    private static __NAME__Part GetEmptyPart()
+    {
+        return new __NAME__Part
+        {
+            ItemId = Guid.NewGuid().ToString(),
+            RoleId = "some-role",
+            CreatorId = "zeus",
+            UserId = "another",
+        };
+    }
+
+    [Fact]
+    public void Part_Is_Serializable()
+    {
+        __NAME__Part part = GetPart();
+
+        string json = TestHelper.SerializePart(part);
+        __NAME__Part part2 = TestHelper.DeserializePart<__NAME__Part>(json)!;
+
+        Assert.Equal(part.Id, part2.Id);
+        Assert.Equal(part.TypeId, part2.TypeId);
+        Assert.Equal(part.ItemId, part2.ItemId);
+        Assert.Equal(part.RoleId, part2.RoleId);
+        Assert.Equal(part.CreatorId, part2.CreatorId);
+        Assert.Equal(part.UserId, part2.UserId);
+        // TODO: check parts data here...
+    }
+
+    // TODO: check pins here, e.g. for the NotePart we get a single pin
+    // when the tag is set, with name=tag and value=tag value:
+    // [Fact]
+    // public void GetDataPins_NoTag_Empty()
+    // {
+    //     __NAME__Part part = GetEmptyPart();
+    //     part.Tag = null;
+
+    //     Assert.Empty(part.GetDataPins());
+    // }
+
+    // [Fact]
+    // public void GetDataPins_Tag_1()
+    // {
+    //     __NAME__Part part = GetEmptyPart();
+    //     // TODO: set only the properties required for pins
+    //     // in a predictable way so we can test them
+
+    //     List<DataPin> pins = part.GetDataPins(null).ToList();
+    //     Assert.Single(pins);
+
+    //     DataPin? pin = pins.Find(p => p.Name == "id" && p.Value == "steph");
+    //     Assert.NotNull(pin);
+    //     TestHelper.AssertPinIds(part, pin!);
+    // }
+}
+```
+
+---
+
+## ⚙️ Part Code - Multiple Entities
+
+Use this template when your part is just a container of an object representing an entry in a list of entries. You can add more properties besides the list; this template just makes it easier to deal with typical objects-container parts.
 
 ```cs
 using System;
@@ -255,168 +400,7 @@ public sealed class __NAME__Part : PartBase
 }
 ```
 
-## Part Test Templates
-
-Testing requires a bit of [infrastructure](#part-test-helper), usually encapsulated in a `TestHelper` class.
-
-### Part Test Helper
-
-This helper class provides the methods used to ease testing:
-
-```cs
-using Cadmus.Core;
-using Cadmus.Core.Layers;
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using Xunit;
-
-namespace Cadmus.__PRJ__.Parts.Test;
-
-internal static class TestHelper
-{
-    private static readonly JsonSerializerOptions _options =
-        new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-    public static string SerializePart(IPart part)
-    {
-        ArgumentNullException.ThrowIfNull(part);
-        return JsonSerializer.Serialize(part, part.GetType(), _options);
-    }
-
-    public static T? DeserializePart<T>(string json)
-        where T : class, IPart, new()
-    {
-        ArgumentNullException.ThrowIfNull(json);
-        return JsonSerializer.Deserialize<T>(json, _options);
-    }
-
-    public static string SerializeFragment(ITextLayerFragment fr)
-    {
-        ArgumentNullException.ThrowIfNull(fr);
-        return JsonSerializer.Serialize(fr, fr.GetType(), _options);
-    }
-
-    public static T? DeserializeFragment<T>(string json)
-        where T : class, ITextLayerFragment, new()
-    {
-        ArgumentNullException.ThrowIfNull(json);
-        return JsonSerializer.Deserialize<T>(json, _options);
-    }
-
-    public static void AssertPinIds(IPart part, DataPin pin)
-    {
-        Assert.Equal(part.ItemId, pin.ItemId);
-        Assert.Equal(part.Id, pin.PartId);
-        Assert.Equal(part.RoleId, pin.RoleId);
-    }
-
-    static public bool IsDataPinNameValid(string name) =>
-        Regex.IsMatch(name, @"^[a-zA-Z0-9\-_\.]+$");
-
-    static public void AssertValidDataPinNames(IList<DataPin> pins)
-    {
-        foreach (DataPin pin in pins)
-        {
-            Assert.True(IsDataPinNameValid(pin.Name!), pin.ToString());
-        }
-    }
-}
-```
-
-### Part Test - Single Entity
-
-This template refers to the [single-entity part template](#part---single-entity):
-
-```cs
-using System;
-using Xunit;
-using Cadmus.Core;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Cadmus.__PRJ__.Parts.Test;
-
-public sealed class __NAME__PartTest
-{
-    private static __NAME__Part GetPart()
-    {
-        __NAME__PartSeeder seeder = new();
-        IItem item = new Item
-        {
-            FacetId = "default",
-            CreatorId = "zeus",
-            UserId = "zeus",
-            Description = "Test item",
-            Title = "Test Item",
-            SortKey = ""
-        };
-        return (__NAME__Part)seeder.GetPart(item, null, null)!;
-    }
-
-    private static __NAME__Part GetEmptyPart()
-    {
-        return new __NAME__Part
-        {
-            ItemId = Guid.NewGuid().ToString(),
-            RoleId = "some-role",
-            CreatorId = "zeus",
-            UserId = "another",
-        };
-    }
-
-    [Fact]
-    public void Part_Is_Serializable()
-    {
-        __NAME__Part part = GetPart();
-
-        string json = TestHelper.SerializePart(part);
-        __NAME__Part part2 = TestHelper.DeserializePart<__NAME__Part>(json)!;
-
-        Assert.Equal(part.Id, part2.Id);
-        Assert.Equal(part.TypeId, part2.TypeId);
-        Assert.Equal(part.ItemId, part2.ItemId);
-        Assert.Equal(part.RoleId, part2.RoleId);
-        Assert.Equal(part.CreatorId, part2.CreatorId);
-        Assert.Equal(part.UserId, part2.UserId);
-        // TODO: check parts data here...
-    }
-
-    // TODO: check pins here, e.g. for the NotePart we get a single pin
-    // when the tag is set, with name=tag and value=tag value:
-    // [Fact]
-    // public void GetDataPins_NoTag_Empty()
-    // {
-    //     __NAME__Part part = GetEmptyPart();
-    //     part.Tag = null;
-
-    //     Assert.Empty(part.GetDataPins());
-    // }
-
-    // [Fact]
-    // public void GetDataPins_Tag_1()
-    // {
-    //     __NAME__Part part = GetEmptyPart();
-    //     // TODO: set only the properties required for pins
-    //     // in a predictable way so we can test them
-
-    //     List<DataPin> pins = part.GetDataPins(null).ToList();
-    //     Assert.Single(pins);
-
-    //     DataPin? pin = pins.Find(p => p.Name == "id" && p.Value == "steph");
-    //     Assert.NotNull(pin);
-    //     TestHelper.AssertPinIds(part, pin!);
-    // }
-}
-```
-
-### Part Test - Multiple Entities
-
-This template refers to [multiple-entities container parts](#part---multiple-entities):
+### ⚙️ Part Test Code - Multiple Entities
 
 ```cs
 using Cadmus.Core;
@@ -523,75 +507,7 @@ public sealed class __NAME__PartTest
 For layer parts, the same guidelines already listed for the other parts are applicable, with the following additions:
 
 - create a `...LayerFragment` class representing the fragment for the layer part. This is the true data model for the metatextual data represented by the layer. The class must implement `ITextLayerFragment`. Do not add any other property to the class; _by design, the only property of a layer part is its collection of fragments_.
-
 - give the fragment a type ID (via the usual `TagAttribute`), which _must_ begin with the prefix `fr.` (=`PartBase.FR_PREFIX`; note the trailing dot).
-
 - if adding pins in the fragment, just provide the pin's name and value; the other properties will be supplied by the container part. By convention, you should prefix your pin name with the `fr.` prefix (defined in `PartBase.FR_PREFIX`).
 
 Anyway, adding a new layer part would be rarely required, as there is just a generic (parameterized) layer part provided for this: one part, many fragments. You rather have to provide fragments and their tests.
-
-### Layer Fragment Test Template
-
-**Fragment test template** sample:
-
-```cs
-public sealed class __NAME__LayerFragmentTest
-{
-    private static __NAME__LayerFragment GetFragment()
-    {
-        return new __NAME__LayerFragment
-        {
-            Location = "1.23",
-            // TODO: add properties here...
-        };
-    }
-
-    [Fact]
-    public void Fragment_Has_Tag()
-    {
-        TagAttribute attr = typeof(__NAME__LayerFragment).GetTypeInfo()
-            .GetCustomAttribute<TagAttribute>();
-        string typeId = attr != null ? attr.Tag : GetType().FullName;
-        Assert.NotNull(typeId);
-        Assert.StartsWith(PartBase.FR_PREFIX, typeId);
-    }
-
-    [Fact]
-    public void Fragment_Is_Serializable()
-    {
-        __NAME__LayerFragment fr = GetFragment();
-
-        string json = TestHelper.SerializeFragment(fr);
-        __NAME__LayerFragment fr2 =
-            TestHelper.DeserializeFragment<__NAME__LayerFragment>(json);
-
-        Assert.Equal(fr.Location, fr2.Location);
-        // TODO: check properties here...
-    }
-
-    // TODO: check pins here, e.g. for the CommentLayerFragment
-    // we get a single pin when the tag is set, with name=fr.tag
-    // and value=tag value:
-    // [Fact]
-    // public void GetDataPins_NoTag_0()
-    // {
-    //     CommentLayerFragment fr = GetFragment();
-    //     fr.Tag = null;
-
-    //     Assert.Empty(fr.GetDataPins(null));
-    // }
-
-    // [Fact]
-    // public void GetDataPins_Tag_1()
-    // {
-    //     CommentLayerFragment fr = GetFragment();
-
-    //     List<DataPin> pins = [.. part.GetDataPins(null)];
-
-    //     Assert.Single(pins);
-    //     DataPin pin = pins[0];
-    //     Assert.Equal("fr.tag", pin.Name);
-    //     Assert.Equal("some-tag", pin.Value);
-    // }
-}
-```

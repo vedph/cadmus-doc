@@ -2,7 +2,7 @@
 title: "Using Monaco Editor"
 parent: "Developing Frontend"
 layout: default
-nav_order: 12
+nav_order: 6
 ---
 
 - [Using Monaco Editor](#using-monaco-editor)

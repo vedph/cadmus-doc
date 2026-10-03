@@ -1,15 +1,15 @@
 ---
-title: "Adding Backend Fragment Seeders"
-parent: "Creating Backend Core"
+title: "Adding Fragment Seeders"
+parent: "Developing Backend"
 layout: default
-nav_order: 6
+nav_order: 5
 ---
 
-- [Adding Backend Fragment Seeders](#adding-backend-fragment-seeders)
+- [Adding Fragment Seeders](#adding-fragment-seeders)
   - [Fragment Seeder Template](#fragment-seeder-template)
   - [Fragment Seeder Test Template](#fragment-seeder-test-template)
 
-# Adding Backend Fragment Seeders
+# Adding Fragment Seeders
 
 ## Fragment Seeder Template
 
