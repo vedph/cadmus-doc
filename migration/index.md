@@ -6,7 +6,7 @@ nav_order: 4
 
 # Data Migration
 
-Migration functionality in Cadmus refer to both data [import](migration/import) and [export](migration/export).
+Migration functionality in Cadmus refer to both data [import](import) and [export](export).
 
 While nothing stops you from just importing data into the standard MongoDB database used by Cadmus, many existing components and procedures exist to satisfy the typical requirements of data import and export.
 

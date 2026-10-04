@@ -1,0 +1,16 @@
+MIGRATION MAP
+
+- 📁 migration
+  - index "Migration"
+  - 📁 export "Export"
+    - index
+    - 1 json-dump
+    - 2 mappings
+    - 3 jmes-path
+    - 4 json-export
+    - 5 graph
+    - 6 rendition
+  - 📁 import "Import"
+    - index
+    - 1 import-xlsx
+    - 2 ui-import

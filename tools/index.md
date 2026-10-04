@@ -36,20 +36,20 @@ To add a plugin:
 
 In this sample I setup the tool with a plugin in an Ubuntu server.
 
-(1) download the tool (change the version to the latest one):
+▶️ (1) download the tool (change the version to the latest one):
 
 ```sh
 wget https://github.com/vedph/cadmus_tool/releases/download/v.11.0.2/App-v.11.0.2-linux-x64.tar.gz
 ```
 
-(2) unzip it and remove the archive:
+▶️ (2) unzip it and remove the archive:
 
 ```sh
 tar -xf App-v.11.0.2-linux-x64.tar.gz
 rm App-v.11.0.2-linux-x64.tar.gz
 ```
 
-(3) rename the folder and grant permissions to the tool:
+▶️ (3) rename the folder and grant permissions to the tool:
 
 ```sh
 mv App-v.11.0.2-linux-x64 cadmus-tool
@@ -57,7 +57,7 @@ cd cadmus-tool
 chmod +x cadmus-tool
 ```
 
-(4) get the plugin and unzip it:
+▶️ (4) get the plugin and unzip it:
 
 ```sh
 cd plugins
