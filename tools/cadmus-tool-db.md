@@ -1,5 +1,5 @@
 ---
-title: "Database" 
+title: "Database Commands" 
 layout: default
 parent: "Cadmus Tool"
 nav_order: 1

@@ -1,5 +1,5 @@
 ---
-title: "Deployment - Local"
+title: "Local Deployment"
 layout: default
 parent: "Deployment"
 nav_order: 5

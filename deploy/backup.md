@@ -1,13 +1,13 @@
 ---
-title: "Deployment - Backup"
+title: "Configuring Backup"
 layout: default
 parent: "Deployment"
 nav_order: 4
 ---
 
-# Data Backup
+# Configuring Backup
 
-- [Data Backup](#data-backup)
+- [Configuring Backup](#configuring-backup)
   - [Backup](#backup)
   - [Restore](#restore)
   - [Cleanup](#cleanup)

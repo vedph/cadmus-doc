@@ -1,13 +1,13 @@
 ---
-title: "Deployment - App Setup"
+title: "Configuring App"
 layout: default
 parent: "Deployment"
 nav_order: 2
 ---
 
-# App Setup
+# Configuring App
 
-- [App Setup](#app-setup)
+- [Configuring App](#configuring-app)
   - [1. Prepare Docker Compose Script](#1-prepare-docker-compose-script)
     - [Data Persistence](#data-persistence)
     - [Named Volumes and Bind Mounts](#named-volumes-and-bind-mounts)

@@ -1,5 +1,5 @@
 ---
-title: "Deployment - Docker Setup"
+title: "Docker Setup"
 layout: default
 parent: "Deployment"
 nav_order: 1

@@ -1,5 +1,5 @@
 ---
-title: "Accounts" 
+title: "Accounts Commands" 
 layout: default
 parent: "Cadmus Tool"
 nav_order: 2

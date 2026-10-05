@@ -1,5 +1,5 @@
 ---
-title: "Deployment - HTTPS Configuration"
+title: "Configuring HTTPS"
 layout: default
 parent: "Deployment"
 nav_order: 3
