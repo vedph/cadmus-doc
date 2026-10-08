@@ -542,7 +542,7 @@ A few things worth pointing out about this configuration, tying back to the mode
 
 ## Executing an Export
 
-To execute a JSON export for data, use this command in the [Cadmus CLI tool](../../tools/cadmus-tool):
+To execute a JSON export for data, use this command in the [Cadmus CLI tool](../../tools/index.md):
 
-- [export JSON](../../tools/cadmus-tool.md#export)
+- [export JSON](../../tools/cadmus-tool-exp.md#export-json-command)
   {% endraw %}
