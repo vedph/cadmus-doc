@@ -184,7 +184,7 @@ You can add a header row or not, and use whatever name you want, as columns get 
 
 ## TaxoStore Import Command
 
-🎯 Import a taxonomies store into its database, creating it if not existing.
+🎯 Import a [taxonomies store](../linking/taxonomies.md) into its database, creating it if not existing.
 
 ```sh
 taxo-tool import-store <TREES_CSV> <NODES_CSV> -d <DATABASE_NAME> [-c <CONNECTION_TEMPLATE>]
@@ -215,32 +215,27 @@ taxo-tool import-store wwwroot/taxo/trees.csv wwwroot/taxo/nodes.csv -d taxo
 - 📁 `trees.csv`:
 
 ```csv
-id,name,note
+id,name,note,flat
 products,Products,"Product taxonomy"
-categories,Categories,"Category hierarchy"
+categories,Categories,"Category hierarchy",true
 ```
 
 - 📁 `nodes.csv`:
 
 ```csv
-tree_n,parent_key,key,label,filtered_label,flags
+tree_n,parent_key,key,label,filtered_label,flags,note
 1,,electronics,Electronics,electronics,
 1,electronics,computers,Computers,computers,
 1,electronics,phones,Mobile Phones,mobile phones,
 2,,food,Food & Beverages,food beverages,
 ```
 
-Fields in `trees.csv`:
+- 📁 `mappings.csv`
 
-- `id`: unique tree identifier (key), used to reference the tree externally.
-- `name`: human-friendly display name for the tree.
-- `note`: optional descriptive note about the tree.
-
-Fields in `nodes.csv`:
-
-- `tree_n`: tree number (1-based index from trees.csv).
-- `parent_key`: key of the parent node (empty for root nodes).
-- `key`: unique identifier within the tree.
-- `label`: display label.
-- `filtered_label`: searchable label (auto-generated if empty).
-- `flags`: optional flags string.
+```csv
+tree_n,node_key,scope,target,label,filtered_label
+1,computers,wikidata,Q68,computer,
+1,computers,getty,300212998,computers,
+1,computers,alias,it,Calcolatóri,calcolatori
+3,red,getty,300126225,red (color),
+```

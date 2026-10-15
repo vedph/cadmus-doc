@@ -22,3 +22,6 @@ DEVELOP MAP
     - 4 app-fragments
     - 5 app-object-editor
     - 6 monaco
+  - 📁 recipes "Recipes"
+    - index
+    - 1 setup taxonomies
