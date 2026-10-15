@@ -1,5 +1,5 @@
 ---
-title: "Taxonomies" 
+title: "Taxonomies"
 layout: default
 parent: "Linking Data"
 nav_order: 2
@@ -37,6 +37,30 @@ The taxonomies subsystem provides:
 - API endpoints ready to be integrated in your API.
 - [frontend components](https://github.com/vedph/taxo-store-shell) to integrate in your frontend. Cadmus provides a part editor based on these components.
 - a Cadmus part, [taxonomies store tree nodes part](https://github.com/vedph/taxo-store/blob/master/docs/taxo-store-nodes.md), provides a ready to use part which allows user to pick nodes from any specific tree, while also editing it. This part lets you pick any number of node IDs from a single tree. The tree is specified as the part's role ID, and lookup and editing parameters can be customized via backend settings for each combination of part type ID and part role ID.
+
+## Features
+
+The taxonomies store is simple but generic enough to provide these features:
+
+- both flat and hierarchical taxonomies.
+- human-friendly string identifiers for each node.
+- aliases and external mappings for each node.
+- lookup and search functionality (extended to both nodes and mappings).
+- configurable, in-place editing with automatic key and filtered label generation.
+- automatic data seeding from CSV sources.
+- manual data seeding via the [Cadmus CLI tool](../tools/index.md).
+
+Internally, each taxonomy is just a tree. Flat taxonomies are simply trees where all nodes are root-level nodes. This allows dealing with both flat and hierarchical taxonomies.
+
+Each node is designed to represent a unique entity with its own identity (its key), thus providing an authority file. The store focuses on defining the identify of each entity; any additional metadata can be added elsewhere, inside or (usually) outside the store. This is consistent with a simple authority file in the context of semantic web: we just define entities and assign them a unique ID. Unlimited data can then be attached to these entities by just referencing them via their ID.
+
+Additionally, each node can have any number of mappings, which define equivalent entities in other resources. For instance, you might have your own list of persons in a taxonomy store, and provide for each node one or more links to external authority files like VIAF, Biblissima+, etc. The editor component allows you to configure external lookup providers for mappings, so that you can directly pick mapped entities from the respective API services.
+
+So, every node can act as an aggregation hub connecting its entity to equivalent entities in other resources; this implies that you have to define these external mappings just once, and then they will be available whenever you link to the taxonomy node. For instance, if you have a node for Dante Alighieri, this node can be mapped to the corresponding person in VIAF, Biblissima+, Wikidata, etc. Whenever your data reference that node via the taxonomy store, it will implicitly reference all the equivalent entities in other resources at once.
+
+> Mappings can also be used to represent aliases. Each node has its own "canonical" label, but you can provide more aliases by simply adding mappings for them; an alias mapping will just have as its target its source node. In other terms, it will work as a self-referencing mapping providing a new label for the same node.
+
+Thus, taxonomies can be used as a sort of facade between your data and any number of external authority files or ontologies you want to link to. You can even start with an empty taxonomy, and fill it as you enter your data, progressively building it node after node with all their mappings. This is usually more efficient than having multiple links at the same level: for instance, instead of having separate _multiple_ links to VIAF and Biblissima+, and falling back to your own taxonomy when these resources lack the entity you want, you always use a _single_ link to your own taxonomy. In turn, this links to other resources via mappings. This provides more consistency, because your reference is just one, and contains every entity, even those other resources lack; and it's easier to use, because you just have to look into a single resource.
 
 ## Data Source
 
