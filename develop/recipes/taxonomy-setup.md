@@ -254,3 +254,35 @@ constructor() {
   this.configureTaxoLookup(storage);
 }
 ```
+
+### Node Editor
+
+The taxonomies store node editor component allows users to edit or add nodes in the taxonomy (as far as editing capabilities are allowed in the app configuration). In most cases, the node's key can be automatically generated from its label. The default logic for generating it is:
+
+- trim the label and remove diacritics from its letters;
+- convert it to lowercase;
+- replace each sequence of whitespaces with a single `_`, each `:` with `.`, each `'` with `_`;
+- keep only letters `a`-`z`, digits, `_`, `-` and `.`, dropping any other character (including letters with no `a`-`z` base, like Greek letters or `ß`).
+
+For instance, `Roberto d'Angiò` becomes `roberto_d_angio`.
+
+To use your own key generator, provide a `TaxoStoreEditorConfig` object with the `TAXO_STORE_EDITOR_CONFIG` injection token, e.g. in `app.config.ts`:
+
+```ts
+import { TAXO_STORE_EDITOR_CONFIG, TaxoStoreEditorConfig } from '@myrmidon/taxo-store-editor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...
+    {
+      provide: TAXO_STORE_EDITOR_CONFIG,
+      useValue: {
+        // the label passed to the generator is trimmed
+        keyGenerator: (label: string) => label.toUpperCase().replace(/\s+/g, '-'),
+      } satisfies TaxoStoreEditorConfig,
+    },
+  ],
+};
+```
+
+> The configuration is optional: when it is not provided, or its `keyGenerator` is not set, the default logic is used. The generated key is just a suggestion, which users can still edit before saving.
