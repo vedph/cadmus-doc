@@ -98,6 +98,41 @@ public static class Program
 }
 ```
 
+To configure the asserted composite ID brick you have additional options. Typically you will add an `asserted-id-tags@en` thesaurus to provide a list of roles for the entities you link to.
+
+You can create many versions of this thesaurus giving them other identifiers, e.g. `asserted-id-tags-pers@en`, `asserted-id-tags-org@en`, etc. if you want to conditionally select them according to the role of the part editor using the brick. Your part must support this by passing its settings down to the brick. For a code example, see the [codicology content parts](https://github.com/vedph/cadmus-codicology-shell/blob/master/projects/myrmidon/cadmus-part-codicology-contents/src/lib/cod-contents-part/cod-contents-part.component.ts).
+
+By default, the tag of an asserted composite ID is picked from a closed list when there is an `asserted-id-tags` thesaurus, or else freely typed. The optional `tagSettings` brick input (of type `AssertedCompositeIdTagSettings`) refines this behavior, and also allows hiding some of the globally configured lookup sources in a specific instance of the component:
+
+- `hiddenLookupProviderIds`: the IDs of the lookup providers to hide. The ID of a provider is the ID of its lookup service (`RefLookupConfig.service.id`, e.g. `viaf`, `whg`, `geonames`), not its human-friendly name.
+- `hiddenTaxoTreeIds`: the IDs of the taxonomy trees to hide (`TaxoStoreLookupConfig.treeId`). When all the trees are hidden, the taxonomy source is no longer available. An existing ID whose target comes from a hidden tree can still be edited with its own tree.
+- `tagThesaurusMap`: maps the ID of a lookup source (a lookup provider ID or a taxonomy tree ID) to the ID of the thesaurus providing the tags for that source. When the currently selected source has an entry in this map, the tags are loaded from that thesaurus overriding the brick's `idTagEntries` input property. In any other case (no map, source not found in the map, internal source, thesaurus empty or not found) the default behavior applies.
+
+Example:
+
+```ts
+public tagSettings: AssertedCompositeIdTagSettings = {
+  hiddenLookupProviderIds: ['whg'],
+  hiddenTaxoTreeIds: ['food'],
+  tagThesaurusMap: {
+    // lookup provider ID => thesaurus ID
+    viaf: 'asserted-id-tags-viaf',
+    // taxonomy tree ID => thesaurus ID
+    animals: 'asserted-id-tags-animals',
+  },
+};
+```
+
+The template of your parent component should pass the tag settings down to the child, e.g.:
+
+```html
+<cadmus-refs-asserted-composite-id
+  [idTagEntries]="idTagEntries"
+  [tagSettings]="tagSettings"
+  [(id)]="id"
+/>
+```
+
 ### Data Seed
 
 The TaxoStore supports automatic database seeding from CSV files. When the database is created for the first time, it will automatically import data from CSV files if they are present.
