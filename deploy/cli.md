@@ -15,15 +15,15 @@ If you need to setup the [CLI tool](../tools/index.md) in the server:
 
 ```sh
 # download
-wget https://github.com/vedph/cadmus-core/releases/download/v.16.0.10/v.16.0.10-linux-x64.tar.gz
+wget https://github.com/vedph/cadmus-core/releases/download/v.16.0.11/v.16.0.11-linux-x64.tar.gz
 
 # unzip
-tar -xzf v.16.0.10-linux-x64.tar.gz
-rm v.16.0.10-linux-x64.tar.gz
+tar -xzf v.16.0.11-linux-x64.tar.gz
+rm v.16.0.11-linux-x64.tar.gz
 
 # move to unversioned folder
-mv v.16.0.10-linux-x64/* cadmus-tool/
-rm v.16.0.10-linux-x64
+mv v.16.0.11-linux-x64/* cadmus-tool/
+rm -rf v.16.0.11-linux-x64
 
 # ensure the tool is executable
 chmod +x cadmus-tool/cadmus-tool
