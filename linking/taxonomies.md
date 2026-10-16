@@ -72,8 +72,8 @@ tree --> node3
 
 node1 --> VIAF
 node1 --> Biblissima
-node1 --> Wikidata
 node1 --> etc[...]
+node1 -->|alias| node1
 ```
 
 - _Figure 1 - Nodes as aggregation hubs_
