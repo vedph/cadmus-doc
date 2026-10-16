@@ -51,8 +51,8 @@ To check the network: `docker network ls`.
 
 ```yaml
 services:
-  nginx:
-    image: nginx:latest
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
     container_name: nginx-proxy
     ports:
       - "80:80"
@@ -61,64 +61,40 @@ services:
       - conf:/etc/nginx/conf.d
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
-      - certs:/etc/nginx/certs
-    # this label is for the companion container to find the proxy container
-    labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     restart: always
 
-  dockergen:
-    image: jwilder/docker-gen:latest
-    container_name: nginx-proxy-gen
-    depends_on:
-      - nginx
-    command: -notify-sighup nginx-proxy -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-    volumes:
-      - conf:/etc/nginx/conf.d
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - certs:/etc/nginx/certs
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
-
-  letsencrypt:
+  acme-companion:
     image: nginxproxy/acme-companion
     container_name: nginx-proxy-le
     depends_on:
-      - nginx
-      - dockergen
+      - nginx-proxy
     environment:
-      NGINX_PROXY_CONTAINER: nginx-proxy
-      NGINX_DOCKER_GEN_CONTAINER: nginx-proxy-gen
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - DEFAULT_EMAIL=daniele.fusi@unive.it
     volumes:
-      - conf:/etc/nginx/conf.d
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - certs:/etc/nginx/certs
-      # the companion MUST access the host's Docker socket
+      - acme:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
 
 volumes:
   conf:
   vhost:
   html:
   certs:
-
-# Do not forget to 'docker network create nginx-proxy' before launch, and to add '--network nginx-proxy' to proxied containers.
+  acme:
 
 networks:
   default:
-    external:
-      name: nginx-proxy
+    name: nginx-proxy
+    external: true
 ```
 
 > This setup will expose port 80 (and 443 for SSL) to the outside world, and automatically route traffic to the correct service based on the domain name used to access your server. It uses Docker labels to determine which service a request should be routed to, so you need to add a `VIRTUAL_HOST` environment variable to each of your services with the domain name for that service, as explained below.
-
-▶️ (4) **Supply nginx.tmpl and start proxy**: the line `- ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro` in the above script creates a Docker volume between a file on your host filesystem (in this case, in the `nginx-proxy` directory) and a file inside one of the Docker containers. For that volume to work, we need to supply the `nginx.tmpl` file. Inside of the `nginx-proxy` directory, use the following `curl` command to copy the developer's sample `nginx.tmpl` file to your VPS:
-
-```bash
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > nginx.tmpl
-```
 
 You can now start the nginx container in the `nginx-proxy` directory:
 
@@ -126,9 +102,9 @@ You can now start the nginx container in the `nginx-proxy` directory:
 docker compose up -d
 ```
 
-To confirm this, run `docker ps`. You should see three running containers, named `nginx-proxy`, `nginx-proxy-gen`, and `nginx-proxy-le`.
+To confirm this, run `docker ps`. You should see two running containers, named `nginx-proxy`, and `nginx-proxy-le`.
 
-▶️ (5) **Configure Your Services** connecting them to the newly created network and linking each service to a subdomain. In your `docker-compose.yml` file, make sure each of your services is connected to the `nginx-proxy` network and add under `environment:`a list of variables like this:
+▶️ (3) **Configure Your Services** connecting them to the newly created network and linking each service to a subdomain. In your `docker-compose.yml` file, make sure each of your services is connected to the `nginx-proxy` network and add under `environment:`a list of variables like this:
 
 - 📁 `stacks/cadmus-PRJ/docker-compose.yml`
 
@@ -143,8 +119,11 @@ services:
     environment:
       # for ASP.NET API use this:
       - ASPNETCORE__URLS=https://+:443;http://+:80
-      # optionally add also the port, e.g.:
-      # - VIRTUAL_PORT=8080 or whatever if not 80
+      # optionally add also the port, e.g. for API typically:
+      # - VIRTUAL_PORT=8080 or whatever
+      # or for app typically:
+      # - VIRTUAL_PORT=80
+      # each service has its subdomain
       - VIRTUAL_HOST=servicesubdomain.mydomain.com
       - LETSENCRYPT_HOST=servicesubdomain.mydomain.com
       - LETSENCRYPT_EMAIL=yourEmailAddress
@@ -210,7 +189,7 @@ services:
       - cadmus-PRJ-pgsql
       - cadmus-biblio-api
     environment:
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:8080
       - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-PRJ-mongo:27017/{0}
       - CONNECTIONSTRINGS__AUTH=Server=cadmus-PRJ-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include
       - CONNECTIONSTRINGS__INDEX=Server=cadmus-PRJ-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
@@ -223,7 +202,9 @@ services:
       - MESSAGING__APIROOTURL=https://cadmus-PRJ-api.YOURDOMAIN/
       - MESSAGING__APPROOTURL=http://cadmus-PRJ.YOURDOMAIN/
       - MESSAGING__SUPPORTEMAIL=...
+      # LetsEncrypt
       - VIRTUAL_HOST=cadmus-PRJ-api.YOURDOMAIN
+      - VIRTUAL_PORT=8080
       - LETSENCRYPT_HOST=cadmus-PRJ-api.YOURDOMAIN
       - LETSENCRYPT_EMAIL=...
     networks:
@@ -239,6 +220,7 @@ services:
       - cadmus-PRJ-api
     environment:
       - VIRTUAL_HOST=cadmus-PRJ.YOURDOMAIN
+      - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=cadmus-PRJ.YOURDOMAIN
       - LETSENCRYPT_EMAIL=...
     volumes:
