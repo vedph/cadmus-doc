@@ -47,6 +47,8 @@ To check the network: `docker network ls`.
 
 ▶️ (2) **Set Up NGINX Proxy**: create a new Docker Compose file for the NGINX proxy. This will use the `jwilder/nginx-proxy` image, which automatically generates reverse proxy configurations for your services. To use SSL, you can use the `jrcs/letsencrypt-nginx-proxy-companion` Docker image to automatically create and manage your SSL certificates:
 
+- 📁 `stacks/nginx-proxy/docker-compose.yml`
+
 ```yaml
 services:
   nginx:
@@ -128,7 +130,7 @@ To confirm this, run `docker ps`. You should see three running containers, named
 
 ▶️ (5) **Configure Your Services** connecting them to the newly created network and linking each service to a subdomain. In your `docker-compose.yml` file, make sure each of your services is connected to the `nginx-proxy` network and add under `environment:`a list of variables like this:
 
-- 📁 `stacks/nginx-proxy/docker-compose.yml`
+- 📁 `stacks/cadmus-PRJ/docker-compose.yml`
 
 ```yaml
 services:
