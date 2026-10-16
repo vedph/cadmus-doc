@@ -4,11 +4,14 @@ layout: default
 parent: "Deployment"
 nav_order: 3
 ---
+
 0
+
 # HTTPS Configuration
 
 - [HTTPS Configuration](#https-configuration)
   - [(A) NGINX Proxy Companion](#a-nginx-proxy-companion)
+    - [Client IP Addresses and Rate Limiting](#client-ip-addresses-and-rate-limiting)
     - [Sample Cadmus Docker Compose](#sample-cadmus-docker-compose)
     - [Defining A-Records](#defining-a-records)
       - [Configuring DNS](#configuring-dns)
@@ -40,10 +43,12 @@ You can place your files where you want; usually I create a `/stacks` folder and
 ▶️ (1) **Create a Docker Network**: create a Docker network that your services and the NGINX proxy will use to communicate with each other. You can create a network with the following command:
 
 ```bash
-docker network create nginx-proxy
+docker network create --subnet 172.30.0.0/16 nginx-proxy
 ```
 
 To check the network: `docker network ls`.
+
+> The explicit subnet is optional, but it makes the addresses of the containers in this network predictable: this is required by APIs which must know the address of the proxy, e.g. for rate limiting (see [below](#client-ip-addresses-and-rate-limiting)). Pick any private subnet not used by other networks in your host; if the network already exists, get its subnet with `docker network inspect nginx-proxy -f '{{(index .IPAM.Config 0).Subnet}}'`.
 
 ▶️ (2) **Set Up NGINX Proxy**: create a new Docker Compose file for the NGINX proxy. This will use the `jwilder/nginx-proxy` image, which automatically generates reverse proxy configurations for your services. To use SSL, you can use the `jrcs/letsencrypt-nginx-proxy-companion` Docker image to automatically create and manage your SSL certificates:
 
@@ -117,8 +122,8 @@ services:
     # ...
     # link to subdomain
     environment:
-      # for ASP.NET API use this:
-      - ASPNETCORE__URLS=https://+:443;http://+:80
+      # for ASP.NET API use this (plain HTTP: HTTPS is provided by the proxy):
+      - ASPNETCORE_URLS=http://+:8080
       # optionally add also the port, e.g. for API typically:
       # - VIRTUAL_PORT=8080 or whatever
       # or for app typically:
@@ -137,7 +142,30 @@ networks:
     external: true
 ```
 
-▶️ (6) **Start Your Services**: Start your services with `docker compose up -d`.
+> The proxy reaches your services via the `nginx-proxy` Docker network, so there is no need to publish their ports (the `ports` section). If you publish them, e.g. for diagnostic purposes, bind them to localhost only (like `127.0.0.1:5003:8080`), so that they cannot be reached from the outside bypassing the proxy.
+
+▶️ (4) **Start Your Services**: Start your services with `docker compose up -d`.
+
+### Client IP Addresses and Rate Limiting
+
+Behind the proxy, an API receives all the requests from the proxy container, so it sees the IP address of the proxy (e.g. `172.30.0.2`) rather than that of the client. This matters for APIs which use the client address, typically for **rate limiting**: if the API partitions its quota by IP address, all the users share a single quota, which is quickly exhausted, and users get unexpected 429 (Too Many Requests) errors.
+
+The proxy adds the real client address to the `X-Forwarded-For` header of each request, but the API must be told to trust this header only when coming from the proxy; otherwise anyone could send a fake header to evade the limit. For instance, Pythia-based APIs (Pythia, Minerva) have these settings (set them in the API service of your `docker-compose.yml`):
+
+```yml
+environment:
+  # ...
+  # trust forwarded headers from the proxy network (as created above)
+  - FORWARDEDHEADERS__KNOWNNETWORKS__0=172.30.0.0/16
+  # enable the rate limiter: 300 requests per minute per client
+  - RATELIMIT__ISDISABLED=false
+  - RATELIMIT__PERMITLIMIT=300
+  - RATELIMIT__TIMEWINDOW=00:01:00
+```
+
+Trusting the whole proxy network is safe as long as only your own containers are connected to it. To check that it works, look at the API log (e.g. `docker logs minerva-api`) while using the app from different machines: the `Rate limit key: ...` lines should show a different public IP address for each user, rather than the same `172.30.x.x` address.
+
+> Note that the web app containers (NGINX serving the static Angular files) are not involved: the browser loads the app from its container, but then calls the API directly at the URL set in `env.js` (`apiUrl`), which goes through the proxy to the API container.
 
 ### Sample Cadmus Docker Compose
 
@@ -182,8 +210,9 @@ services:
     image: vedph2020/cadmus-PRJ-api:0.0.1
     container_name: cadmus-PRJ-api
     restart: unless-stopped
+    # optional (the proxy uses the Docker network)
     ports:
-      - 5003:80
+      - 127.0.0.1:5003:8080
     depends_on:
       - cadmus-PRJ-mongo
       - cadmus-PRJ-pgsql
@@ -214,8 +243,9 @@ services:
   cadmus-app:
     image: vedph2020/cadmus-PRJ-app:0.0.1
     container_name: cadmus-PRJ-app
+    # optional (the proxy uses the Docker network)
     ports:
-      - 4200:80
+      - 127.0.0.1:4200:80
     depends_on:
       - cadmus-PRJ-api
     environment:
