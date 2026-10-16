@@ -21,9 +21,9 @@ In your API project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="TaxoStore.Api.Controllers" Version="1.1.0" />
-  <PackageReference Include="TaxoStore.Core" Version="1.1.0" />
-  <PackageReference Include="TaxoStore.PgSql" Version="1.1.0" />
+  <PackageReference Include="TaxoStore.Api.Controllers" Version="2.0.0" />
+  <PackageReference Include="TaxoStore.Core" Version="2.0.0" />
+  <PackageReference Include="TaxoStore.PgSql" Version="2.0.0" />
 </ItemGroup>
 ```
 
@@ -151,30 +151,37 @@ If these files exist, they will be automatically used for seeding when the datab
 
 ```csv
 id,name,note,flat
-products,Products,"Product taxonomy",
-categories,Categories,"Category hierarchy",
-colors,Colors,"A flat list of colors",true
+animals,Animals,Sample hierarchy of animals.,
+food,Food,Sample hierarchy of foods.,
+philosophers,Greek Philosophers,Sample flat list of ancient Greek philosophers.,true
 ```
 
 - 📁 `nodes.csv`:
 
 ```csv
-tree_n,parent_key,key,label,filtered_label,flags,note
-1,,electronics,Electronics,electronics,,
-1,electronics,computers,Computers,computers,,"Desktops, laptops, and servers"
-1,electronics,phones,Mobile Phones,mobile phones,,
-2,,food,Food & Beverages,food beverages,,
-3,,red,Red,red,,
+tree_n,parent_key,key,label,filtered_label,note
+1,,animal,animals,animals,"Kingdom Animalia, i.e. multicellular, eukaryotic organisms."
+1,animal,animal.mammal,animal: mammals,animal: mammals,
+1,animal.mammal,animal.mammal.dog,animal: mammals: dogs,animal: mammals: dogs,"Domestic dog (Canis familiaris), the ""best friend"" of humans."
+1,animal.mammal,animal.mammal.cat,animal: mammals: cats,animal: mammals: cats,Domestic cat
 ```
 
 - 📁 `mappings.csv` (optional):
 
 ```csv
 tree_n,node_key,scope,target,label,filtered_label
-1,computers,wikidata,Q68,computer,
-1,computers,getty,300212998,computers,
-1,computers,alias,it,Calcolatóri,calcolatori
-3,red,getty,300126225,red (color),
+1,animal,mock-wiki,MW-000001,animal,
+1,animal,mock-thesaurus,300000001,animals (fauna),
+1,animal.mammal,mock-wiki,MW-000010,mammal,
+```
+
+- 📁 `features.csv` (optional):
+
+```csv
+tree_n,node_key,name,value,filtered_value
+2,fruit.pome.apple,color,red,
+2,fruit.pome.apple,color,green,
+2,fruit.pome.apple,color,yellow,
 ```
 
 Fields in `trees.csv`:
@@ -191,7 +198,6 @@ Fields in `nodes.csv`:
 - `key`: unique identifier within the tree.
 - `label`: display label.
 - `filtered_label`: searchable label (auto-generated if empty).
-- `flags`: optional flags string.
 - `note`: optional note (the column itself can be omitted). Like any other field, it must be wrapped in double quotes when it includes the delimiter, quotes (escaped by doubling them) or line breaks.
 
 Fields in `mappings.csv`:
@@ -202,6 +208,14 @@ Fields in `mappings.csv`:
 - `target`: the target ID.
 - `label`: optional human-friendly label of the target.
 - `filtered_label`: optional searchable label of the target (auto-generated from `label` if empty). The column itself can be omitted.
+
+Fields in `features.csv`:
+
+- `tree_n`: tree number (1-based index from trees.csv) of the mapped node.
+- `node_key`: key of the node owning the feature. The node must be found in `nodes.csv`.
+- `name`: the feature name.
+- `value`: the feature value.
+- `filtered_value`: optional searchable value (auto-generated from `value` if empty). The column itself can be omitted.
 
 ## Frontend
 
@@ -216,9 +230,9 @@ If configured, this component allows you to link not only to internal or externa
 ```json
 "dependencies": {
     // ...
-    "@myrmidon/taxo-store-api": "^1.2.1",
-    "@myrmidon/taxo-store-editor": "^1.2.1",
-    "@myrmidon/taxo-store-picker": "^1.2.1",
+    "@myrmidon/taxo-store-api": "^1.3.0",
+    "@myrmidon/taxo-store-editor": "^1.3.0",
+    "@myrmidon/taxo-store-picker": "^1.3.0",
 }
 ```
 
