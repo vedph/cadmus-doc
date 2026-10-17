@@ -117,6 +117,12 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
     "QueueLimit": 0,
     "TimeWindow": "00:01:00"
   },
+  "ForwardedHeaders": {
+    "KnownProxies": [],
+    "KnownNetworks": [],
+    "TrustAllProxies": false,
+    "ForwardLimit": 1
+  },
   "Seed": {
     "ProfileSource": "%wwwroot%/seed-profile.json",
     "ItemCount": 100,
@@ -284,12 +290,13 @@ public static class Program
 
             WebApplication app = builder.Build();
 
-            // forward headers for use with an eventual reverse proxy
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor
-                    | ForwardedHeaders.XForwardedProto
-            });
+            // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer
+            // this must come first, so that the client IP address (used by
+            // the rate limiter) and the original scheme (https) are restored
+            // before anything (e.g. OpenAPI servers URL) uses them.
+            // Only localhost is trusted by default: when behind a reverse
+            // proxy, list it in ForwardedHeaders:KnownProxies/KnownNetworks
+            ServiceConfigurator.UseForwardedHeaders(app, config);
 
             // development or production
             if (builder.Environment.IsDevelopment())
@@ -324,11 +331,11 @@ public static class Program
 
             // CORS
             app.UseCors("CorsPolicy");
-            // rate limiter
-            if (!config.GetValue<bool>("RateLimit:IsDisabled"))
-                app.UseRateLimiter();
             // authentication
             app.UseAuthentication();
+            // rate limiter (unless RateLimit:IsDisabled): after authentication,
+            // so that its partition key can be the authenticated user name
+            ServiceConfigurator.UseRateLimiter(app, config);
             app.UseAuthorization();
             // proxy
             app.UseResponseCaching();
@@ -344,8 +351,8 @@ public static class Program
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
-                options.WithTitle("Cadmus __PRJ__ API")
-                       .AddPreferredSecuritySchemes("Bearer");
+                options.WithTitle("Cadmus API")
+                        .AddPreferredSecuritySchemes("Bearer");
             });
 
             Log.Information("Running API");

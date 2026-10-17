@@ -24,6 +24,7 @@ nav_order: 2
       - [Securing Databases](#securing-databases)
       - [External Databases](#external-databases)
     - [Other Services](#other-services)
+    - [Rate Limiting Environment](#rate-limiting-environment)
   - [4. Configure Frontend App](#4-configure-frontend-app)
   - [Updating Services](#updating-services)
   - [Ubuntu Old Kernel and MongoDB](#ubuntu-old-kernel-and-mongodb)
@@ -632,6 +633,62 @@ All the messaging services share these options:
 Other options are specific for each service. Other mailing services can be used (e.g. SendGrid, MailJet, etc.); this requires just swapping the default service with another in the API startup code.
 
 > 💡 The messaging section is separated from the mailer section because building a text message is a process potentially shared among different messaging systems (email, SMS, etc.). Messages are built according to a set of HTML templates in the API layer (in folder `wwwroot/messages` of its source code).
+
+### Rate Limiting Environment
+
+These API settings (handled by `Cadmus.Api.Config`, so they apply to `Cadmus.Api` and to any API project built on it) are relevant when deploying in a server. You can set them in `appsettings.json` or, more commonly, via environment variables in `docker-compose.yml` (a `:` in a setting path becomes `__`, and array items are numbered, e.g. `ForwardedHeaders:KnownNetworks[0]` is `FORWARDEDHEADERS__KNOWNNETWORKS__0`):
+
+| setting                            | environment variable                 | default    | description                                                                                                                                                                                     |
+| ---------------------------------- | ------------------------------------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AllowedOrigins`                   | `ALLOWEDORIGINS__0`, ...             |            | the origins of the web app (CORS).                                                                                                                                                              |
+| `Jwt:SecureKey`                    | `JWT__SECUREKEY`                     |            | the key used to sign authentication tokens: **always replace it** in a server.                                                                                                                  |
+| `ForwardedHeaders:KnownProxies`    | `FORWARDEDHEADERS__KNOWNPROXIES__0`  |            | the IP addresses of trusted reverse proxies, whose `X-Forwarded-For` and `X-Forwarded-Proto` headers are used to get the client IP address and scheme (localhost is always trusted).            |
+| `ForwardedHeaders:KnownNetworks`   | `FORWARDEDHEADERS__KNOWNNETWORKS__0` |            | the networks (CIDR, e.g. `172.16.0.0/12` for the default Docker networks) of trusted reverse proxies.                                                                                           |
+| `ForwardedHeaders:TrustAllProxies` | `FORWARDEDHEADERS__TRUSTALLPROXIES`  | `false`    | true to trust the forwarded headers from any sender (the behavior before v16.0.12). Use only if the API port is reachable exclusively via the proxy, otherwise clients can fake their IP.       |
+| `ForwardedHeaders:ForwardLimit`    | `FORWARDEDHEADERS__FORWARDLIMIT`     | `1`        | the number of proxies in front of the API (e.g. 2 for a CDN in front of NGINX).                                                                                                                 |
+| `RateLimit:IsDisabled`             | `RATELIMIT__ISDISABLED`              | `true`     | true to disable rate limiting; set it to `false` to enable it.                                                                                                                                  |
+| `RateLimit:PermitLimit`            | `RATELIMIT__PERMITLIMIT`             | `100`      | the number of requests allowed to each client (the authenticated user name, or the IP address for anonymous requests) in the time window. Further requests get 429 with a `Retry-After` header. |
+| `RateLimit:QueueLimit`             | `RATELIMIT__QUEUELIMIT`              | `0`        | the number of requests over the limit which are queued (rather than rejected) until the next time window.                                                                                       |
+| `RateLimit:TimeWindow`             | `RATELIMIT__TIMEWINDOW`              | `00:01:00` | the rate limit time window, as `HH:MM:SS`.                                                                                                                                                      |
+
+When the limit is exceeded and the mailer is enabled (`Mailer:IsEnabled`, `Mailer:Recipients`), a notification is sent to the recipients, at most once every 30 minutes.
+
+⚠️ **Rate limiting and reverse proxies**: anonymous clients are identified by their IP address, so the rate limiter works only when the API sees the real client address. When a reverse proxy in the host (e.g. NGINX providing HTTPS) forwards requests to the API container, or in some Docker setups even without a proxy, the API sees the same address (the proxy's or the Docker gateway's, like `172.18.0.1`) for all the requests, so that all the users share a single quota and quickly hit the limit. To avoid this:
+
+1. have the proxy set the `X-Forwarded-For` and `X-Forwarded-Proto` headers (Apache's `mod_proxy` sets `X-Forwarded-For` automatically; in NGINX add `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` and `proxy_set_header X-Forwarded-Proto $scheme;`).
+2. trust the proxy: with a dockerized proxy (like nginx-proxy) set the subnet of the Docker network shared by the proxy and the API, e.g. `FORWARDEDHEADERS__KNOWNNETWORKS__0=172.30.0.0/16` (create the network with an explicit subnet, like `docker network create --subnet 172.30.0.0/16 nginx-proxy`); with a proxy in the host, requests reach the container from the Docker network gateway, so set `172.16.0.0/12` (the default Docker networks) or the specific address.
+3. publish the API port to localhost only (e.g. `127.0.0.1:5000:8080`), so that the API can be reached only via the proxy, and nobody can fake the `X-Forwarded-For` header to evade the limit.
+
+For example:
+
+```yml
+cadmus-api:
+  # ...
+  ports:
+    - 127.0.0.1:5000:8080
+  environment:
+    # ...
+    - RATELIMIT__ISDISABLED=false
+    - RATELIMIT__PERMITLIMIT=100
+    - FORWARDEDHEADERS__KNOWNNETWORKS__0=172.16.0.0/12
+```
+
+To check the result, set the `Serilog:MinimumLevel:Default` (or `SERILOG__MINIMUMLEVEL__DEFAULT`) to `Debug` and look at the `Rate limit key: ...` lines in the API log while using the app from different machines: each anonymous user should have a different `ip:...` key. Also, the `Forwarded headers: ...` line logged at startup shows the trusted proxies.
+
+🛠️ **API projects** built on `Cadmus.Api.Config` should configure their pipeline in `Program.cs` like `Cadmus.Api` does:
+
+```cs
+// first in the pipeline
+ServiceConfigurator.UseForwardedHeaders(app, config);
+// ...
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
+// after authentication, so that users are limited by name rather than IP
+ServiceConfigurator.UseRateLimiter(app, config);
+app.UseAuthorization();
+```
+
+The rate limiter services are already added by `ServiceConfigurator.ConfigureServices`.
 
 ## 4. Configure Frontend App
 
