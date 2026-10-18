@@ -269,6 +269,14 @@ constructor() {
 }
 ```
 
+▶️ (3) in `env.js` ensure to add the URL to the taxonomies store, e.g. (the `taxostore/` part is added automatically):
+
+```js
+window.__env.taxoUrl = "http://localhost:5172/api/";
+```
+
+> As remarked above, you can use `tagSettings.hiddenTaxoTreeIds` to hide some trees in a specific editor.
+
 ### Node Editor
 
 The taxonomies store node editor component allows users to edit or add nodes in the taxonomy (as far as editing capabilities are allowed in the app configuration). In most cases, the node's key can be automatically generated from its label. The default logic for generating it is:
@@ -283,7 +291,10 @@ For instance, `Roberto d'Angiò` becomes `roberto_d_angio`.
 To use your own key generator, provide a `TaxoStoreEditorConfig` object with the `TAXO_STORE_EDITOR_CONFIG` injection token, e.g. in `app.config.ts`:
 
 ```ts
-import { TAXO_STORE_EDITOR_CONFIG, TaxoStoreEditorConfig } from '@myrmidon/taxo-store-editor';
+import {
+  TAXO_STORE_EDITOR_CONFIG,
+  TaxoStoreEditorConfig,
+} from "@myrmidon/taxo-store-editor";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -292,7 +303,8 @@ export const appConfig: ApplicationConfig = {
       provide: TAXO_STORE_EDITOR_CONFIG,
       useValue: {
         // the label passed to the generator is trimmed
-        keyGenerator: (label: string) => label.toUpperCase().replace(/\s+/g, '-'),
+        keyGenerator: (label: string) =>
+          label.toUpperCase().replace(/\s+/g, "-"),
       } satisfies TaxoStoreEditorConfig,
     },
   ],
