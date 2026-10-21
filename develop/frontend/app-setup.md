@@ -410,7 +410,7 @@ env.local.js
   ...
   <script src="env.js"></script>
 
-<!-- ADD THIS IF YOU USE env.local.js -->
+  <!-- ADD THIS IF YOU USE env.local.js -->
   <script>
     // check if a local environment file exists and load it
     function loadLocalEnv() {
@@ -724,7 +724,7 @@ services:
       - MONGO_LOG_DIR=/dev/null
     command: mongod --logpath=/dev/null
     ports:
-      - 27017:27017
+      - 127.0.0.1:27017:27017
     networks:
       - cadmus-__PRJ__-network
 
@@ -737,7 +737,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     networks:
       - cadmus-__PRJ__-network
 
@@ -747,7 +747,7 @@ services:
     container_name: cadmus-__PRJ__-api
     ports:
       # TODO: change 5080 with your API port in the host
-      - 5080:8080
+      - 127.0.0.1:5080:8080
     depends_on:
       - cadmus-__PRJ__-mongo
       - cadmus-__PRJ__-pgsql
@@ -770,7 +770,7 @@ services:
     image: vedph2020/cadmus-__PRJ__-app:0.0.1
     container_name: cadmus-__PRJ__-app
     ports:
-      - 4200:80
+      - 127.0.0.1:4200:80
     depends_on:
       - cadmus-__PRJ__-api
     networks:

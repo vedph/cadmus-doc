@@ -92,7 +92,7 @@ services:
     container_name: cadmus-biblio-api
     restart: unless-stopped
     ports:
-      - 5000:8080
+      - 127.0.0.1:5000:8080
     depends_on:
       cadmus-__PRJ__-mongo:
         condition: service_healthy
@@ -123,7 +123,7 @@ services:
     restart: unless-stopped
     ports:
       # TODO: change 5080 with your API port in the host
-      - 5080:8080
+      - 127.0.0.1:5080:8080
     depends_on:
       cadmus-__PRJ__-mongo:
         condition: service_healthy
@@ -155,7 +155,7 @@ services:
     container_name: cadmus-__PRJ__-app
     restart: unless-stopped
     ports:
-      - 4200:80
+      - 127.0.0.1:4200:80
     depends_on:
       - cadmus-__PRJ__-api
       - cadmus-biblio-api # TODO: remove if not required
