@@ -24,6 +24,40 @@ Setting up the editor to use Zotero concerns the frontend only:
 })(this);
 ```
 
+> 💡 To avoid storing real credentials in code (and thus in a potentially public repository) but still test Zotero during development you might want to leave these credentials empty and override them adding a separate `env.local.js` file with the real credentials only, e.g.:
+
+```js
+// development overrides for env.js
+// DO NOT COMMIT THIS FILE TO THE REPOSITORY
+
+// Zotero
+window.__env.zoteroApiKey = "...";
+window.__env.zoteroUserId = "...";
+window.__env.zoteroLibraryId = "...";
+```
+
+To use this, add this script to your app's `index.html` after `<script src="env.js"></script>`:
+
+```html
+<script>
+  // check if a local environment file exists and load it
+  function loadLocalEnv() {
+    var script = document.createElement("script");
+    script.onload = function () {
+      console.log("Loaded local environment overrides.");
+    };
+    script.onerror = function () {
+      console.warn(
+        "Local environment file not found, using default values."
+      );
+    };
+    script.src = "env.local.js";
+    document.head.appendChild(script);
+  }
+  loadLocalEnv();
+</script>
+```
+
 ▶️ (3) in `app.config.ts` add the Zotero provider:
 
 ```ts
