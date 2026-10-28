@@ -58,6 +58,8 @@ To use this, add this script to your app's `index.html` after `<script src="env.
 </script>
 ```
 
+⚠️ Remember to add `env.local.js` to your `.gitignore` file!
+
 ▶️ (3) in `app.config.ts` add the Zotero provider:
 
 ```ts
