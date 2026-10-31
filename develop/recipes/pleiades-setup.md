@@ -18,6 +18,50 @@ To host the Pleiades backend in your Cadmus stack, you must add two services:
 
 ▶️ Add services like in this example `docker-compose.yml`:
 
+- **localhost example**:
+
+```yml
+  pleiades-pgsql:
+    image: postgis/postgis
+    container_name: pleiades-pgsql
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      # pick any port on the host side, here 5434
+      - 127.0.0.1:5434:5432
+    # uncomment volume to persist data beyond container lifetime
+    #volumes:
+    #  - pleiades-vol:/var/lib/postgresql
+
+  # Pleiades API
+  pleiades-api:
+    image: vedph2020/pleiades-api:3.0.2
+    container_name: pleiades-api
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:29139:8080
+    depends_on:
+      - pleiades-pgsql
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - CONNECTIONSTRINGS__DEFAULT=Server=pleiades-pgsql;User ID=postgres;Password=postgres;Port=5434;Database=pleiades;
+      # the seconds delay before database seed starts
+      - SEEDDELAY=30
+    #volumes:
+      # 👉 place dump files in host dump folder here
+      #- ./dump:/var/pleiades
+
+# ... other services ...
+
+#volumes:
+#  pleiades-vol:
+```
+
+- **web server example**:
+
 ```yml
 services:
   # Postgis
@@ -71,7 +115,19 @@ As explained in the [Pleiades API](https://github.com/vedph/pleiades-api) reposi
 1. download the latest Pleiades data from the [official site](http://atlantides.org/downloads/pleiades/json/).
 2. create the Pleiades database by importing Pleiades data. You will need the `pleitool` CLI app you can download from [Releases](https://github.com/vedph/pleiades-api/releases) in the Pleiades site.
 3. dump the Pleiades database into binary files for fast restore.
-4. copy these binary files into the `dump` folder, which should be a subfolder of the folder containing your `docker-compose.yml` file. Once done, when you first run the services the API will create and seed the database at startup.
+4. upload these binary files into the `dump` folder of your server, which should be a subfolder of the folder containing your `docker-compose.yml` file. Once done, when you first run the services the API will create and seed the database at startup.
+
+For steps 2-3 here are the sample CLI commands:
+
+```sh
+# pleiades-places.json is the JSON file unzipped from downloaded Pleiades data
+./pleitool import-graph c:/users/dfusi/desktop/pleiades-places.json
+
+# pleiades-profiles.json is from Pleiades API repository
+./pleitool index c:/users/dfusi/desktop/pleiades-profile.json -c
+
+./pleitool pop-spatial
+```
 
 ## Frontend
 
@@ -105,7 +161,7 @@ import {
   PleiadesSearchResult,
 } from '@myrmidon/cadmus-refs-pleiades-lookup';
 
-// in app.ts call configureLookup from your constructor
+// in app.ts call configureLookup from your constructor...
 
 private configureLookup(storage: RamStorageService): void {
     storage.store(LOOKUP_CONFIGS_KEY, [
