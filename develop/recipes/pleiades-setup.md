@@ -145,7 +145,7 @@ pnpm i @myrmidon/cadmus-refs-lookup @myrmidon/cadmus-refs-pleiades-lookup
 
 ```js
 // local example:
-window.__env.pleiadesUrl = "http://localhost:5000/api/";
+window.__env.pleiadesUrl = "http://localhost:29139/api/";
 
 // remote example:
 window.__env.pleiadesUrl = "https://pleiades-api.fusi-soft.com/api/";
@@ -182,4 +182,4 @@ private configureLookup(storage: RamStorageService): void {
 }
 ```
 
-> To let users switch from the lookup to the full search, set [hasMore]="true" on the lookup and open PleiadesQueryDialogComponent on its `moreRequest`. See the [Pleiades brick documentation](https://github.com/vedph/cadmus-bricks-shell-v3/tree/master/projects/myrmidon/cadmus-refs-pleiades-lookup) for more.
+> To let users switch from the lookup to the full search, set `[hasMore]="true"` on the lookup and open `PleiadesQueryDialogComponent` on its `moreRequest`. See the [Pleiades brick documentation](https://github.com/vedph/cadmus-bricks-shell-v3/tree/master/projects/myrmidon/cadmus-refs-pleiades-lookup) for more.
