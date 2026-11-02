@@ -216,12 +216,39 @@ public static class Program
     // startup log file name, Serilog is configured later via appsettings.json
     private const string STARTUP_LOG_NAME = "startup.log";
 
+    #region Taxo Store
+    // TODO: remove if not used
+    private static void ConfigureTaxoStoreServices(IServiceCollection services,
+        IConfiguration config)
+    {
+        services.AddTaxoStoreServices(options =>
+        {
+            // get connection string
+            string? connectionString = config.GetConnectionString("TaxoStore");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Connection string 'TaxoStore' not found.");
+            }
+            options.ConnectionString = connectionString;
+
+            // read auto-initialization flag
+            options.EnableAutoInitialization =
+                config.GetValue("TaxoStore:EnableAutoInitialization", true);
+
+            // read initialization delay (useful for Docker/PostgreSQL startup)
+            options.InitializationDelaySeconds =
+                config.GetValue("TaxoStore:InitializationDelaySeconds", 0);
+        });
+    }
+    #endregion
+
     private static void ConfigureAppServices(IServiceCollection services,
         IConfiguration config)
     {
         // Cadmus repository
         string dataCS = string.Format(
-        config.GetConnectionString("Default")!,
+            config.GetConnectionString("Default")!,
             config.GetValue<string>("DatabaseNames:Data"));
         services.AddSingleton<IRepositoryProvider>(
             _ => new AppRepositoryProvider { ConnectionString = dataCS });
@@ -243,6 +270,9 @@ public static class Program
         // index and graph
         ServiceConfigurator.ConfigureIndexServices(services, config);
         ServiceConfigurator.ConfigureGraphServices(services, config);
+
+        // taxostore
+        ConfigureTaxoStoreServices(services, config);
 
         // previewer
         services.AddSingleton(p => ServiceConfigurator.GetPreviewer(p, config));
