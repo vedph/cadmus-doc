@@ -12,7 +12,7 @@ Exporting JSON differs from a [raw JSON export](json-dump) as it implies selecti
 
 A typical application of this export process is a frontend designed around a set of predefined view models, specifically designed for it. Data is thus transformed into the target schema, similarly to what happens in XML via XSLT.
 
-This export process shares its source data selection and mapping logic with the [graph](../graph/graph) exporter, which targets RDF, with an important difference:
+This export process shares its source data selection and mapping logic with the [graph](./graph/index) exporter, which targets RDF, with an important difference:
 
 - the _graph exporter_ is designed to constantly map items into an RDF graph, keeping it in synch with user edits. Whenever users save their edits in the editor, data gets selected and mapped to target the graph according to the chosen ontologies. Users can even edit the target RDF graph directly to manually extend it.
 - the _JSON exporter_ instead is not designed to export data in real-time. Rather, its purpose is to provide a massive JSON-based data transform and export, to be later consumed by a third-party client: for instance, a view-model for a web UI based on exported data. So, the task of the JSON exporter is only to generate JSON documents, without caring about their usage. The graph exporter instead targets a graph database actively updating it to keep the graph in synch with user edits. Then, at any moment one can also export the nodes and triples of this graph into various standard formats to consume them as required.

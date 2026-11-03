@@ -101,7 +101,7 @@ Syntax:
 
 ## Export RDF Command
 
-🎯 Export Cadmus [semantic graph](../migration/graph/graph) into various standard RDF formats.
+🎯 Export Cadmus [semantic graph](../migration/export/graph/index) into various standard RDF formats.
 
 Syntax:
 
