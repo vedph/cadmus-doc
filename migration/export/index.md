@@ -10,11 +10,11 @@ nav_order: 2
 Currently, export functions target these scenarios:
 
 - **raw data dump**:
-  - [dumping raw JSON data](./export/json-dump). This dumps the items with their parts into JSON. Apart from nesting parts inside the JSON of each item, there is no change in JSON schemas. This is used when you just need a massive or incremental data import into a system using the same schema.
+  - [dumping raw JSON data](./json-dump). This dumps the items with their parts into JSON. Apart from nesting parts inside the JSON of each item, there is no change in JSON schemas. This is used when you just need a massive or incremental data import into a system using the same schema.
 - **data mapping**:
-  - [exporting data into custom JSON objects](./export/json-export). This exports items with their parts into JSON documents having a different schema, mapping source to target as required. This is used to adapt data to any target, e.g. a frontend requiring specific view models.
+  - [exporting data into custom JSON objects](./json-export). This exports items with their parts into JSON documents having a different schema, mapping source to target as required. This is used to adapt data to any target, e.g. a frontend requiring specific view models.
   - [exporting an RDF graph](./graph/index). This projects data into an RDF graph using any ontologies. The graph is kept in synch with editor data whenever this gets updated, and you can even edit it beyond its source projections.
 - **rendition**:
-  - [rendering data](./export/rendition). This renders data within the editor or into specialized outputs like TEI.
+  - [rendering data](./rendition/index). This renders data within the editor or into specialized outputs like TEI.
 
-Most of the migration functions are available from the [Cadmus CLI tool](../tools/cadmus-tool).
+Most of the migration functions are available from the [Cadmus CLI tool](../../tools/index.md).
