@@ -15,8 +15,8 @@ The `GraphWalkerComponent` gets a single node ID (`nodeId`) representing the sta
 
 The parameters of the `GraphWalker` class are:
 
-- `pageSize`: the paging size.
-- `maxLiteralLen`: the max length of the literal value to display.
+- `pageSize`: the paging size (default 10).
+- `maxLiteralLen`: the max length of the literal value to display (default 30; 0=no limit).
 
 The class exposes a number of observables:
 
@@ -36,7 +36,7 @@ Nodes in the walker may represent nodes, literals, or property groups. While eac
 
 - **nodes**: `N<node_id>`, e.g. `N12` where `12` is the node's numeric ID.
 - **literals**: `L<triple_id>`, e.g. `L34` where `34` is the ID of the triple the literal is the object of.
-- **property groups**: `P<predicate_id>N<node_id>`, e.g. `P12N34` where `12` is the ID of the node acting as a predicate, and `N` is the source node ID. The source node is either the subject or the object of the triple, according to the walk direction.
+- **property groups**: `P<predicate_id>N<node_id>`, e.g. `P12N34` where `12` is the ID of the node acting as a predicate, and `34` is the source node ID. The source node is either the subject or the object of the triple, according to the walk direction. When the same predicate links the source node both as a subject and as an object (e.g. `rdfs:subClassOf` for a class in the middle of a hierarchy), the two groups share the same graph node, whose label is the sum of their counts; anyway, expanding a property group always loads both its outbound and inbound nodes.
 - **edges**: `E<source>_<target>`.
 
 All the nodes visualized in the graph include node data in their `data` property. These data are defined in types having the following hierarchy:
@@ -58,11 +58,19 @@ All the nodes visualized in the graph include node data in their `data` property
 - `expandSelectedProperty`: expand the currently selected properties group node, by loading its outbound nodes, inbound nodes, and literal nodes. If there is no selection, or the selected node is not a properties group node, nothing is done.
 - `toggleNode`: toggle the specified node by expanding or collapsing it.
 
+Expansions are asynchronous: when several of them are pending at the same time (e.g. the user quickly expands two nodes), each one is applied to the graph as it is when its data arrive, so that no result gets lost.
+
+Each graph node keeps its own filters and totals: for instance, a non-literal node discovered by expanding a property group gets its own outbound and inbound triples filters (starting from page 1), which are used when it gets expanded in turn.
+
 ## API
 
 Cadmus provides a graph-specific API to handle the graph, with a number of endpoints.
 
-- [API code repository](https://github.com/vedph/cadmus_api): [GraphController](https://github.com/vedph/cadmus_api/blob/master/Cadmus.Api.Controllers/GraphController.cs)
+- [API code repository](https://github.com/vedph/cadmus-core): [GraphController](https://github.com/vedph/cadmus-core/blob/master/Cadmus.Api.Controllers/GraphController.cs)
+
+All the endpoints require an authenticated user. Paging parameters are `pageNumber` (1-N) and `pageSize` (0-100). Parameters with multiple values (like `classIds` or `predicateIds`) are repeated in the query string, e.g. `classIds=1&classIds=2`.
+
+>As empty query string parameters are received as null, a `tag` filter cannot be used to match nodes or triples without a tag: an empty tag just means "any tag".
 
 ### API - Nodes
 
@@ -71,7 +79,7 @@ Cadmus provides a graph-specific API to handle the graph, with a number of endpo
   - `pageSize`
   - `uid`: any portion of the node's UID to match.
   - `isClass`: match node's class status.
-  - `tag`: null (match any), empty (match null tags), non-empty (match the specified tag).
+  - `tag`: the tag to match (omit to match any).
   - `label`: any portion of the node's label to match.
   - `sourceType`: type of source (0-N).
   - `sid`: match node's SID.
@@ -80,9 +88,9 @@ Cadmus provides a graph-specific API to handle the graph, with a number of endpo
   - `linkedNodeId`: match only nodes directly linked to the specified node ID.
   - `linkedNodeRole`: the role of the node identified by linkedNodeId: `S`ubject or `O`bject.
 - `GET api/graph/nodes/ID`: get the node with the specified ID.
-- `GET api/graph/nodes-set`: get the nodes with the specified IDs.
-- `GET api/graph/nodes-by-uri`: get nodes by URI.
-- `POST api/graph/nodes`: add or update the specified node.
+- `GET api/graph/nodes-set`: get the nodes with the specified IDs (parameter `ids`, repeated for each ID).
+- `GET api/graph/nodes-by-uri`: get the node with the specified URI (parameter `uri`).
+- `POST api/graph/nodes`: add or update the specified node. The node is identified by its URI. When editing an existing node, its SID and source type should be preserved, as they tell which source owns the node.
 - `DELETE api/graph/nodes/ID`: delete the node with the specified ID.
 
 ### API - Triples
@@ -97,10 +105,10 @@ Cadmus provides a graph-specific API to handle the graph, with a number of endpo
   - `objectId`: the ID of the object node.
   - `sid`: match triple's SID.
   - `isSidPrefix`: match only the initial portion of the triple's SID.
-  - `tag`: null (match any), empty (match null tags), non-empty (match the specified tag).
-  - `sort`: the sort order.
+  - `tag`: the tag to match (omit to match any).
+  - `literalPattern`, `literalType`, `literalLanguage`, `minLiteralNumber`, `maxLiteralNumber`: filters for literal objects (see below).
 - `GET api/graph/triples/ID`: get the triple with the specified ID.
-- `POST api/graph/triples`: add or update the specified node.
+- `POST api/graph/triples`: add (when its ID is 0) or update the specified triple. When editing an existing triple, its SID and tag should be preserved. The literal index value and numeric value are calculated from the literal when not specified.
 - `DELETE api/graph/triples/ID`: delete the triple with the specified ID.
 
 ### API - Walker
@@ -115,14 +123,15 @@ Cadmus provides a graph-specific API to handle the graph, with a number of endpo
   - `objectId`: the ID of the object node.
   - `sid`: match triple's SID.
   - `isSidPrefix`: match only the initial portion of the triple's SID.
-  - `tag`: null (match any), empty (match null tags), non-empty (match the specified tag).
-  - `sort`: the sort order.
+  - `tag`: the tag to match (omit to match any).
+  - `literalPattern`, `literalType`, `literalLanguage`, `minLiteralNumber`, `maxLiteralNumber`: filters for literal objects (see below).
+  - `sort`: the sort order of the groups: any combination of `c` (by count, ascending), `C` (by count, descending), `u` (by predicate URI, ascending), `U` (by predicate URI, descending). Default is `Cu`.
 - `GET api/graph/walk/nodes`: get walker linked nodes. Filter:
   - `pageNumber`
   - `pageSize`
   - `uid`: match node's UID.
   - `isClass`: match node's class status.
-  - `tag`: null (match any), empty (match null tags), non-empty (match the specified tag).
+  - `tag`: the tag to match (omit to match any).
   - `label`: any portion of the node's label to match.
   - `sourceType`: type of source (0-N).
   - `sid`: match node's SID.
@@ -137,7 +146,13 @@ Cadmus provides a graph-specific API to handle the graph, with a number of endpo
   - `literalPattern`: the regular expression to match the literal.
   - `literalType`: the type of the object literal. This corresponds to literal suffixes after `^^` in Turtle: e.g. `"12.3"^^xs:double`.
   - `literalLanguage`: literal's language to match.
-  - `minLiteralNumber`: max numeric value for a numeric object literal.
-  - `maxLiteralNumber`: min numeric value for a numeric object literal.
+  - `minLiteralNumber`: min numeric value for a numeric object literal.
+  - `maxLiteralNumber`: max numeric value for a numeric object literal.
   - `subjectId`: the subject node ID in the triple including the literal to match.
   - `predicateId`: the predicate node ID in the triple including the literal to match.
+
+### Demo
+
+The Cadmus API also provides a demo graph for the walker, under `api/demo/graph` (the same endpoints listed above, without authentication). This graph is stored in a database named `cadmus-graph-demo`, which is automatically created and seeded with mock data (Petrarch's birth and death, in the API's assets `Petrarch-n.json` and `Petrarch-t.json`) at its first use, and upgraded when it already exists.
+
+In the frontend, the demo page (route `demo/graph`) shows the walker starting from the node `x:guys/francesco_petrarca`, using a `GraphService` instance configured for this API path via the `GRAPH_API_PATH` injection token.

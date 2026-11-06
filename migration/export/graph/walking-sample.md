@@ -11,11 +11,11 @@ The video below shows a sample walk session:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/P0TlqbOi590" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-This demo relies on a mock dataset, whose nodes are listed in this picture:
+This demo relies on a mock dataset (seeded by the Cadmus API in its demo graph database: see [walker](walking-api#demo)), whose nodes are listed in this picture:
 
 ![sample nodes](img/walker-vid-01.png)
 
-In the video, we start walking from Petrarch node, whose ID is 17 in this table. Note that this node also has a [SID](graph-mappings.md#source-id-sid), because it was derived from mapping a Cadmus part. You can also see that a number of nodes represent predicates, and are thus tagged with `property`; while other nodes represent classes (`is_class`=1). Typically, predicates are injected in the graph at an earlier stage, and are used by mapping rules.
+In the video, we start walking from Petrarch node, whose ID is 17 in this table. Note that this node also has a [SID](mappings#source-id-sid), because it was derived from mapping a Cadmus part. You can also see that a number of nodes represent predicates, and are thus tagged with `property`; while other nodes represent classes (`is_class`=1). Typically, predicates are injected in the graph at an earlier stage, and are used by mapping rules.
 
 The nodes can then be used as the building blocks of triples:
 
@@ -77,6 +77,6 @@ The result is now filtered to include only the English label:
 
 ![walking - 10](img/walker-vid-13.png)
 
-The process might continue indefinitely, but that's enough to show how the walker can be used in the context of a Cadmus-generated graph. We have started walking from a single node, and expanded all its connections up to other nodes of the graph, visually unveiling the data shown in the above tables. At any time, full filtering and pagins is available for each single node of the graph.
+The process might continue indefinitely, but that's enough to show how the walker can be used in the context of a Cadmus-generated graph. We have started walking from a single node, and expanded all its connections up to other nodes of the graph, visually unveiling the data shown in the above tables. At any time, full filtering and paging is available for each single node of the graph.
 
 Typically, the walker is used to explore the graph and locate the node to edit, or see how all the nodes either created by projection or manually added get composed in the bigger picture.

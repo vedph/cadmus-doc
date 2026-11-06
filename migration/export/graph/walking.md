@@ -29,6 +29,8 @@ For instance, say you start from the node representing Petrarch; you can see a l
 - "literal" links (always outbound by definition): links to literals, i.e. triples where our chosen origin node is the subject of a triple having a _literal_ node as its object.
 - "inbound" links, i.e. triples where our chosen origin node is the _object_. On the other end (the subject end) we will necessarily have a non literal node.
 
+>The same predicate may link a node both as a subject and as an object (e.g. `rdfs:subClassOf` for a class in the middle of a hierarchy): in this case, the walker shows a single property group, which leads to both the outbound and the inbound nodes.
+
 Each of these sets has its filters and paging options, so that users can further refine the visualization by removing unnecessary links and nodes.
 
 To avoid polluting the visualization and provide a visual anchor for filtering and paging, we don't directly represent links on the node; rather, we represent groups of links, each with a number equal to the count of all the links of a specific type.

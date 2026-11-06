@@ -63,7 +63,7 @@ The properties of each abstract mappings are:
 - `facetFilter`: an optional item's facet filter. When specified, the mapping will target only those items whose facet ID is _equal_ to this value.
 - `groupFilter`: an optional item's group filter. This is a regular expression; when specified, the mapping will target only those items whose group ID _matches_ this expression.
 - `flagsFilter`: an optional item's flags filter. This is a numeric value, where each bit represents a flag. When specified, the mapping will target only those items whose flags include at least _all_ the bits set in this value, i.e. all the flags specified in the filter must be present.
-- title filter
+- `titleFilter`: an optional item's title filter. This is a regular expression; when specified, the mapping will target only those items whose title _matches_ this expression.
 - `partTypeFilter`: an optional part's type ID filter. When specified, the mapping will target only those items whose part type ID is _equal_ to this value.
 - `partRoleFilter`: an optional part's role ID filter. When specified, the mapping will target only those items whose part role ID is _equal_ to this value.
 - `source`\*: the source expression representing the data selected by this mapping. In the current implementation this is a [JMES path](jmes-path). For instance, `events[?type=='person.birth']` matches only the entries in the `events` array property of a part's model whose type is equal to `person.birth`. When your source expression selects an object, you can refer to it as a whole with `.`, or to any of its properties by their name. When it selects an array, the mapper will implicitly loop through all its items, and be run for each of them. So, you can still define your mappings in terms of a single object, which here is the array's item. Additionally, the `index` metadatum will be used to represent the index number of the item in the array (0-N).
@@ -76,28 +76,12 @@ The source ID (SID for short) is calculated so that _the same source always poin
 
 The algorithm building the SID is idempotent; so you can run it any time being confident that the same input will always produce the same output. This is ensured by the fact that GUIDs are unique by definitions.
 
-A SID is built with these components:
-
-(a) for **items**:
-
-1. the 36-characters _GUID_ of the source (item).
-2. if the node comes from a group or a facet, the suffix `|group` or `|facet`. On passage, note that the group ID can be composite (using slash, e.g. `alpha/beta`); in this case, a mapping producing nodes for groups emits several nodes, one for each component. The top component is the first in the group ID, followed by its children (in the above sample, `beta` is child of `alpha`). Each of these nodes has an additional suffix for the component ordinal, preceded by `|`.
+The SID is built by the `sid` template of each mapping, which is inherited by children mappings unless overridden. By convention, ⚠️ **a SID must always start with the GUID of its source** (the item or part ID, as provided by metadata `item-id` and `part-id`), optionally followed by other components: for instance `{$part-id}/{@eid}` for the events of a part, or `{$item-id}` for an item. This is essential for the [graph](graph/mappings#source-id-sid), where the graph generated from a source is identified by the GUID prefix of its SIDs.
 
 Examples:
 
-- `76066733-6f81-48dd-a653-284d5be54cfb`: an entity derived from an item.
-- `76066733-6f81-48dd-a653-284d5be54cfb|group`: an entity derived from an item's group.
-- `76066733-6f81-48dd-a653-284d5be54cfb|group|2`: an entity derived from the 2nd component of an item's composite group.
-
-(b) for **parts**:
-
-1. the _GUID_ of the source (part).
-2. if the part has a role ID, the _role ID_ preceded by `#`.
-
-Examples:
-
-- `76066733-6f81-48dd-a653-284d5be54cfb`: an entity derived from a part.
-- `76066733-6f81-48dd-a653-284d5be54cfb#some-role`: an entity derived from a part with a role.
+- `76066733-6f81-48dd-a653-284d5be54cfb`: an entity derived from an item or a part.
+- `76066733-6f81-48dd-a653-284d5be54cfb/birth`: an entity derived from the entry with EID `birth` in a part.
 
 ## Configuration
 

@@ -29,8 +29,8 @@ The filter model (`TripleFilter`) includes these properties:
 - `ObjectId`: the ID of the triple's object to match.
 - `Sid`: the SID to match.
 - `IsSidPrefix`: true to treat the SID filter as a prefix.
-- `Tag`: the tag to match (empty to match null tags, null to ignore tags in matching).
-- `LiteralPattern`: the pattern of the triple's literal object value to match.
+- `Tag`: the tag to match (empty to match null tags, null to ignore tags in matching; via the API, only null and non-empty tags can be used).
+- `LiteralPattern`: the regular expression pattern of the triple's literal object value to match.
 - `LiteralType`: the type of the triple's literal object to match.
 - `LiteralLanguage`: the language of the triple's literal object to match.
 - `MinLiteralNumber`: the minimum numeric value for a numeric literal object.
@@ -55,7 +55,7 @@ The filter model is different:
 - `IsObject`: true if the node to match is the object of the triple; false if it's the subject.
 - `Uid`: any portion of the node ID to match.
 - `IsClass`: true to match nodes representing classes; false to match nodes not representing classes; null to match both.
-- `Tag`: the tag to match (empty to match null tags, null to ignore tags in matching).
+- `Tag`: the tag to match (empty to match null tags, null to ignore tags in matching; via the API, only null and non-empty tags can be used).
 - `Label`: any portion of the label to match.
 - `SourceType`: the source type to match.
 - `Sid`: the SID to match.

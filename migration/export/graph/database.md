@@ -16,6 +16,7 @@ nav_order: 5
   - [Property Table](#property-table)
   - [Node Mapping Tables](#node-mapping-tables)
   - [Triple Table](#triple-table)
+  - [Indexes and Upgrades](#indexes-and-upgrades)
 
 In Cadmus, the semantic graph is stored into its own database.
 
@@ -52,13 +53,13 @@ Example:
   - 🔑 `id` PK AI: the ID.
   - `sid` (string): the SID.
   - `unsuffixed` (string): the UID as calculated without its optional final suffix (e.g. `x:ms-decorations/angel-1v`).
-  - `has-suffix` (bool): true if the SID should be built by adding suffix `#` + `id` to `unsuffixed` (e.g. `3` generates the complete UID `x:ms-decorations/angel-1v#3`).
+  - `has_suffix` (bool): true if the UID should be built by adding suffix `#` + `id` to `unsuffixed` (e.g. `3` generates the complete UID `x:ms-decorations/angel-1v#3`).
 
-This table is used to generate UIDs, ensuring that each combination of a [SID](../mappings.md#source-id-sid) (=source ID) + a generated entity identifier gets a unique UID.
+This table is used to generate UIDs, ensuring that each combination of a [SID](mappings#source-id-sid) (=source ID) + a generated entity identifier gets a unique UID. The full rules are described in the [UID builder](mappings#uid-builder) section.
 
 This essentially is a lookup table, which gets filled whenever a new UID for a graph entity gets calculated. While SID calculation is idempotent (=the same source always has the same globally unique ID), UID calculation is not, because to ensure friendly values UIDs are generated from user-entered data, like an item's title.
 
-So, it might happen that two UIDs from two different sources (as identified by SIDs) clash. In this case, the new UID must receive a unique numeric suffix (in the form `#N`). This number is provided by the database itself, which ensures it is unique, and gets forever associated to that UID and SID.
+So, it might happen that two UIDs from two different sources (as identified by SIDs) clash. In this case, when the mapping requested a unique UID (with a template ending with `##`), the new UID must receive a unique numeric suffix (in the form `#N`). This number is provided by the database itself, which ensures it is unique, and gets forever associated to that UID and SID.
 
 This association allows re-creating the same UID whenever adding the same entity (as identified by SID) using the same calculated UID.
 
@@ -68,19 +69,19 @@ Consider this example:
 
 2. first, the graph projection system searches the UID table for records having an _unsuffixed_ UID equal to the generated one (`x:ms-decorations/angel-1v`). In this example, it finds one (or more), because it happens that somewhere else in the database there is another decoration which was given the same human-friendly identifier (`angel-1v`). So, the projector gets from the database a numeric suffix, say 23, and appends it to this decoration. The trick for getting this numeric value is just that this table's PK is an autoincremented number. So, whenever we add a new record to it, we automatically get this number. If required, this will then be used as the UID's suffix.
 
-3. in this example, we need a suffixed UID because we found other records with the same unsuffixed UID. Here, the new UID gets saved into the UID lookup table as a record corresponding to `x:ms-decorations/angel-1v#23`, connected to SID `bf849795-375e-4deb-9f91-3b03630ea2fa` (the GUID for the decorations part where our angel was located). In the table, this means that we save both the unsuffixed UID and its SID, and set the `has_suffix` field to true, meaning that we're going to use the record's PK (the autonumber) as the UID's suffix.
+3. in this example, we need a suffixed UID because we found other records with the same unsuffixed UID. Here, the new UID gets saved into the UID lookup table as a record corresponding to `x:ms-decorations/angel-1v#23`, connected to SID `bf849795-375e-4deb-9f91-3b03630ea2fa/eid/angel-1v` (whose first component is the GUID of the decorations part where our angel was located). In the table, this means that we save both the unsuffixed UID and its SID, and set the `has_suffix` field to true, meaning that we're going to use the record's PK (the autonumber) as the UID's suffix.
 
 4. later, a user deletes this decoration.
 
 5. later again, a user decides to re-enter the _same_ decoration, in the _same_ part. As a SID is idempotent, this produces again the same SID: `bf849795-375e-4deb-9f91-3b03630ea2fa/eid/angel-1v`, with an unsuffixed UID `x:ms-decorations/angel-1v`. Looking up the UID table, we now find that 1 or more records already exist with an unsuffixed UID equal to this value. Also, among them there is one with the same SID, too; the one saved when the angel decoration from that part was first saved. So, rather than requesting a new number for its suffix, we _reuse_ the old number, getting `x:ms-decorations/angel-1v#23` again.
 
-This ensures that the same entity (as identified by its SID) always corresponds to the same UID. The UID lookup table model is thus designed for the purpose of completing the generation of each UID.
+This ensures that the same entity (as identified by its SID) always corresponds to the same UID. The same happens whenever the decoration is saved again: the entry for its SID is reused, so that its UID never changes. The UID lookup table model is thus designed for the purpose of completing the generation of each UID.
 
 ## URI Lookup Table
 
 - ♦️ `uri_lookup`: this is a mapping between unique numeric IDs and URIs, used to reduce tables size and enhance performance. Internally, RDBMS records are identified by a simple numeric ID, which corresponds to a full URI.
   - 🔑 `id` (int) PK AI: the numeric ID.
-  - `uri` (string): the corresponding URI (where namespaces are replaced by prefixes for more readability; e.g. `rdfs:label`). It is assumed that all the prefixes used here are resolved in `namespace_lookup`.
+  - `uri` (string): the corresponding URI (where namespaces are replaced by prefixes for more readability; e.g. `rdfs:label`). It is assumed that all the prefixes used here are resolved in `namespace_lookup`. URIs are case-insensitive, and unique.
 
 Example:
 
@@ -109,8 +110,8 @@ Example:
   - `is_class` (boolean): a value indicating whether this node is a class. This is a shortcut property for a node being the subject of a triple with S=class URI, predicate=`a` and object=`rdfs:Class` (or `owl:Class` -- note that `owl:Class` is defined as a subclass of `rdfs:Class`). Given the importance of class nodes in editing, this is a performance-wise shortcut.
   - `tag`: a general purpose tag for the classification for nodes. For instance, this can be used to mark all the nodes potentially used as properties, so that a frontend can filter them accordingly.
   - `label` (string): the optional label used to designate this entity in a human-friendly way. This is defined by mapping, or manually entered by user.
-  - `source_type` (int): set from the mapping which generated this node; 0 if manually created.
-  - `sid` (string): the SID built from the identity of the source data record, or null if user-defined.
+  - `source_type` (int): set from the mapping which generated this node: 0=user (manually created), 1=item, 2=part, 3=thesaurus, 4=implicit (added because used by a triple, without being generated as a node).
+  - `sid` (string): the SID built from the identity of the source data record, or null if user-defined. This tells which source owns the node (see [updating](updating)).
 
 >💡 If you need other UIDs for the same entity, you can add them manually or import from external sources, connecting them to the original node with `owl:sameAs` predicate, ideally in the sense of "same thing as but different context" (see Halpin H., Herman I., _When owl:sameAs isn't the Same: An Analysis of Identity Links on the Semantic Web_, Conference: Proceedings of the WWW2010 Workshop on Linked Data on the Web, LDOW 2010, Raleigh, USA, April 27, 2010).
 
@@ -120,9 +121,11 @@ Example:
   - 🔑 `id` (int) PK FK.
   - `node_id` (int) FK linked to the instance `node.id`.
   - `class_id` (int) FK linked to the class `node.id`.
-  - `level` (int) the depth level at which this class was detected when walking classes starting from the instance node: 1=parent classes, 2=parent classes of parent classes, etc.
+  - `level` (int) the depth level at which this class was detected when walking classes starting from the instance node: 1=parent classes, 2=parent classes of parent classes, etc. When a class is reachable via several paths, it is stored once with its minimum level.
 
-⚙️ Recursively querying an RDBMS database implies using recursive CTEs. For instance, in MySql (this example is drawn from the time where Cadmus used MySql rather than PostgreSQL):
+In PostgreSQL, this table is populated for each node by the `populate_node_class` procedure, which walks the `rdf:type` triples of the node and then the `rdfs:subClassOf` hierarchy with a recursive CTE. The walk has a maximum depth (32 levels), so that cycles in `rdfs:subClassOf` cannot make it endless. The table is updated automatically whenever the graph changes, only for the affected nodes.
+
+⚙️ Recursively querying an RDBMS database implies using recursive CTEs. For instance, in MySql (this example is drawn from the time where Cadmus used MySql rather than PostgreSQL; the logic is the same):
 
 ```sql
 with recursive cn as (
@@ -198,25 +201,33 @@ These are the results of the anchor query. Then, the recursive query finds all t
 
 ## Node Mapping Tables
 
-A [node mapping](mappings) is modeled with 4 tables:
+A [node mapping](mappings) is modeled with 5 tables:
 
 - ♦️ `mapping`:
   - 🔑 `id` PK AI
-  - `parent_id` FK
+  - `ordinal`: the order of application among siblings.
   - `name`
   - `source_type`
   - `facet_filter`
   - `group_filter`
+  - `title_filter`
   - `flags_filter`
   - `part_type_filter`
   - `part_role_filter`
   - `description`
   - `source`
   - `sid`
+  - `scalar_pattern`
+
+- ♦️ `mapping_link`: the parent-child relationships among mappings. A mapping without parents is a root mapping. As named children mappings can be shared by several parents, this is a many-to-many relationship.
+  - 🔑 `parent_id` PK FK
+  - 🔑 `child_id` PK FK
 
 - ♦️ `mapping_out_node`:
   - 🔑 `id` PK AI
   - `mapping_id` FK
+  - `ordinal`
+  - `name`: the node key.
   - `uid`
   - `label`
   - `tag`
@@ -224,6 +235,7 @@ A [node mapping](mappings) is modeled with 4 tables:
 - ♦️ `mapping_out_triple`:
   - 🔑 `id` PK AI
   - `mapping_id` FK
+  - `ordinal`
   - `s`
   - `p`
   - `o`
@@ -232,8 +244,11 @@ A [node mapping](mappings) is modeled with 4 tables:
 - ♦️ `mapping_out_meta`:
   - 🔑 `id` PK AI
   - `mapping_id` FK
+  - `ordinal`
   - `name`
   - `value`
+
+The `ordinal` of outputs preserves their definition order, as templates may refer to previously emitted nodes and metadata.
 
 ## Triple Table
 
@@ -243,4 +258,23 @@ A [node mapping](mappings) is modeled with 4 tables:
   - `p_id` (int): FK. Predicate, linked to a property.
   - `o_id` (int): FK. Object, linked to a node.
   - `o_lit` (string): an optional literal value. This is alternative to `o_id`.
+  - `o_lit_type` (string): the optional type of the literal (e.g. `xs:int`).
+  - `o_lit_lang` (string): the optional language of the literal (e.g. `en`).
+  - `o_lit_ix` (string): the literal value as filtered for searching it (e.g. lowercased and without diacritics).
+  - `o_lit_n` (double): the numeric value of the literal, when it has a numeric or boolean type. This allows for numeric searches.
+  - `sid` (string): the SID of the source which generated the triple, or null if user-defined.
   - `tag`: a general purpose tag, used to tag triples for some reason. The primary purpose is marking those triples which represent restrictions, like those composed by subproperty of (`rdfs:subPropertyOf`), domain (`rdfs:domain`), range (`rdfs:range`), literal only (`owl:DataTypeProperty`), object only (`owl:ObjectProperty`), symmetric (`owl:SymmetricProperty`), asymmetric (`owl:AsymmetricProperty`). Except for domain/range/subproperty, which are used as predicates (property - has-range - node), all the other restrictions listed here are used as objects (property - is-a - object-property).
+
+## Indexes and Upgrades
+
+⚙️ The PostgreSQL schema is in two scripts: one creating tables and preset data, and another (idempotent) creating all the indexes and procedures. When a new graph database is created, both are run. Existing databases created by older versions are upgraded by running the second script, which only adds what is missing: the Cadmus API does it at each startup, and so does the CLI command `create-db graph`. On big graphs, the first upgrade may take some time to create the missing indexes.
+
+The indexes are designed for the queries actually used, considering that the graph is updated at each save:
+
+- case-insensitive lookups of URIs (unique), namespaces, and UIDs;
+- SID exact and prefix lookups for nodes and triples (i.e. the graph of each source);
+- trigram indexes (PostgreSQL extension `pg_trgm`) for "contains" searches on node labels and URIs, as used by node lookups in the editor;
+- triples by subject and predicate, object and predicate, and predicate (graph walking, linked nodes, node classes population, foreign key cascades);
+- node classes by node and by class.
+
+>The unique index on URIs is created only when there are no URIs differing only by case. Databases created by old versions might have such duplicates: in this case a warning is emitted, and a non-unique index is created instead. Lookups still work, but you should merge the duplicate nodes.

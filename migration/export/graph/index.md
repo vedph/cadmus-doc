@@ -50,7 +50,7 @@ This does not mean that users necessarily have to edit data in terms of nodes an
 
 In fact, many objects can legitimately include some relational data which fits their model and purpose. Some objects are even designed to contain purely relational data, e.g. when dealing with relationships like events. Among the general purpose parts, Cadmus provides a historical events model, which contains a list of events of any type, each with a description, optional date and/or time, and directly related entities. Such part can be used for a lot of different purposes: for instance, in the biography of a person it can represent all the relevant events involving that person, including birth and death.
 
-So, users can encode a lot of relations without leaving the user-friendly environment of object-editing in a rich GUI. Whenever they save such objects, Cadmus can optionally apply a number of **mapping rules** for projecting a subset of their data into a RDF-like graph. This way, users effectively build RDF without even knowing about it, only by filling web forms; just like they can generate TEI without even knowing XML. All this is made possible by this projection mechanism, based on rules defined by the designers of each project, and stored in the Cadmus index database.
+So, users can encode a lot of relations without leaving the user-friendly environment of object-editing in a rich GUI. Whenever they save such objects, Cadmus can optionally apply a number of **mapping rules** for projecting a subset of their data into a RDF-like graph. This way, users effectively build RDF without even knowing about it, only by filling web forms; just like they can generate TEI without even knowing XML. All this is made possible by this projection mechanism, based on rules defined by the designers of each project, and stored in the Cadmus graph database.
 
 Yet, when required users can **directly edit** the graph, to supply additional nodes or edges. Their edits get combined with the result of projections, and are never overwritten by them, even though the projection can keep in synch its nodes and triples whenever items and parts are added, updated or deleted.
 
@@ -58,7 +58,7 @@ The following picture summarizes the different layers of abstraction used in Cad
 
 ![graph architecture](graph/img/graph-architecture.png)
 
-The mappings are stored in the RDBMS index database, but for easier definition you can list them in a JSON file, and then let Cadmus tool import them.
+The mappings are stored in the graph database, but for easier definition you can list them in a JSON file, and then let Cadmus tool import them.
 
 At any rate, given that they are a completely independent resource, this means that you can not only change or augment the projection behavior at any time; but you could even design a totally different mapping, using different ontologies from the same set of data. In a sense, the graph here is just another output of our objects (except that users can edit it directly for supplying new details).
 
