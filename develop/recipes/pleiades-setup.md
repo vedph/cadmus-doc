@@ -183,3 +183,66 @@ private configureLookup(storage: RamStorageService): void {
 ```
 
 > To let users switch from the lookup to the full search, set `[hasMore]="true"` on the lookup and open `PleiadesQueryDialogComponent` on its `moreRequest`. See the [Pleiades brick documentation](https://github.com/vedph/cadmus-bricks-shell-v3/tree/master/projects/myrmidon/cadmus-refs-pleiades-lookup) for more.
+
+▶️ (5) if you create a Docker image with NGINX, ensure that it is configured to avoid long-term cache for MapLibre worker files, or you might get worker load errors when trying to use Maplibre:
+
+```conf
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  include /etc/nginx/mime.types;
+  # ES modules (e.g. MapLibre worker): browsers require a JS MIME type
+  types {
+    application/javascript mjs;
+  }
+  default_type application/octet-stream;
+
+  log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+  '$status $body_bytes_sent "$http_referer" '
+  '"$http_user_agent" "$http_x_forwarded_for"';
+
+  access_log /var/log/nginx/access.log main;
+
+  sendfile on;
+
+  keepalive_timeout 65;
+
+  server {
+    listen 80;
+    listen [::]:80;
+    server_name localhost;
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    location / {
+      root /usr/share/nginx/html;
+      index index.html index.htm;
+      try_files $uri $uri/ /index.html;
+    }
+
+    # MapLibre worker files have no hash in their name: do not cache long-term
+    location /assets/maplibre-gl/ {
+      root /usr/share/nginx/html;
+      add_header Cache-Control "no-cache";
+      try_files $uri =404;
+    }
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+      root /usr/share/nginx/html;
+    }
+  }
+}
+```
+
+> 💡 For Maplibre setup you can also see <https://github.com/vedph/cadmus-geo-shell/blob/master/maplibre-setup.md>.
