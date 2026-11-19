@@ -588,13 +588,13 @@ This is the core customization for the whole project. Usually, the profile file 
 
 ```yml
 # Stage 1: base (uses target platform architecture for ASP.NET runtime)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:11.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 443
 
 # Stage 2: build/publish (SDK runs natively on host platform for speed)
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -634,7 +634,7 @@ services:
       - MONGO_LOG_DIR=/dev/null
     command: mongod --logpath=/dev/null
     ports:
-      - 27017:27017
+      - 127.0.0.1:27017:27017
     networks:
       - cadmus-PRJ-network
 
@@ -657,7 +657,7 @@ services:
     image: vedph2020/cadmus-biblio-api:7.0.0
     container_name: cadmus-biblio-api
     ports:
-      - 60058:8080
+      - 127.0.0.1:60058:8080
     depends_on:
       - cadmus-PRJ-mongo
       - cadmus-PRJ-pgsql
@@ -678,7 +678,7 @@ services:
     container_name: cadmus-PRJ-api
     ports:
       # TODO: set your port replacing 5052
-      - 5052:8080
+      - 127.0.0.1:5052:8080
     depends_on:
       - cadmus-PRJ-mongo
       - cadmus-PRJ-pgsql
@@ -731,6 +731,8 @@ networks:
 **/values.dev.yaml
 LICENSE
 README.md
+# Exclude local Windows NuGet source config from Docker build context
+nuget.config
 ```
 
 🐋 To **build a Docker image**:
