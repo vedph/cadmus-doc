@@ -15,6 +15,8 @@ nav_order: 7
 
 # Creating API
 
+---
+
 ## 1. Create Project
 
 The [reference API backend project](https://github.com/vedph/cadmus-api) is the model for this section.
@@ -62,6 +64,8 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 ```
 
 > You can remove the Serilog sinks you are not going to use, like e.g. the PostgreSQL one.
+
+---
 
 ## 2. Add Settings
 
@@ -173,6 +177,8 @@ The [reference API backend project](https://github.com/vedph/cadmus-api) is the 
 ```
 
 > ⚠️ before API v10, the authentication database was MongoDB. Now it is a PostgreSQL database, as specified by `ConnectionStrings:Auth` and `DatabaseNames:Auth`.
+
+---
 
 ## 3. Add Program
 
@@ -382,7 +388,7 @@ public static class Program
             app.MapScalarApiReference(options =>
             {
                 options.WithTitle("Cadmus API")
-                        .AddPreferredSecuritySchemes("Bearer");
+                       .AddPreferredSecuritySchemes("Bearer");
             });
 
             Log.Information("Running API");
@@ -567,6 +573,8 @@ public sealed class AppPartSeederFactoryProvider : IPartSeederFactoryProvider
 }
 ```
 
+---
+
 ## 4. Add Assets
 
 ▶️ (1) Copy the whole `wwwroot` from [CadmusApi](https://github.com/vedph/cadmus_api), and customize its contents (the Cadmus profile, and if needed the messages template text).
@@ -581,6 +589,8 @@ Inside that folder, edit:
 This is the core customization for the whole project. Usually, the profile file is created after the documentation is completed, and before creating the code.
 
 > Inside the `messages` folder you can customize the message templates as you prefer, but usually this is not required.
+
+---
 
 ## 5. Setup Docker
 
@@ -756,6 +766,8 @@ docker buildx build --platform linux/amd64,linux/arm64 -t vedph2020/cadmus-__PRJ
 
 - add `platform: linux/arm64` to MongoDB and PostgreSQL. Note that some images (especially for PostgreSQL) are not available for ARM, so you may need to add `platform: linux/amd64` to them too or downgrade to a version which supports ARM (e.g. `image: postgres:16`).
 - add `platform: linux/amd64` to API and app.
+
+---
 
 ## 6. Add Readme
 
