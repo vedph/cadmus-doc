@@ -259,7 +259,7 @@ mat-icon.mat-accent {
 ▶️ 1. Install the typical Cadmus packages via NPM:
 
 ```bash
-pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core @myrmidon/cadmus-thesaurus-store @myrmidon/cadmus-profile-editor @myrmidon/cadmus-profile-import
+pnpm i @auth0/angular-jwt @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-api @myrmidon/cadmus-core @myrmidon/cadmus-graph-ui-ex @myrmidon/cadmus-graph-pg-ex @myrmidon/cadmus-item-editor @myrmidon/cadmus-item-list @myrmidon/cadmus-item-search @myrmidon/cadmus-preview-pg @myrmidon/cadmus-preview-ui @myrmidon/cadmus-profile-core @myrmidon/cadmus-thesaurus-store @myrmidon/cadmus-profile-editor @myrmidon/cadmus-profile-import @myrmidon/cadmus-text-segment @myrmidon/cadmus-ui-history @myrmidon/cadmus-ui-diff @myrmidon/timeline-view jsondiffpatch
 
 pnpm i @myrmidon/cadmus-part-general-pg @myrmidon/cadmus-part-general-ui @myrmidon/cadmus-part-philology-pg @myrmidon/cadmus-part-philology-ui
 
@@ -329,14 +329,22 @@ This step is essential to let the frontend find the server, while allowing us to
   window.__env.thesImportEnabled = true;
   // enable item metadata builders in item editor
   window.__env.hasMetadataBuilders = true;
+  // enable history
+  window.__env.historyEnabled = true;
+
   // context help for part/fragment editors: URL template with placeholders
   // {typeId}, {roleId}, {frRoleId}, {separator}, and optional [...] groups
-  // window.__env.helpUrlTemplate =
-  //   "https://www.mysite.com/help/topics/{typeId}{separator}{roleId}{separator}{frRoleId}.html";
+  window.__env.helpUrlTemplate = [
+    // TODO: add your project-specific or language-specific help here to override default
+    // the default fallback help
+    "https://vedph.github.io/cadmus-help[-{language}]/parts/{typeId}{separator}{roleId}{separator}{frRoleId}.html",
+  ];
+
   // separator for {separator} (default: __)
   // window.__env.helpUrlSeparator = "__";
   // set to false to skip checking page availability (e.g. when CORS is not allowed)
-  // window.__env.helpUrlCheck = true;
+  window.__env.helpUrlCheck = true;
+
   // UI branding: staging, dev, production (default)
   window.__env.branding = "production";
 })(this);
@@ -884,9 +892,9 @@ export class App {
 (4) in `app.html` (or `app.component.html`) change the class of the `mat-toolbar`:
 
 ```html
-  <mat-toolbar
-    class="env-branded-toolbar"
-    [style.--app-env-color]="branding().bg"
-    [style.--app-env-on-color]="branding().text"
-  >
+<mat-toolbar
+  class="env-branded-toolbar"
+  [style.--app-env-color]="branding().bg"
+  [style.--app-env-on-color]="branding().text"
+></mat-toolbar>
 ```
