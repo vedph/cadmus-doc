@@ -7,7 +7,9 @@ nav_order: 3
 
 # Setup Pleiades
 
-To setup Pleiades lookup and search, you need to add the Pleiades API service to the backend stack (unless you plan to host it elsewhere) and then simply configure the frontend app similarly to any other API lookup.
+To setup [Pleiades](https://pleiades.stoa.org) lookup and search, you need to add the Pleiades API service to the backend stack (unless you plan to host it elsewhere) and then simply configure the frontend app similarly to any other API lookup.
+
+The Pleiades project integrated in Cadmus (but also usable as a standalone resource) contains the logic to import the downloadable JSON document with all data into a GIS-enabled Postgis database and an API to support lookup and extensive search.
 
 ## Backend
 
